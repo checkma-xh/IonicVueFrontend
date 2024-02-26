@@ -10,7 +10,7 @@
     </ion-toolbar>
   </ion-header>
   <ion-toolbar>
-    <search-bar></search-bar>
+    <modal-search-bar></modal-search-bar>
   </ion-toolbar>
   <ion-content class="ion-padding"></ion-content>
 </template>
@@ -24,7 +24,7 @@ import {
   IonButton,
   modalController,
 } from "@ionic/vue";
-import SearchBar from "./SearchBar.vue";
+import ModalSearchBar from "./ModalSearchBar.vue";
 
 const cancel = () => modalController.dismiss(null, "cancel");
 const confirm = () => modalController.dismiss(null, "confirm");

@@ -29,14 +29,19 @@ const content = defineModel("content", {
 </script>
 
 <template>
-  <ion-button
+  <ion-button fill="clear"
     ><ion-card :color="color">
       <ion-card-header>
         <ion-card-title>{{ title }}</ion-card-title>
-        <ion-card-subtitle>{{ subtitle }}</ion-card-subtitle>
+        <ion-card-subtitle>
+          {{ subtitle }}
+        </ion-card-subtitle>
       </ion-card-header>
       <ion-card-content>{{ content }}</ion-card-content>
       <!-- <ion-icon :icon="icon"></ion-icon> -->
     </ion-card>
   </ion-button>
 </template>
+
+<style scoped>
+</style>

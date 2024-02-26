@@ -7,8 +7,9 @@
     placeholder="Search"
     expand="block"
     label-placement="floating"
+    @ionBlur="handleBlur"
   ></ion-searchbar>
-  <ion-button @click="setFocus">Click to set focus</ion-button>
+
   <ion-list>
     <ion-item v-for="(value, index) in results" :key="index">
       <ion-label>{{ value }}</ion-label>
@@ -17,13 +18,13 @@
 </template>
 
 <script setup lang="ts">
+import { IonSearchbar } from "@ionic/vue";
 import { ref, Ref } from "vue";
 
 const searchBarRef = ref();
 const data = ["apple", "banana", "peach"];
 const results: Ref<string[]> = ref<string[]>([]);
-
-const handleInput = (event: InputEvent) => {
+const handleInput = (event: any) => {
   const query = (event.target as HTMLInputElement).value.toLowerCase();
   if (query == "" || query == null || query == undefined) {
     results.value = [];
@@ -34,19 +35,12 @@ const handleInput = (event: InputEvent) => {
   }
 };
 
-function setFocus() {
+// 设置聚焦
+let setFocus = setTimeout(function fun() {
   searchBarRef.value.$el.setFocus();
-}
-
-// onMounted(() => {
-//   if (searchBarRef.value) {
-//     requestAnimationFrame(() => {
-//     query.value = "ok but...";
-//     setFocus();
-//     query.value = "ok";
-//     });
-//   } else {
-//     query.value = "no";
-//   }
-// });
+  setFocus = setTimeout(fun, 1000);
+}, 100);
+const handleBlur = () => {
+  clearTimeout(setFocus);
+};
 </script>

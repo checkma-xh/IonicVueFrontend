@@ -2,25 +2,22 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-title>home</ion-title>
+        <ion-title>auth</ion-title>
       </ion-toolbar>
     </ion-header>
 
     <ion-content :fullscreen="true">
       <ion-header collapse="condense">
         <ion-toolbar>
-          <ion-title size="large">home</ion-title>
+          <ion-title size="large">auth</ion-title>
         </ion-toolbar>
       </ion-header>
 
       <div id="container">
-        <div><hom-search-bar></hom-search-bar></div>
-        <completed-module></completed-module>
-        <unfinished-module></unfinished-module>
-        <trash-module></trash-module>
-        <plans-module></plans-module>
-        <groups-module></groups-module>
-        <create-module></create-module>
+        <register-module></register-module>
+        <login-module></login-module>
+        <logout-module></logout-module>
+        <deactivate-module></deactivate-module>
       </div>
     </ion-content>
   </ion-page>
@@ -34,13 +31,10 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/vue";
-import HomSearchBar from "@/components/HomeSearchBar.vue";
-import CompletedModule from "@/components/CompletedModule.vue";
-import UnfinishedModule from "@/components/UnfinishedModule.vue";
-import TrashModule from "@/components/TrashModule.vue";
-import PlansModule from "@/components/PlansModule.vue";
-import GroupsModule from "@/components/GroupsModule.vue";
-import CreateModule from "@/components/CreateModule.vue";
+import RegisterModule from "@/components/RegisterModule.vue";
+import LoginModule from "@/components/LoginModule.vue";
+import LogoutModule from "@/components/LogoutModule.vue";
+import DeactivateModule from "@/components/DeactivateModule.vue";
 </script>
 
 <style scoped>
