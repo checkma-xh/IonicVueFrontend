@@ -14,7 +14,7 @@
       </ion-header>
 
       <div id="container">
-        <search-button></search-button>
+        <search-bar2></search-bar2>
         <search-bar></search-bar>
         <functional-module
           v-for="(value, index) of functionalModules"
@@ -41,7 +41,7 @@ import {
 import FunctionalModule from "../components/FunctionalModule.vue";
 import { reactive } from "vue";
 import { addCircleOutline } from "ionicons/icons";
-import SearchButton from "../components/SearchButton.vue";
+import SearchBar2 from "../components/SearchBar2.vue";
 import SearchBar from "../components/SearchBar.vue";
 
 const functionalModules = reactive({
