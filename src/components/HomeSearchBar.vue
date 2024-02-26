@@ -19,3 +19,5 @@ const openModal = async () => {
   modal.present();
 };
 </script>
+
+<style scoped></style>
