@@ -14,64 +14,73 @@
       </ion-header>
 
       <div id="container">
+        <ion-chip>
+          <ion-avatar>
+            <img
+              alt="Silhouette of a person's head"
+              :src="avatarPhoto?.webviewPath"
+              @click="takePhoto"
+            />
+          </ion-avatar>
+          <ion-label>{{ name }}</ion-label>
+        </ion-chip>
         <ion-list>
+          <ion-input
+            label="name"
+            label-placement="floating"
+            helper-text="please input name"
+            :clear-input="true"
+            :counter="true"
+            :maxlength="64"
+            fill="outline"
+            v-model="name"
+          >
+          </ion-input>
 
-            <ion-input
-              label="name"
-              label-placement="floating"
-              helper-text="please input name"
-              :clear-input="true"
-              :counter="true"
-              :maxlength="64"
-              fill="outline"
-            >
-            </ion-input>
+          <ion-input
+            label="account"
+            :clear-input="true"
+            label-placement="floating"
+            helper-text="please input account"
+            :counter="true"
+            :maxlength="64"
+            fill="outline"
+          >
+          </ion-input>
 
-            <ion-input
-              label="account"
-              :clear-input="true"
-              label-placement="floating"
-              helper-text="please input account"
-              :counter="true"
-              :maxlength="64"
-              fill="outline"
-            >
-            </ion-input>
+          <ion-input
+            label="password"
+            :clear-input="true"
+            label-placement="floating"
+            helper-text="please input password"
+            type="password"
+            :counter="true"
+            :maxlength="64"
+            fill="outline"
+          >
+          </ion-input>
 
-            <ion-input
-              label="password"
-              :clear-input="true"
-              label-placement="floating"
-              helper-text="please input password"
-              type="password"
-              :counter="true"
-              :maxlength="64"
-              fill="outline"
-            >
-            </ion-input>
+          <ion-input
+            label="confirm password"
+            :clear-input="true"
+            label-placement="floating"
+            helper-text="confirm password"
+            type="password"
+            :counter="true"
+            :maxlength="64"
+            fill="outline"
+          >
+          </ion-input>
 
-            <ion-input
-              label="confirm password"
-              :clear-input="true"
-              label-placement="floating"
-              helper-text="confirm password"
-              type="password"
-              :counter="true"
-              :maxlength="64"
-              fill="outline"
-            >
-            </ion-input>
-
-            <ion-textarea
-              label="remark"
-              label-placement="floating"
-              helper-text="please input remark"
-              :counter="true"
-              :maxlength="64"
-              fill="outline"
-            >
-            </ion-textarea>
-
+          <ion-textarea
+            label="remark"
+            label-placement="floating"
+            helper-text="please input remark"
+            :counter="true"
+            :maxlength="64"
+            fill="outline"
+          >
+          </ion-textarea>
         </ion-list>
       </div>
     </ion-content>
@@ -88,14 +97,24 @@ import {
   IonInput,
   IonList,
   IonTextarea,
+  IonChip,
+  IonAvatar,
 } from "@ionic/vue";
+import { ref } from "vue";
+import { takePhoto, avatarPhoto } from "../utils/usePhotoGallery";
+const name = ref();
 </script>
 
 <style scoped>
-ion-input{
-  margin-bottom: 1%;
+#container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1%;
 }
-ion-list{
-  margin: 1%;
+#container ion-input,
+ion-textarea {
+  margin-top: 6%;
 }
 </style>
