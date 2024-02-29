@@ -4,68 +4,72 @@ import {
   CameraSource,
   Photo,
 } from "@capacitor/camera";
-import { ref } from "vue";
+import { onMounted } from "vue";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 
-// 定义头像类
-export interface Avatar {
-  filepath: string;
-  webviewPath?: string;
-}
+// 定义头像文件常量
+export const AVATAR_FILENAME = "userAvatar";
 
-// 头像文件
-export const avatarPhoto = ref<Avatar>({
-  filepath: "",
-  webviewPath: "https://ionicframework.com/docs/img/demos/avatar.svg",
-});
-
-// 辅助函数, 文件转 Base64 数据
-export async function convertBlobToBase64(blob: Blob) {
-  new Promise((resolve, reject) => {
+// 文件转 Base64 数据
+export function convertBlobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = reject;
     reader.onload = () => {
-      resolve(reader.result);
+      resolve(reader.result as string);
     };
     reader.readAsDataURL(blob);
   });
 }
 
 // 保存图片
-export async function savedFileImage(photo: Photo, fileName: string) {
-  const response = await fetch(photo.webPath!);
-  const blob = await response.blob();
-  const base64Data = await convertBlobToBase64(blob);
+export async function savePhoto(photo: Photo, filepath: string) {
+  try {
+    const response = await fetch(photo.webPath!);
+    const blob = await response.blob();
+    const base64Data = await convertBlobToBase64(blob);
 
-  Filesystem.writeFile({
-    path: fileName,
-    data: String(base64Data),
-    directory: Directory.Data,
-  });
-
-  return {
-    filepath: fileName,
-    webviewPath: photo.webPath,
-  };
+    await Filesystem.writeFile({
+      path: filepath,
+      data: base64Data.toString(),
+      directory: Directory.Data,
+    });
+    return true;
+  } catch (error) {
+    console.error("Unable to save photo:", error);
+    return false;
+  }
 }
 
 // 加载图片
-export async function loadFileImage(fileName: string): Promise<string | null> {
-  const file = await Filesystem.readFile({
-    path: fileName,
-    directory: Directory.Data,
-  });
-  // 将文件内容转换为 base64 格式的数据 URI
-  const base64DataUri = `data:image/jpeg;base64,${file.data}`;
-  return base64DataUri;
+export async function loadPhoto(filepath: string) {
+  try {
+    const photo = await Filesystem.readFile({
+      path: filepath,
+      directory: Directory.Data,
+    });
+    return photo;
+  } catch (error) {
+    console.error("Unable to load photo:", error);
+    return null;
+  }
 }
 
 // 获取照片: 拍照, 选择图库照片
-export const takePhoto = async (): Promise<void> => {
-  const photo = await Camera.getPhoto({
-    resultType: CameraResultType.Uri,
-    source: CameraSource.Camera,
-    quality: 100,
-  });
-  avatarPhoto.value = await savedFileImage(photo, "avatar.jpeg");
-};
+export async function takePhoto() {
+  try {
+    const photo = await Camera.getPhoto({
+      resultType: CameraResultType.Uri,
+      source: CameraSource.Camera,
+      quality: 100,
+    });
+    return photo;
+  } catch (error) {
+    console.error("Unable to take photo:", error);
+    return null;
+  }
+}
+
+onMounted(async () => {
+  await loadPhoto(AVATAR_FILENAME);
+});

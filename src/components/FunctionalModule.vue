@@ -1,3 +1,21 @@
+<template>
+  <div class="ion-activatable" @click="handleClick()">
+    <ion-card :color="color">
+      <ion-icon
+        alt="Silhouette of mountains"
+        :icon="icon"
+        class="large-icon"
+      ></ion-icon>
+      <ion-card-header>
+        <ion-card-title>{{ title }}</ion-card-title>
+        <ion-card-subtitle>{{ subtitle }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>{{ content }}</ion-card-content>
+      <ion-ripple-effect></ion-ripple-effect>
+    </ion-card>
+  </div>
+</template>
+
 <script setup lang="ts">
 import {
   IonCard,
@@ -7,6 +25,10 @@ import {
   IonCardTitle,
 } from "@ionic/vue";
 
+const handleClick = defineModel("handleClick", {
+  type: Function,
+  required: true,
+});
 const icon = defineModel("icon", {
   required: true,
 });
@@ -28,20 +50,9 @@ const content = defineModel("content", {
 });
 </script>
 
-<template>
-  <ion-button fill="clear"
-    ><ion-card :color="color">
-      <ion-card-header>
-        <ion-card-title>{{ title }}</ion-card-title>
-        <ion-card-subtitle>
-          {{ subtitle }}
-        </ion-card-subtitle>
-      </ion-card-header>
-      <ion-card-content>{{ content }}</ion-card-content>
-      <!-- <ion-icon :icon="icon"></ion-icon> -->
-    </ion-card>
-  </ion-button>
-</template>
-
 <style scoped>
+.large-icon {
+  font-size: 200%;
+  margin-top: 5%;
+}
 </style>
