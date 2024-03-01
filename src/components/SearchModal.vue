@@ -9,10 +9,9 @@
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
-  <ion-toolbar>
+  <ion-content class="ion-padding">
     <search-bar></search-bar>
-  </ion-toolbar>
-  <ion-content class="ion-padding"></ion-content>
+  </ion-content>
 </template>
 
 <script setup lang="ts">

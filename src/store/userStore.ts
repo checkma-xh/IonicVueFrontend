@@ -5,23 +5,25 @@ export const useUserStore = defineStore(
   "userStore",
   () => {
     let currentUser = reactive({
-      email: "",
+      email: "checkma_xh@outlook.com",
       passwordHash: "",
-      avatarUrl: "https://ionicframework.com/docs/img/demos/avatar.svg",
+      avatarUrl: "/src/assets/icons/avatar.svg",
       activated: false,
     });
     let accessToken = ref();
     let refreshToken = ref();
+    let islogin = ref(false);
 
     async function reset() {
       currentUser = reactive({
         email: "",
         passwordHash: "",
-        avatarUrl: "https://ionicframework.com/docs/img/demos/avatar.svg",
+        avatarUrl: "/src/assets/icons/avatar.svg",
         activated: false,
       });
       accessToken = ref();
       refreshToken = ref();
+      islogin = ref(false);
       await nextTick();
     }
 
@@ -29,6 +31,7 @@ export const useUserStore = defineStore(
       currentUser,
       accessToken,
       refreshToken,
+      islogin,
       reset,
     };
   },

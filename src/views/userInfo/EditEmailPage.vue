@@ -6,7 +6,7 @@
       </ion-toolbar>
     </ion-header>
 
-    <ion-content :fullscreen="true">
+    <ion-content :fullscreen="true" class="ion-padding">
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">deactivate</ion-title>
@@ -257,4 +257,3 @@ async function editEmail() {
   width: 100%;
 }
 </style>
-@/stores/userStore@/store/userStore

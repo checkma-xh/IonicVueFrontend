@@ -1,3 +1,4 @@
+import router from "@/router";
 import {
   logInOutline,
   logOutOutline,
@@ -8,7 +9,7 @@ import {
 export const moduleMessages = {
   registerModuleStyle: {
     handleClick: () => {
-      alert("register");
+      router.push({ name: "Register" });
     },
     icon: personAddOutline,
     color: "tertiary",
@@ -18,7 +19,7 @@ export const moduleMessages = {
   },
   loginModuleStyle: {
     handleClick: () => {
-      alert("login");
+      router.push({ name: "Login" });
     },
     icon: logInOutline,
     color: "success",
@@ -38,7 +39,7 @@ export const moduleMessages = {
   },
   deactivateModuleStyle: {
     handleClick: () => {
-      alert("deactivate");
+      router.push({ name: "Deactivate" });
     },
     icon: personRemoveOutline,
     color: "danger",

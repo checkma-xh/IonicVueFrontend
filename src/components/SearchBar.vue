@@ -40,14 +40,8 @@
         <ion-icon :icon="closeOutline"></ion-icon>
       </ion-button>
     </ion-item>
-
-    <ion-button class="centered-button" @click="handleClear">
-      clear
-    </ion-button>
   </ion-list>
-  <ion-infinite-scroll>
-    <ion-infinite-scroll-content></ion-infinite-scroll-content>
-  </ion-infinite-scroll>
+  <ion-button class="centered-button" @click="handleClear"> clear </ion-button>
 </template>
 
 <script setup lang="ts">
@@ -59,14 +53,7 @@ import {
   clearSearchHistory,
   deleteSearchHistory,
 } from "@/utils/useSearchHistory";
-import {
-  IonSearchbar,
-  IonInfiniteScroll,
-  IonInfiniteScrollContent,
-  IonList,
-  IonItem,
-  IonLabel,
-} from "@ionic/vue";
+import { IonSearchbar, IonList, IonItem, IonLabel } from "@ionic/vue";
 import { closeOutline } from "ionicons/icons";
 import { onMounted, ref, Ref } from "vue";
 

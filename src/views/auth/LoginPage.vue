@@ -6,154 +6,137 @@
       </ion-toolbar>
     </ion-header>
 
-    <ion-content :fullscreen="true">
+    <ion-content :fullscreen="true" class="ion-padding">
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">login</ion-title>
         </ion-toolbar>
       </ion-header>
 
-      <div id="container">
+      <div id="container" v-if="!verify">
         <ion-list>
-          <ion-input
-            ref="emailRef"
-            type="email"
-            label="Email"
-            label-placement="floating"
-            helper-text="Enter a valid email"
+          <functional-input
+            inputType="email"
             v-model="email"
-            fill="solid"
-            :required="true"
-            @ionInput="validateEmail"
-            @ionBlur="markTouched"
-            error-text="Invalid email"
-          ></ion-input>
-
-          <ion-input
-            ref="passwordRef"
-            type="password"
-            label="Password"
-            label-placement="floating"
-            helper-text="Input your password"
-            :counter="true"
-            :maxlength="64"
-            :minlength="8"
+          ></functional-input>
+          <functional-input
+            inputType="password"
             v-model="password"
-            fill="solid"
-            :required="true"
-            error-text="Password can only contain numbers, letters, and special symbols"
-          ></ion-input>
-
-          <ion-button @click="login" id="login-alert"> login </ion-button>
+          ></functional-input>
+          <ion-button @click.stop="login" id="login-alert">login</ion-button>
+          <ion-button @click.stop="codeLogin">code login</ion-button>
+          <ion-alert
+            trigger="login-alert"
+            :header="alertHeader"
+            :sub-header="alertSubHeader"
+            :message="alertMessage"
+            :buttons="alertButtons"
+          ></ion-alert>
         </ion-list>
-        <ion-alert
-          trigger="login-alert"
-          :header="alertHeaderRef"
-          :sub-header="alertSubHeaderRef"
-          :message="alertMessageRef"
-          :buttons="alertButtons"
-        ></ion-alert>
+      </div>
+
+      <div id="container" v-else>
+        <ion-list>
+          <verify-module
+            v-model:code="code"
+            :avatarUrl="avatarUrl"
+            :email="email"
+            :handleVerify="handleVerify"
+          ></verify-module>
+        </ion-list>
       </div>
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
-import router from "@/router";
 import {
   IonPage,
   IonHeader,
   IonToolbar,
   IonTitle,
   IonContent,
-  IonInput,
   IonList,
-  IonButton,
 } from "@ionic/vue";
-import { ref } from "vue";
+import FunctionalInput from "@/components/FunctionalInput.vue";
+import { onMounted, ref } from "vue";
+import router from "@/router";
+import { codeFormat, emailFormat, passwordFormat } from "@/utils/useTextFormat";
+import VerifyModule from "@/components/VerifyModule.vue";
+import { useUserStore } from "@/store/userStore";
+
+const userStore = useUserStore();
+const alertHeader = ref("wrong format");
+const alertSubHeader = ref("wrong format");
+const alertMessage = ref("wrong format");
+const email = ref();
+const password = ref();
+const code = ref();
+const verify = ref();
+const avatarUrl = ref("/src/assets/icons/avatar.svg");
 
 let alertButtons = [
   {
-    text: "Confirm",
+    text: "confirm",
     role: "confirm",
     handler: () => {
       return;
     },
   },
 ];
-const alertHeaderRef = ref();
-const alertSubHeaderRef = ref();
-const alertMessageRef = ref();
-const email = ref("checkma_xh@outlook.com");
-const password = ref("Wlj+=9351524");
-const emailRef = ref();
-const passwordRef = ref();
-
-function validateEmail() {
-  emailRef.value.$el.classList.remove("ion-valid");
-  emailRef.value.$el.classList.remove("ion-invalid");
-
-  if (
-    /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(
-      email.value
-    )
-  ) {
-    emailRef.value.$el.classList.add("ion-valid");
-    return true;
-  } else {
-    emailRef.value.$el.classList.add("ion-invalid");
-    return false;
-  }
-}
-
-function markTouched() {
-  emailRef.value.$el.classList.add("ion-touched");
-}
-
-function validatePassword() {
-  return (
-    /[a-zA-Z0-9`~!@#$%^&*()_\-+={}[\]\\|:;"',<>.?]{8,64}/.test(
-      password.value
-    ) &&
-    /\d+/.test(password.value) &&
-    /[a-zA-Z]+/.test(password.value)
-  );
-}
 
 async function login() {
-  alertButtons = [
-    {
-      text: "Confirm",
-      role: "confirm",
-      handler: () => {
-        return;
+  if (!emailFormat(email.value) || !passwordFormat(password.value)) {
+    alertSubHeader.value = "wrong format";
+    alertHeader.value = "wrong format";
+    alertMessage.value = "wrong format";
+    alertButtons = [
+      {
+        text: "confirm",
+        role: "confirm",
+        handler: () => {
+          return;
+        },
       },
-    },
-  ];
-  if (!validateEmail()) {
-    alertSubHeaderRef.value = "Email format is incorrect";
-    alertHeaderRef.value = "Email format is incorrect";
-    alertSubHeaderRef.value = "Email format is incorrect";
-    return;
-  } else if (!validatePassword()) {
-    alertSubHeaderRef.value = "Password format is incorrect";
-    alertHeaderRef.value = "Password format is incorrect";
-    alertSubHeaderRef.value = "Password format is incorrect";
+    ];
     return;
   }
-  alertSubHeaderRef.value = "Login success";
-  alertHeaderRef.value = "Login success";
-  alertSubHeaderRef.value = "Login success";
+  alertSubHeader.value = "success";
+  alertHeader.value = "success";
+  alertMessage.value = "success";
   alertButtons = [
     {
-      text: "Confirm",
+      text: "confirm",
       role: "confirm",
       handler: () => {
         router.push({ name: "PlansManagement" });
       },
     },
   ];
+  userStore.islogin = true;
 }
+
+async function codeLogin() {
+  if (!emailFormat(email.value)) {
+    alert("wrong format");
+    return;
+  }
+  verify.value = true;
+  userStore.islogin = true;
+}
+
+async function handleVerify() {
+  if (!codeFormat(code.value)) {
+    alert("wrong format");
+    return;
+  }
+  alert("success");
+  router.push({ name: "PlansManagement" });
+}
+
+onMounted(() => {
+  verify.value = false;
+});
 </script>
 
 <style scoped>
@@ -162,16 +145,21 @@ async function login() {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin-top: auto;
+  margin-left: 1%;
+  margin-right: 1%;
+}
+
+#container ion-list {
+  width: 100%;
+}
+
+#container ion-input {
   margin-top: 1%;
 }
-#container ion-list {
-  width: 300px;
-}
-#container ion-input {
-  margin-top: 6%;
-}
+
 #container ion-button {
-  margin-top: 6%;
-  width: 100%;
+  display: block;
+  margin-top: 1%;
 }
 </style>

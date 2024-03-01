@@ -6,7 +6,7 @@
       </ion-toolbar>
     </ion-header>
 
-    <ion-content :fullscreen="true">
+    <ion-content :fullscreen="true" class="ion-padding">
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">register</ion-title>
@@ -14,90 +14,40 @@
       </ion-header>
 
       <div id="container">
-        <ion-chip>
-          <ion-avatar>
-            <img
-              alt="Silhouette of a person's head"
-              :src="photo.webPath"
-              @click="takePhoto"
-            />
-          </ion-avatar>
-          <ion-label>{{ email }}</ion-label>
-        </ion-chip>
         <ion-list>
-          <ion-input
-            ref="emailRef"
-            type="email"
-            label="Email"
-            label-placement="floating"
-            helper-text="Enter a valid email"
-            :counter="true"
-            :maxlength="64"
-            :minlength="4"
+          <ion-chip>
+            <ion-avatar>
+              <img
+                alt="Silhouette of a person's head"
+                :src="avatarWebPath"
+                @click="takeAvatar"
+              />
+            </ion-avatar>
+            <ion-label>{{ email }}</ion-label>
+          </ion-chip>
+          <functional-input
+            inputType="email"
             v-model="email"
-            fill="solid"
-            :required="true"
-            @ionInput="validateEmail"
-            @ionBlur="markTouched"
-            error-text="Invalid email"
-          ></ion-input>
-
-          <ion-input
-            ref="passwordRef"
-            type="password"
-            label="Password"
-            label-placement="floating"
-            helper-text="Input your password"
-            :counter="true"
-            :maxlength="64"
-            :minlength="8"
+          ></functional-input>
+          <functional-input
+            inputType="password"
             v-model="password"
-            fill="solid"
-            :required="true"
-            :ionBlur="validatePassword"
-            error-text="Password can only contain numbers, letters, and special symbols"
-          ></ion-input>
-
-          <ion-input
-            ref="confirmPasswordRef"
-            type="password"
-            label="Confirm password"
-            label-placement="floating"
-            helper-text="Confirm password"
-            :counter="true"
-            :maxlength="64"
-            :minlength="8"
+          ></functional-input>
+          <functional-input
+            inputType="password"
             v-model="confirmPassword"
-            fill="solid"
-            :required="true"
-            error-text="Passwords are inconsistent"
-          ></ion-input>
-
-          <ion-input
-            ref="verificationCodeRef"
-            type="text"
-            label="Verification code"
-            label-placement="floating"
-            helper-text="Confirm verification code"
-            v-model="verificationCode"
-            fill="solid"
-            :required="true"
-            :counter="true"
-            :maxlength="4"
-            :minlength="4"
-            error-text="Verification code is incorrect"
-          ></ion-input>
+          ></functional-input>
           <ion-button @click="register" id="register-alert">
             register
           </ion-button>
+          <ion-alert
+            trigger="register-alert"
+            :header="alertHeader"
+            :sub-header="alertSubHeader"
+            :message="alertMessage"
+            :buttons="alertButtons"
+          ></ion-alert>
         </ion-list>
-        <ion-alert
-          trigger="register-alert"
-          :header="alertHeaderRef"
-          :sub-header="alertSubHeaderRef"
-          :message="alertMessageRef"
-          :buttons="alertButtons"
-        ></ion-alert>
       </div>
     </ion-content>
   </ion-page>
@@ -110,24 +60,37 @@ import {
   IonToolbar,
   IonTitle,
   IonContent,
-  IonInput,
   IonList,
   IonChip,
   IonAvatar,
   IonAlert,
 } from "@ionic/vue";
-import { ref } from "vue";
-import router from "@/router";
+import FunctionalInput from "@/components/FunctionalInput.vue";
 import {
-  Camera,
-  CameraResultType,
-  CameraSource,
-  Photo,
-} from "@capacitor/camera";
+  takePhoto,
+  savePhoto,
+  AVATAR_FILENAME,
+  loadPhoto,
+} from "@/utils/usePhotoGallery";
+import { ref } from "vue";
+import { emailFormat, passwordFormat } from "@/utils/useTextFormat";
+import router from "@/router";
+import { useUserStore } from "@/store/userStore";
+
+const userStore = useUserStore();
+const currentUser = userStore.currentUser;
+const avatarWebPath = ref("/src/assets/icons/avatar.svg");
+const avatar = ref();
+const email = ref("checkma_xh@outlook.com");
+const password = ref("Wlj+=9351524");
+const confirmPassword = ref("Wlj+=9351524");
+const alertHeader = ref("wrong format");
+const alertSubHeader = ref("wrong format");
+const alertMessage = ref("wrong format");
 
 let alertButtons = [
   {
-    text: "Confirm",
+    text: "confirm",
     role: "confirm",
     handler: () => {
       return;
@@ -135,116 +98,50 @@ let alertButtons = [
   },
 ];
 
-const alertHeaderRef = ref();
-const alertSubHeaderRef = ref();
-const alertMessageRef = ref();
-const email = ref("checkmaxh@gmail.com");
-const password = ref("Wlj+=9351524");
-const confirmPassword = ref("Wlj+=9351524");
-const verificationCode = ref("2222");
-const emailRef = ref();
-const passwordRef = ref();
-const confirmPasswordRef = ref();
-const verificationCodeRef = ref();
-
-// 初始化照片
-const photo = ref<Photo>({
-  webPath: "https://ionicframework.com/docs/img/demos/avatar.svg",
-  format: "",
-  saved: false,
-});
-
-// 选择照片
-async function takePhoto() {
-  photo.value = await Camera.getPhoto({
-    resultType: CameraResultType.Uri,
-    source: CameraSource.Camera,
-    quality: 100,
-  });
-}
-
-function validateEmail() {
-  emailRef.value.$el.classList.remove("ion-valid");
-  emailRef.value.$el.classList.remove("ion-invalid");
-
-  if (
-    /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(
-      email.value
-    )
-  ) {
-    emailRef.value.$el.classList.add("ion-valid");
-    return true;
-  } else {
-    emailRef.value.$el.classList.add("ion-invalid");
-    return false;
+async function takeAvatar() {
+  avatar.value = await takePhoto();
+  if (avatar.value) {
+    avatarWebPath.value = avatar.value.webPath!;
   }
-}
-
-function markTouched() {
-  emailRef.value.$el.classList.add("ion-touched");
-}
-
-function validatePassword() {
-  return (
-    /[a-zA-Z0-9`~!@#$%^&*()_\-+={}[\]\\|:;"',<>.?]{8,64}/.test(
-      password.value
-    ) &&
-    /\d+/.test(password.value) &&
-    /[a-zA-Z]+/.test(password.value)
-  );
-}
-
-function validateConfirmPassword() {
-  return password.value === confirmPassword.value;
-}
-
-function validateVerificationCode() {
-  return verificationCode.value === "2222";
 }
 
 async function register() {
-  alertButtons = [
-    {
-      text: "Confirm",
-      role: "confirm",
-      handler: () => {
-        return;
+  if (
+    !emailFormat(email.value) ||
+    !passwordFormat(password.value) ||
+    password.value != confirmPassword.value
+  ) {
+    alertSubHeader.value = "wrong format";
+    alertHeader.value = "wrong format";
+    alertMessage.value = "wrong format";
+    alertButtons = [
+      {
+        text: "confirm",
+        role: "confirm",
+        handler: () => {
+          return;
+        },
       },
-    },
-  ];
-  if (!validateEmail()) {
-    alertSubHeaderRef.value = "Email format is incorrect";
-    alertHeaderRef.value = "Email format is incorrect";
-    alertSubHeaderRef.value = "Email format is incorrect";
-    return;
-  } else if (!validatePassword()) {
-    alertSubHeaderRef.value = "Password format is incorrect";
-    alertHeaderRef.value = "Password format is incorrect";
-    alertSubHeaderRef.value = "Password format is incorrect";
-    return;
-  } else if (!validateConfirmPassword()) {
-    alertSubHeaderRef.value = "Passwords are inconsistent";
-    alertHeaderRef.value = "Passwords are inconsistent";
-    alertSubHeaderRef.value = "Passwords are inconsistent";
-    return;
-  } else if (!validateVerificationCode()) {
-    alertSubHeaderRef.value = "Verification code error";
-    alertHeaderRef.value = "Verification code error";
-    alertSubHeaderRef.value = "Verification code error";
+    ];
     return;
   }
-  alertSubHeaderRef.value = "Registration success";
-  alertHeaderRef.value = "Registration success";
-  alertSubHeaderRef.value = "Registration success";
+  alertSubHeader.value = "success";
+  alertHeader.value = "success";
+  alertMessage.value = "success";
   alertButtons = [
     {
-      text: "Confirm",
+      text: "confirm",
       role: "confirm",
       handler: () => {
         router.push({ name: "Login" });
       },
     },
   ];
+  await savePhoto(avatar.value, AVATAR_FILENAME);
+  avatar.value = await loadPhoto(AVATAR_FILENAME);
+  if (avatar.value) {
+    currentUser.avatarUrl = `data:image/jpeg;base64,${avatar.value.data}`;
+  }
 }
 </script>
 
@@ -254,16 +151,29 @@ async function register() {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin-left: 1%;
+  margin-right: 1%;
+}
+
+#container ion-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#container ion-input {
   margin-top: 1%;
 }
-#container ion-list {
-  width: 300px;
-}
-#container ion-input {
-  margin-top: 6%;
-}
+
 #container ion-button {
-  margin-top: 6%;
+  margin-top: 1%;
   width: 100%;
+}
+
+#container ion-chip {
+  margin-top: 1%;
+  margin-bottom: 0%;
 }
 </style>

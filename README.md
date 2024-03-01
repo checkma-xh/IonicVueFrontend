@@ -12,7 +12,6 @@
 8. 云同步：(Redis、MySQL)
 9. 白天夜晚主题
 
-
 ### plan-management 计划管理模块
 
 ```javascript
@@ -21,11 +20,11 @@ POST    /plan-management/users/<int:id>/plans          # 新建计划
 {
 	name              : string,
 	remark            : string,
-	group_name        : string,
-	repeat_name       : string,
-	priority_name     : string,
-	start_datetime    : string,
-	end_datetime      : string,
+	groupName         : string,
+	repeatName        : string,
+	priorityName      : string,
+	startDatetime     : string,
+	endDatetime       : string,
 }
 PATCH   /plan-management/users/<int:id>/plans/<int:id> # 更新计划状态
 {
@@ -36,11 +35,11 @@ PATCH   /plan-management/users/<int:id>/plans/<int:id> # 更新计划设置
 {
 	name              : string,
 	remark            : string,
-	group_name        : string,
-	repeat_name       : string,
-	priority_name     : string,
-	start_datetime    : string,
-	end_datetime      : string,
+	groupName         : string,
+	repeatName        : string,
+	priorityName      : string,
+	startDatetime     : string,
+	endDatetime       : string,
 }
 POST    /plan-management/users/<int:id>/groups   # 新建分组
 {
@@ -53,44 +52,30 @@ PATHCH  /plan-management/users/<int:id>/groups   # 更新分组
 	name   : string,
 	remark : string,
 }
-```
-
-### plan-analysis 计划分析模块
-
-```javascript
-plan_info
-GET     /plan-analysis/users/<int:id>/plans?deleted=<bool>
-GET     /plan-analysis/users/<int:id>/plans?group-name=<string>
-GET     /plan-analysis/users/<int:id>/plans?start-datetime=<string>&end-datetime=<string> # 查看时间段计划
-GET     /plan-analysis/users/<int:id>/plans?completed=<bool>&deleted=false
+GET     /plan-management/users/<int:id>/plans?deleted=<bool>
+GET     /plan-managements/users/<int:id>/plans?group-name=<string>
+GET     /plan-management/users/<int:id>/plans?start-datetime=<string>&end-datetime=<string> # 查看时间段计划
+GET     /plan-management/users/<int:id>/plans?completed=true&deleted=false
+GET     /plan-management/users/<int:id>/plans?remark=<string>
 ```
 
 ### user-info-management 用户信息管理模块
 
 ```javascript
 user_info
-GET     /userinfo/users/<int:id>
-POST    /userinfo/users
+GET     /user-info/users/<int:id>
+PATCH   /user-info/users/<int:id>/email
 {
-	username : string,
-	account  : string,
+	email    : string,
+}
+PATCH   /user-info/users/<int:id>/password
+{
 	password : string,
+}
+PATCH   /user-info/users/<int:id>/avatar
+{
 	avatar   : file,
-	remark   : string,
 }
-PATCH   /userinfo/users/<int:id>/name
-{
-	name     : string,
-}
-PATCH   /userinfo/users/<int:id>/account
-{
-	account  : string,
-}
-PATCH   /userinfo/users/<int:id>/password
-{
-	password : string,
-}
-DELETE  /userinfo/users/<int:id>
 ```
 
 ### auth 身份验证模块
@@ -99,24 +84,44 @@ DELETE  /userinfo/users/<int:id>
 user_info
 POST    /auth/login
 {
-	account  : string,
+	email    : string,
 	password : string,
+	avatar   : file,
 }
 POST    /auth/refresh
 {
-	refresh_token : string,
+	refreshToken  : string,
 }
 POST    /auth/logout
 {
-	access_token  : string,
+	accessToken   : string,
+}
+POST    /auth/deactivate
+{
+	accessToken   : string,
+}
+POST    /auth/register
+{
+	email    : string,
+	password : string,
+	avatar   : file,
+	verificationCode: string,
+}
+POST    /auth/verification-code/request
+{
+	email    : string,
+}
+POST    /auth/verification-code/verify
+{
+	verificationCode: string,
 }
 ```
 
 ### 用户信息表 user_info
 
-| **id** | **account** | **name** | **password_hash** | **remark** | **avatar_url** |
-| ------------ | ----------------- | -------------- | ----------------------- | ---------------- | -------------------- |
-| bigint       | varchar(64)       | varchar(64)    | varchar(256)            | varchar(64)      | varchar(64)          |
+| **id** | **email** | **password_hash** | **avatar_url** | **activated** |
+| ------------ | --------------- | ----------------------- | -------------------- | ------------------- |
+| bigint       | varchar(64)     | varchar(256)            | varchar(64)          | tinyint             |
 
 ### 计划信息表 plan_info
 

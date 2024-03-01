@@ -28,7 +28,6 @@ export async function savePhoto(photo: Photo, filepath: string) {
     const response = await fetch(photo.webPath!);
     const blob = await response.blob();
     const base64Data = await convertBlobToBase64(blob);
-
     await Filesystem.writeFile({
       path: filepath,
       data: base64Data.toString(),
@@ -37,6 +36,20 @@ export async function savePhoto(photo: Photo, filepath: string) {
     return true;
   } catch (error) {
     console.error("Unable to save photo:", error);
+    return false;
+  }
+}
+
+// 删除照片
+export async function deletePhoto(filepath: string) {
+  try {
+    await Filesystem.deleteFile({
+      path: filepath,
+      directory: Directory.Data,
+    });
+    return true;
+  } catch (error) {
+    console.error("Unable to delete photo:", error);
     return false;
   }
 }
