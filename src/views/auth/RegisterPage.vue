@@ -76,10 +76,11 @@ import { ref } from "vue";
 import { emailFormat, passwordFormat } from "@/utils/useTextFormat";
 import router from "@/router";
 import { useUserStore } from "@/store/userStore";
+import { personCircleOutline } from "ionicons/icons";
 
 const userStore = useUserStore();
 const currentUser = userStore.currentUser;
-const avatarWebPath = ref("/src/assets/icons/avatar.svg");
+const avatarWebPath = ref(personCircleOutline);
 const avatar = ref();
 const email = ref("checkma_xh@outlook.com");
 const password = ref("Wlj+=9351524");

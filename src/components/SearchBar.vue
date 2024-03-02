@@ -40,8 +40,12 @@
         <ion-icon :icon="closeOutline"></ion-icon>
       </ion-button>
     </ion-item>
+    <ion-item>
+      <ion-button class="centered-button" @click="handleClear">
+        clear
+      </ion-button>
+    </ion-item>
   </ion-list>
-  <ion-button class="centered-button" @click="handleClear"> clear </ion-button>
 </template>
 
 <script setup lang="ts">
@@ -123,5 +127,7 @@ onMounted(async () => {
 <style scoped>
 .centered-button {
   display: block;
+  width: 100%;
+  height: 70%;
 }
 </style>

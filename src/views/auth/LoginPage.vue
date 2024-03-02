@@ -64,6 +64,7 @@ import router from "@/router";
 import { codeFormat, emailFormat, passwordFormat } from "@/utils/useTextFormat";
 import VerifyModule from "@/components/VerifyModule.vue";
 import { useUserStore } from "@/store/userStore";
+import { personCircleOutline } from "ionicons/icons";
 
 const userStore = useUserStore();
 const alertHeader = ref("wrong format");
@@ -73,7 +74,7 @@ const email = ref();
 const password = ref();
 const code = ref();
 const verify = ref();
-const avatarUrl = ref("/src/assets/icons/avatar.svg");
+const avatarUrl = ref(personCircleOutline);
 
 let alertButtons = [
   {

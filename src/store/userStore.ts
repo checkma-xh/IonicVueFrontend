@@ -1,3 +1,4 @@
+import { personCircleOutline } from "ionicons/icons";
 import { defineStore, acceptHMRUpdate } from "pinia";
 import { ref, reactive, nextTick } from "vue";
 
@@ -7,7 +8,7 @@ export const useUserStore = defineStore(
     let currentUser = reactive({
       email: "checkma_xh@outlook.com",
       passwordHash: "",
-      avatarUrl: "/src/assets/icons/avatar.svg",
+      avatarUrl: personCircleOutline,
       activated: false,
     });
     let accessToken = ref();
@@ -18,7 +19,7 @@ export const useUserStore = defineStore(
       currentUser = reactive({
         email: "",
         passwordHash: "",
-        avatarUrl: "/src/assets/icons/avatar.svg",
+        avatarUrl: personCircleOutline,
         activated: false,
       });
       accessToken = ref();

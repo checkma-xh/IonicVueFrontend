@@ -49,7 +49,7 @@ export const moduleMessages = {
       alert("trash");
     },
     icon: trashOutline,
-    color: "dark",
+    color: "medium",
     title: "trash",
     subtitle: "-",
     content: "deleted plans",
@@ -79,7 +79,7 @@ export const moduleMessages = {
       alert("create");
     },
     icon: addOutline,
-    color: "medium",
+    color: "light",
     title: "create",
     subtitle: "-",
     content: "create new plan",

@@ -2,93 +2,58 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-title>deactivate</ion-title>
+        <ion-title>editPassword</ion-title>
       </ion-toolbar>
     </ion-header>
 
     <ion-content :fullscreen="true" class="ion-padding">
       <ion-header collapse="condense">
         <ion-toolbar>
-          <ion-title size="large">deactivate</ion-title>
+          <ion-title size="large">editPassword</ion-title>
         </ion-toolbar>
       </ion-header>
 
-      <div id="container">
-        <ion-chip>
-          <ion-avatar>
-            <img
-              alt="Silhouette of a person's head"
-              :src="avatarPhoto?.webviewPath"
-            />
-          </ion-avatar>
-          <ion-label>{{ currentUser.email }}</ion-label>
-        </ion-chip>
+      <div id="container" v-if="!verify">
         <ion-list>
-          <ion-input
-            type="email"
-            label="Email"
-            label-placement="floating"
-            v-model="currentUser.email"
-            fill="solid"
-            readonly
-          ></ion-input>
-
-          <ion-input
-            ref="passwordRef"
-            type="password"
-            label="New password"
-            label-placement="floating"
-            helper-text="Input your new password"
-            :counter="true"
-            :maxlength="64"
-            :minlength="8"
+          <ion-chip>
+            <ion-avatar>
+              <img
+                alt="Silhouette of a person's head"
+                :src="currentUser.avatarUrl"
+              />
+            </ion-avatar>
+            <ion-label>{{ currentUser.email }}</ion-label>
+          </ion-chip>
+          <functional-input
+            inputType="password"
             v-model="password"
-            fill="solid"
-            :required="true"
-            error-text="Password can only contain numbers, letters, and special symbols"
-          ></ion-input>
-
-          <ion-input
-            ref="confirmPasswordRef"
-            type="password"
-            label="Confirm password"
-            label-placement="floating"
-            helper-text="Confirm password"
-            :counter="true"
-            :maxlength="64"
-            :minlength="8"
+          ></functional-input>
+          <functional-input
+            inputType="password"
             v-model="confirmPassword"
-            fill="solid"
-            :required="true"
-            error-text="Password can only contain numbers, letters, and special symbols"
-          ></ion-input>
-
-          <ion-input
-            ref="verificationCodeRef"
-            type="text"
-            label="Verification code"
-            label-placement="floating"
-            helper-text="Confirm verification code"
-            v-model="verificationCode"
-            fill="solid"
-            :required="true"
-            :counter="true"
-            :maxlength="4"
-            :minlength="4"
-            error-text="Verification code is incorrect"
-          ></ion-input>
-
+          ></functional-input>
           <ion-button @click="editPassword" id="edit-password-alert">
             editPassword
           </ion-button>
+          <ion-alert
+            trigger="edit-password-alert"
+            :header="alertHeader"
+            :sub-header="alertSubHeader"
+            :message="alertMessage"
+            :buttons="alertButtons"
+          ></ion-alert>
         </ion-list>
-        <ion-alert
-          trigger="edit-password-alert"
-          :header="alertHeaderRef"
-          :sub-header="alertSubHeaderRef"
-          :message="alertMessageRef"
-          :buttons="alertButtons"
-        ></ion-alert>
+      </div>
+
+      <div id="container" v-else>
+        <ion-list>
+          <verify-module
+            v-model:code="code"
+            :avatarUrl="currentUser.avatarUrl"
+            :email="targetEmail"
+            :handleVerify="handleVerify"
+          ></verify-module>
+        </ion-list>
       </div>
     </ion-content>
   </ion-page>
@@ -101,20 +66,21 @@ import {
   IonToolbar,
   IonTitle,
   IonContent,
-  IonInput,
   IonList,
   IonChip,
   IonAvatar,
   IonButton,
 } from "@ionic/vue";
-import { ref } from "vue";
-import { avatarPhoto } from "@/utils/usePhotoGallery";
+import { onMounted, ref } from "vue";
 import { useUserStore } from "@/store/userStore";
+import { codeFormat, passwordFormat } from "@/utils/useTextFormat";
+import VerifyModule from "@/components/VerifyModule.vue";
+import FunctionalInput from "@/components/FunctionalInput.vue";
 import router from "@/router";
 
 let alertButtons = [
   {
-    text: "Confirm",
+    text: "confirm",
     role: "confirm",
     handler: () => {
       return;
@@ -122,77 +88,62 @@ let alertButtons = [
   },
 ];
 
-const store = useUserStore();
-const currentUser = store.currentUser;
-const alertHeaderRef = ref();
-const alertSubHeaderRef = ref();
-const alertMessageRef = ref();
-
-const password = ref("Wlj+=9351524");
-const confirmPassword = ref("Wlj+=9351524");
-const verificationCode = ref("2222");
-
-const passwordRef = ref();
-const confirmPasswordRef = ref();
-const verificationCodeRef = ref();
-
-function validatePassword() {
-  return (
-    /[a-zA-Z0-9`~!@#$%^&*()_\-+={}[\]\\|:;"',<>.?]{8,64}/.test(
-      password.value
-    ) &&
-    /\d+/.test(password.value) &&
-    /[a-zA-Z]+/.test(password.value)
-  );
-}
-
-function validateConfirmPassword() {
-  return password.value === confirmPassword.value;
-}
-
-function validateVerificationCode() {
-  return verificationCode.value === "2222";
-}
+const userStore = useUserStore();
+const currentUser = userStore.currentUser;
+const verify = ref();
+const code = ref();
+const password = ref();
+const confirmPassword = ref();
+const targetEmail = ref("checkma_xh@outlook.com");
+const alertHeader = ref("wrong format");
+const alertSubHeader = ref("wrong format");
+const alertMessage = ref("wrong format");
 
 async function editPassword() {
-  alertButtons = [
-    {
-      text: "Confirm",
-      role: "confirm",
-      handler: () => {
-        return;
+  if (
+    !passwordFormat(password.value) ||
+    password.value != confirmPassword.value
+  ) {
+    alertSubHeader.value = "wrong format";
+    alertHeader.value = "wrong format";
+    alertMessage.value = "wrong format";
+    alertButtons = [
+      {
+        text: "confirm",
+        role: "confirm",
+        handler: () => {
+          return;
+        },
       },
-    },
-  ];
-  if (!validatePassword()) {
-    alertSubHeaderRef.value = "New password format is incorrect";
-    alertHeaderRef.value = "New password format is incorrect";
-    alertSubHeaderRef.value = "New password format is incorrect";
-    return;
-  } else if (!validateConfirmPassword()) {
-    alertSubHeaderRef.value = "Passwords are inconsistent";
-    alertHeaderRef.value = "Passwords are inconsistent";
-    alertSubHeaderRef.value = "Passwords are inconsistent";
-    return;
-  } else if (!validateVerificationCode()) {
-    alertSubHeaderRef.value = "Verification code error";
-    alertHeaderRef.value = "Verification code error";
-    alertSubHeaderRef.value = "Verification code error";
+    ];
     return;
   }
-  alertSubHeaderRef.value = "Edit success";
-  alertHeaderRef.value = "Edit success";
-  alertSubHeaderRef.value = "Edit success";
+  alertSubHeader.value = "Please pay attention to the verification code";
+  alertHeader.value = "Please pay attention to the verification code";
+  alertMessage.value = "Please pay attention to the verification code";
   alertButtons = [
     {
-      text: "Confirm",
+      text: "confirm",
       role: "confirm",
       handler: () => {
-        router.push({ name: "Login" });
+        verify.value = true;
       },
     },
   ];
 }
+
+async function handleVerify() {
+  if (!codeFormat(code.value)) {
+    alert("wrong format");
+    return;
+  }
+  alert("success");
+  router.push({ name: "PlansManagement" });
+}
+
+onMounted(() => {
+  verify.value = false;
+});
 </script>
 
 <style scoped>
@@ -201,16 +152,31 @@ async function editPassword() {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin-top: auto;
+  margin-left: 1%;
+  margin-right: 1%;
+}
+
+#container ion-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+#container ion-input {
   margin-top: 1%;
 }
-#container ion-list {
-  width: 300px;
-}
-#container ion-input {
-  margin-top: 6%;
-}
+
 #container ion-button {
-  margin-top: 6%;
+  display: block;
+  margin-top: 1%;
   width: 100%;
+}
+
+#container ion-chip {
+  margin-top: 1%;
+  margin-bottom: 0%;
 }
 </style>

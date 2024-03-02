@@ -1,9 +1,15 @@
-import { eyeOutline, mailOutline } from "ionicons/icons";
+import router from "@/router";
+import { useUserStore } from "@/store/userStore";
+import { AVATAR_FILENAME, loadPhoto, savePhoto, takePhoto } from "@/utils/usePhotoGallery";
+import { eyeOutline, mailOutline, personCircleOutline } from "ionicons/icons";
+
+const userStore = useUserStore();
+const currentUser = userStore.currentUser;
 
 export const moduleMessages = {
   editEmailModuleStyle: {
     handleClick: () => {
-      alert("edit email");
+      router.push({ name: "Email" });
     },
     icon: mailOutline,
     color: "dark",
@@ -13,12 +19,27 @@ export const moduleMessages = {
   },
   editPasswordModuleStyle: {
     handleClick: () => {
-      alert("edit password");
+      router.push({ name: "Password" });
     },
     icon: eyeOutline,
     color: "danger",
     title: "edit password",
     subtitle: "edit password",
+    content: "good luck",
+  },
+  editAvatarModuleStyle: {
+    handleClick: async () => {
+      const photo = await takePhoto();
+      if (photo) {
+        await savePhoto(photo, AVATAR_FILENAME);
+        const readPhoto = await loadPhoto(AVATAR_FILENAME);
+        currentUser.avatarUrl = `data:image/jpeg;base64,${readPhoto?.data}`;
+      }
+    },
+    icon: personCircleOutline,
+    color: "light",
+    title: "edit avatar",
+    subtitle: "edit avatar",
     content: "good luck",
   },
 };
