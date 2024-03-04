@@ -7,39 +7,39 @@ const userStore = useUserStore();
 const currentUser = userStore.currentUser;
 
 export const moduleMessages = {
-  editEmailModuleStyle: {
-    handleClick: () => {
-      router.push({ name: "Email" });
+    editEmailModuleStyle: {
+        handleClick: () => {
+            router.push({ name: "Email" });
+        },
+        icon: mailOutline,
+        color: "dark",
+        title: "edit email",
+        subtitle: "edit email",
+        content: "good luck",
     },
-    icon: mailOutline,
-    color: "dark",
-    title: "edit email",
-    subtitle: "edit email",
-    content: "good luck",
-  },
-  editPasswordModuleStyle: {
-    handleClick: () => {
-      router.push({ name: "Password" });
+    editPasswordModuleStyle: {
+        handleClick: () => {
+            router.push({ name: "Password" });
+        },
+        icon: eyeOutline,
+        color: "danger",
+        title: "edit password",
+        subtitle: "edit password",
+        content: "good luck",
     },
-    icon: eyeOutline,
-    color: "danger",
-    title: "edit password",
-    subtitle: "edit password",
-    content: "good luck",
-  },
-  editAvatarModuleStyle: {
-    handleClick: async () => {
-      const photo = await takePhoto();
-      if (photo) {
-        await savePhoto(photo, AVATAR_FILENAME);
-        const readPhoto = await loadPhoto(AVATAR_FILENAME);
-        currentUser.avatarUrl = `data:image/jpeg;base64,${readPhoto?.data}`;
-      }
+    editAvatarModuleStyle: {
+        handleClick: async () => {
+            const photo = await takePhoto();
+            if (photo) {
+                await savePhoto(photo, AVATAR_FILENAME);
+                const readPhoto = await loadPhoto(AVATAR_FILENAME);
+                currentUser.avatarUrl = `data:image/jpeg;base64,${readPhoto?.data}`;
+            }
+        },
+        icon: personCircleOutline,
+        color: "light",
+        title: "edit avatar",
+        subtitle: "edit avatar",
+        content: "good luck",
     },
-    icon: personCircleOutline,
-    color: "light",
-    title: "edit avatar",
-    subtitle: "edit avatar",
-    content: "good luck",
-  },
 };

@@ -1,40 +1,36 @@
 <template>
-  <ion-page>
-    <ion-header :translucent="true">
-      <ion-toolbar>
-        <ion-title>deactivate</ion-title>
-      </ion-toolbar>
-    </ion-header>
+    <ion-page>
+        <ion-header :translucent="true">
+            <ion-toolbar>
+                <ion-title>deactivate</ion-title>
+            </ion-toolbar>
+        </ion-header>
 
-    <ion-content :fullscreen="true" class="ion-padding">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">deactivate</ion-title>
-        </ion-toolbar>
-      </ion-header>
+        <ion-content :fullscreen="true" class="ion-padding">
+            <ion-header collapse="condense">
+                <ion-toolbar>
+                    <ion-title size="large">deactivate</ion-title>
+                </ion-toolbar>
+            </ion-header>
 
-      <div id="container">
-        <ion-list>
-          <verify-module
-            v-model:code="code"
-            :avatarUrl="currentUser.avatarUrl"
-            :email="currentUser.email"
-            :handleVerify="handleVerify"
-          ></verify-module>
-        </ion-list>
-      </div>
-    </ion-content>
-  </ion-page>
+            <div id="container">
+                <ion-list>
+                    <verify-module v-model:code="code" :avatarUrl="currentUser.avatarUrl" :email="currentUser.email"
+                        :handleVerify="handleVerify"></verify-module>
+                </ion-list>
+            </div>
+        </ion-content>
+    </ion-page>
 </template>
 
 <script setup lang="ts">
 import {
-  IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonList,
+    IonPage,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonList,
 } from "@ionic/vue";
 import { ref } from "vue";
 import { useUserStore } from "@/store/userStore";
@@ -47,37 +43,38 @@ const currentUser = userStore.currentUser;
 const code = ref();
 
 async function handleVerify() {
-  if (!codeFormat(code.value)) {
-    alert("wrong format");
-    return;
-  }
-  alert("confirm deactivate");
-  await router.push({ name: "Login" });
-  userStore.islogin = false;
+    if (!codeFormat(code.value)) {
+        alert("wrong format");
+        return;
+    }
+    alert("confirm deactivate");
+    await router.push({ name: "Login" });
+    userStore.islogin = false;
 }
 </script>
 
 <style scoped>
 #container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin-top: auto;
-  margin-left: 1%;
-  margin-right: 1%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: auto 1%;
+    /* 将 margin-top 和 margin-left 合并 */
+    width: 98%;
+    /* 使用百分比宽度，以避免内容溢出 */
 }
 
 #container ion-list {
-  width: 100%;
+    width: 100%;
 }
 
-#container ion-input {
-  margin-top: 1%;
+#container ion-input,
+#container ion-button {
+    margin-top: 1%;
 }
 
 #container ion-button {
-  display: block;
-  margin-top: 1%;
+    display: block;
 }
 </style>

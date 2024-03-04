@@ -1,87 +1,88 @@
 import {
-  addOutline,
-  calendarOutline,
-  checkmarkOutline,
-  fileTrayOutline,
-  fileTrayStackedOutline,
-  searchOutline,
-  trashOutline,
+    addOutline,
+    calendarOutline,
+    checkmarkOutline,
+    fileTrayOutline,
+    fileTrayStackedOutline,
+    searchOutline,
+    trashOutline,
 } from "ionicons/icons";
 import { modalController } from "@ionic/vue";
 import SearchModal from "@/components/SearchModal.vue";
+import router from "@/router";
 
 export const moduleMessages = {
-  searchModuleStyle: {
-    handleClick: async () => {
-      const modal = await modalController.create({
-        component: SearchModal,
-      });
-      modal.present();
+    searchModuleStyle: {
+        handleClick: async () => {
+            const modal = await modalController.create({
+                component: SearchModal,
+            });
+            modal.present();
+        },
+        icon: searchOutline,
+        color: "primary",
+        title: "search",
+        subtitle: "-",
+        content: "search your plans",
     },
-    icon: searchOutline,
-    color: "primary",
-    title: "search",
-    subtitle: "-",
-    content: "search your plans",
-  },
-  completedModuleStyle: {
-    handleClick: () => {
-      alert("completed");
+    completedModuleStyle: {
+        handleClick: () => {
+            alert("completed");
+        },
+        icon: checkmarkOutline,
+        color: "success",
+        title: "completed",
+        subtitle: "-",
+        content: "completed plans",
     },
-    icon: checkmarkOutline,
-    color: "success",
-    title: "completed",
-    subtitle: "-",
-    content: "completed plans",
-  },
-  unfinishedModuleStyle: {
-    handleClick: () => {
-      alert("unfinished");
+    unfinishedModuleStyle: {
+        handleClick: () => {
+            alert("unfinished");
+        },
+        icon: fileTrayOutline,
+        color: "warning",
+        title: "unfinished",
+        subtitle: "-",
+        content: "unfinished plans",
     },
-    icon: fileTrayOutline,
-    color: "warning",
-    title: "unfinished",
-    subtitle: "-",
-    content: "unfinished plans",
-  },
-  trashModuleStyle: {
-    handleClick: () => {
-      alert("trash");
+    trashModuleStyle: {
+        handleClick: () => {
+            alert("trash");
+        },
+        icon: trashOutline,
+        color: "medium",
+        title: "trash",
+        subtitle: "-",
+        content: "deleted plans",
     },
-    icon: trashOutline,
-    color: "medium",
-    title: "trash",
-    subtitle: "-",
-    content: "deleted plans",
-  },
-  plansModuleStyle: {
-    handleClick: () => {
-      alert("plans");
+    plansModuleStyle: {
+        handleClick: () => {
+            alert("plans");
+        },
+        icon: calendarOutline,
+        color: "tertiary",
+        title: "plans",
+        subtitle: "-",
+        content: "plans",
     },
-    icon: calendarOutline,
-    color: "tertiary",
-    title: "plans",
-    subtitle: "-",
-    content: "plans",
-  },
-  groupsModuleStyle: {
-    handleClick: () => {
-      alert("groups");
+    groupsModuleStyle: {
+        handleClick: () => {
+            alert("groups");
+        },
+        icon: fileTrayStackedOutline,
+        color: "danger",
+        title: "groups",
+        subtitle: "-",
+        content: "plans in groups",
     },
-    icon: fileTrayStackedOutline,
-    color: "danger",
-    title: "groups",
-    subtitle: "-",
-    content: "plans in groups",
-  },
-  createModuleStyle: {
-    handleClick: () => {
-      alert("create");
+    createModuleStyle: {
+        handleClick: async () => {
+            await router.push({ name: "Create", params: { id: 100 } });
+        },
+        icon: addOutline,
+        color: "light",
+        title: "create",
+        subtitle: "-",
+        content: "create new plan",
     },
-    icon: addOutline,
-    color: "light",
-    title: "create",
-    subtitle: "-",
-    content: "create new plan",
-  },
 };

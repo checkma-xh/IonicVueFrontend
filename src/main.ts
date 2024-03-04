@@ -24,19 +24,20 @@ import '@ionic/vue/css/display.css';
 
 /* Theme variables */
 import './assets/theme/variables.css';
+import "reflect-metadata";
 
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
 defineCustomElements(window);
 
 const pinia = createPinia()
-  .use(persist)
-  
+    .use(persist)
+
 const app = createApp(App)
-  .use(IonicVue)
-  .use(router)
-  .use(pinia);
-  
+    .use(IonicVue)
+    .use(router)
+    .use(pinia);
+
 router.isReady().then(() => {
-  app.mount('#app');
+    app.mount('#app');
 });
 
