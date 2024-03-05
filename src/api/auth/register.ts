@@ -1,22 +1,28 @@
 import axios from "axios";
 
-export async function register(
-    email: string,
-    password: string,
-    verificationCode: string
+export async function register (
+  email: string,
+  passwordHash: string,
+  verificationCode: string,
 ) {
-    try {
-        const postData = {
-            email: email,
-            password: password,
-            verificationCode: verificationCode,
-        };
-        const response = await axios.post(
-            "https://120.24.177.83/auth/register",
-            postData
-        );
-        return response;
-    } catch (error) {
-        console.error("Error fetching data:", error);
-    }
+  try {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      }
+    };
+    const data = {
+      email: email,
+      passwordHash: passwordHash,
+      verificationCode: verificationCode,
+    };
+    const response = await axios.post(
+      "http://localhost:3000/auth/register",
+      data,
+      config
+    );
+    return response.data;
+  } catch ( error ) {
+    console.error( "Error fetching data:", error );
+  }
 }

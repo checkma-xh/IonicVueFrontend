@@ -1,45 +1,53 @@
 import router from "@/router";
 import { useUserStore } from "@/store/userStore";
-import { AVATAR_FILENAME, loadPhoto, savePhoto, takePhoto } from "@/utils/usePhotoGallery";
+import {
+  loadPhoto,
+  savePhoto,
+  takePhoto,
+} from "@/utils/usePhotoGallery";
 import { eyeOutline, mailOutline, personCircleOutline } from "ionicons/icons";
+import dotenv from "dotenv";
+
+dotenv.configDotenv();
 
 const userStore = useUserStore();
 const currentUser = userStore.currentUser;
+const AVATAR_FILENAME = process.env.AVATAR_FILENAME;
 
 export const moduleMessages = {
-    editEmailModuleStyle: {
-        handleClick: () => {
-            router.push({ name: "Email" });
-        },
-        icon: mailOutline,
-        color: "dark",
-        title: "edit email",
-        subtitle: "edit email",
-        content: "good luck",
+  editEmailModuleStyle: {
+    handleClick: () => {
+      router.push({ name: "Email" });
     },
-    editPasswordModuleStyle: {
-        handleClick: () => {
-            router.push({ name: "Password" });
-        },
-        icon: eyeOutline,
-        color: "danger",
-        title: "edit password",
-        subtitle: "edit password",
-        content: "good luck",
+    icon: mailOutline,
+    color: "dark",
+    title: "edit email",
+    subtitle: "edit email",
+    content: "good luck",
+  },
+  editPasswordModuleStyle: {
+    handleClick: () => {
+      router.push({ name: "Password" });
     },
-    editAvatarModuleStyle: {
-        handleClick: async () => {
-            const photo = await takePhoto();
-            if (photo) {
-                await savePhoto(photo, AVATAR_FILENAME);
-                const readPhoto = await loadPhoto(AVATAR_FILENAME);
-                currentUser.avatarUrl = `data:image/jpeg;base64,${readPhoto?.data}`;
-            }
-        },
-        icon: personCircleOutline,
-        color: "light",
-        title: "edit avatar",
-        subtitle: "edit avatar",
-        content: "good luck",
+    icon: eyeOutline,
+    color: "danger",
+    title: "edit password",
+    subtitle: "edit password",
+    content: "good luck",
+  },
+  editAvatarModuleStyle: {
+    handleClick: async () => {
+      const photo = await takePhoto();
+      if (photo) {
+        await savePhoto(photo, AVATAR_FILENAME);
+        const readPhoto = await loadPhoto(AVATAR_FILENAME);
+        currentUser.avatarUrl = `data:image/jpeg;base64,${readPhoto?.data}`;
+      }
     },
+    icon: personCircleOutline,
+    color: "light",
+    title: "edit avatar",
+    subtitle: "edit avatar",
+    content: "good luck",
+  },
 };

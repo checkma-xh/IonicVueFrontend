@@ -1,31 +1,31 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { PlanInfo } from "./PlanInfo";
-import { GroupInfo } from './GroupInfo';
+import { GroupInfo } from "./GroupInfo";
 
 @Entity()
 export class UserInfo {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({ length: 64 })
-    email: string;
+  @Column({ length: 64 })
+  email: string;
 
-    @Column({ length: 256 })
-    passwordHash: string;
+  @Column({ length: 256 })
+  passwordHash: string;
 
-    @Column({ length: 64 })
-    avatarUrl: string;
+  @Column({ length: 64 })
+  avatarUrl: string;
 
-    @Column({ default: true })
-    activated: boolean;
+  @Column({ default: true })
+  activated: boolean;
 
-    @OneToMany(() => PlanInfo, (planInfo) => planInfo.user, {
-        cascade: true,
-    })
-    plans: PlanInfo[];
+  @OneToMany(() => PlanInfo, (planInfo) => planInfo.user, {
+    cascade: true,
+  })
+  plans: PlanInfo[];
 
-    @OneToMany(() => GroupInfo, (groupInfo) => groupInfo.user, {
-        cascade: true,
-    })
-    groups: GroupInfo[];
+  @OneToMany(() => GroupInfo, (groupInfo) => groupInfo.user, {
+    cascade: true,
+  })
+  groups: GroupInfo[];
 }

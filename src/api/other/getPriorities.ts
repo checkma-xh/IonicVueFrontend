@@ -1,19 +1,17 @@
 import axios from "axios";
 
-export async function deactivate ( accessToken: string ) {
+export async function getPriorities ( accessToken: string ) {
   try {
     const config = {
       headers: {
         Authorization: `Bearer ${ accessToken }`
       }
     };
-    const data = {};
-    const response = await axios.post(
-      "https://120.24.177.83/auth/deactivate",
-      data,
-      config
+    const response = await axios.get(
+      `http://localhost:3000/other/priorities`,
+      config,
     );
-    return response;
+    return response.data;
   } catch ( error ) {
     console.error( "Error fetching data:", error );
   }

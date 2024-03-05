@@ -1,14 +1,23 @@
 import axios from "axios";
 
-export async function verify(verificationCode: string) {
-    try {
-        const postData = { verificationCode: verificationCode };
-        const response = await axios.post(
-            "https://120.24.177.83/auth/verification-code/verify",
-            postData
-        );
-        return response;
-    } catch (error) {
-        console.error("Error fetching data:", error);
-    }
+export async function verify ( email: string, verificationCode: string ) {
+  try {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      }
+    };
+    const data = {
+      email: email,
+      verificationCode: verificationCode
+    };
+    const response = await axios.post(
+      "http://localhost:3000/auth/verification-code/verify",
+      data,
+      config
+    );
+    return response.data;
+  } catch ( error ) {
+    console.error( "Error fetching data:", error );
+  }
 }

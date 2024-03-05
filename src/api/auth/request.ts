@@ -1,14 +1,20 @@
 import axios from "axios";
 
-export async function request(email: string) {
-    try {
-        const postData = { email: email };
-        const response = await axios.post(
-            "https://120.24.177.83/auth/verification-code/request",
-            postData
-        );
-        return response;
-    } catch (error) {
-        console.error("Error fetching data:", error);
-    }
+export async function request ( email: string ) {
+  try {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      }
+    };
+    const data = { email: email };
+    const response = await axios.post(
+      "http://localhost:3000/auth/verification-code/request",
+      data,
+      config
+    );
+    return response.data;
+  } catch ( error ) {
+    console.error( "Error fetching data:", error );
+  }
 }

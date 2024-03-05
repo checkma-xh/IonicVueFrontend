@@ -1,14 +1,20 @@
 import axios from "axios";
 
-export async function logout(accessToken: string) {
-    try {
-        const postData = { accessToken: accessToken };
-        const response = await axios.post(
-            "https://120.24.177.83/auth/logout",
-            postData
-        );
-        return response;
-    } catch (error) {
-        console.error("Error fetching data:", error);
-    }
+export async function logout ( accessToken: string ) {
+  try {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${ accessToken }`
+      }
+    };
+    const data = {};
+    const response = await axios.post(
+      "http://localhost:3000/auth/logout",
+      data,
+      config
+    );
+    return response.data;
+  } catch ( error ) {
+    console.error( "Error fetching data:", error );
+  }
 }

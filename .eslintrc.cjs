@@ -17,4 +17,4 @@ module.exports = {
         'vue/no-deprecated-slot-attribute': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
     }
-}
+};
