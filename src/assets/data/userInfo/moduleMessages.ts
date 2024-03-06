@@ -15,7 +15,7 @@ const AVATAR_FILENAME = import.meta.env.VITE_AVATAR_FILENAME;
 export const moduleMessages = {
   editEmailModuleStyle: {
     handleClick: () => {
-      router.push({ name: "Email" });
+      router.push({ name: "EditEmail" });
     },
     icon: mailOutline,
     color: "dark",
@@ -25,7 +25,7 @@ export const moduleMessages = {
   },
   editPasswordModuleStyle: {
     handleClick: () => {
-      router.push({ name: "Password" });
+      router.push({ name: "EditPassword" });
     },
     icon: eyeOutline,
     color: "danger",

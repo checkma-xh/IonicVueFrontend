@@ -4,12 +4,12 @@
 			<ion-router-outlet></ion-router-outlet>
 			<ion-tab-bar slot="bottom">
 				<ion-tab-button
-					tab="PlansManagement"
-					href="/plans-management">
+					tab="PlanManagement"
+					href="/plan-management">
 					<ion-icon
 						aria-hidden="true"
 						:src="listOutline"></ion-icon>
-					<ion-label>plansManagement</ion-label>
+					<ion-label>planManagement</ion-label>
 				</ion-tab-button>
 
 				<ion-tab-button

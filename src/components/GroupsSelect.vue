@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { getGroups } from "@/api/plansManagement/getGroups";
+import { getGroups } from "@/api/planManagement/getGroups";
 import { useUserStore } from "@/store/userStore";
 
 const groups = ref();
@@ -28,4 +28,4 @@ onMounted(async () => {
 	const currentUser = userStore.currentUser;
 	groups.value = await getGroups(currentUser.id, userStore.accessToken);
 });
-</script>
+</script>@/api/planManagement/getGroups

@@ -141,7 +141,7 @@ async function handleVerify() {
 		return;
 	}
 	alert("success");
-	router.push({ name: "PlansManagement" });
+	router.push({ name: "PlanManagement" });
 }
 
 onMounted(() => {

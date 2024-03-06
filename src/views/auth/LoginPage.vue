@@ -106,7 +106,7 @@ async function login() {
 			text: "confirm",
 			role: "confirm",
 			handler: () => {
-				router.push({ name: "PlansManagement" });
+				router.push({ name: "PlanManagement" });
 			},
 		},
 	];
@@ -144,7 +144,7 @@ async function handleVerify() {
 		return;
 	}
 	alert("success");
-	router.push({ name: "PlansManagement" });
+	router.push({ name: "PlanManagement" });
 }
 
 onMounted(() => {

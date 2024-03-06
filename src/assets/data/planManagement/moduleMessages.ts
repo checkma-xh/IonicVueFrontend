@@ -77,7 +77,7 @@ export const moduleMessages = {
   },
   createModuleStyle: {
     handleClick: async () => {
-      await router.push({ name: "Create", params: { id: 100 } });
+      await router.push({ name: "CreatePlan", params: { id: 100 } });
     },
     icon: addOutline,
     color: "light",

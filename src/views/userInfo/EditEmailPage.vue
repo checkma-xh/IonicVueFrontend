@@ -134,7 +134,7 @@ async function handleVerify() {
 	}
 	alert("success");
 	currentUser.email = targetEmail.value;
-	router.push({ name: "PlansManagement" });
+	router.push({ name: "PlanManagement" });
 }
 
 onMounted(() => {

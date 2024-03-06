@@ -2,7 +2,7 @@
 	<ion-page>
 		<ion-header :translucent="true">
 			<ion-toolbar>
-				<ion-title>plansManagement</ion-title>
+				<ion-title>planManagement</ion-title>
 			</ion-toolbar>
 		</ion-header>
 
@@ -11,7 +11,7 @@
 			class="ion-padding">
 			<ion-header collapse="condense">
 				<ion-toolbar>
-					<ion-title size="large">plansManagement</ion-title>
+					<ion-title size="large">planManagement</ion-title>
 				</ion-toolbar>
 			</ion-header>
 
@@ -43,7 +43,7 @@ import {
 	IonToolbar,
 } from "@ionic/vue";
 import FunctionalModule from "@/components/FunctionalModule.vue";
-import { moduleMessages } from "@/assets/data/plansManagement/moduleMessages";
+import { moduleMessages } from "@/assets/data/planManagement/moduleMessages";
 </script>
 
 <style scoped>
