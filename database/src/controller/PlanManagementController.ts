@@ -5,6 +5,11 @@ import { GroupInfo } from "../entity/GroupInfo";
 import { PriorityInfo } from "../entity/PriorityInfo";
 import { PlanInfo } from "../entity/PlanInfo";
 import * as jwt from "jsonwebtoken";
+import * as dotenv from "dotenv";
+
+dotenv.configDotenv();
+
+const SECRET_KEY = process.env.SECRET_KEY
 
 export class PlanManagementController {
   private UserInfoRepository = AppDataSource.getRepository( UserInfo );

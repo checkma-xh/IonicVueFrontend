@@ -75,10 +75,8 @@ import { emailFormat, passwordFormat } from "@/utils/useTextFormat";
 import router from "@/router";
 import { useUserStore } from "@/store/userStore";
 import { personCircleOutline } from "ionicons/icons";
-import dotenv from "dotenv";
 
-dotenv.configDotenv();
-const AVATAR_FILENAME = process.env.AVATAR_FILENAME;
+const AVATAR_FILENAME = import.meta.env.VITE_AVATAR_FILENAME;
 const userStore = useUserStore();
 const currentUser = userStore.currentUser;
 const avatarWebPath = ref(personCircleOutline);

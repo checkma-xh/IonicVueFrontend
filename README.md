@@ -1,6 +1,5 @@
 # Ionic_Frontend
 
-
 1. 创建待办事项：(标题、备注、详细信息、分组)
 2. 设置提醒时间：(通知)
 3. 设置重复时间：(重复通知)
@@ -11,10 +10,10 @@
 8. 云同步：(Redis、MySQL)
 9. 白天夜晚主题
 
+### plan-management 计划管理模块
 
-### plan-management 计划管理模块 
 ```javascript
-plan_info, group_info, priority_info, repeat_info
+关联表: plan_info, group_info, priority_info, repeat_info
 POST    /plan-management/users/<int:id>/plans          # 新建计划
 {
 	name          : string,
@@ -25,12 +24,12 @@ POST    /plan-management/users/<int:id>/plans          # 新建计划
 	startDate     : string,
 	endDate       : string,
 }
-PATCH   /plan-management/users/<int:id>/plans/<int:id> # 更新计划状态
+PATCH   /plan-management/users/<int:id>/plans/<int:id> # 完成计划
 {
 	completed     : bool,
 }
 DELETE  /plan-management/users/<int:id>/plans/<int:id> # 删除计划
-PATCH   /plan-management/users/<int:id>/plans/<int:id> # 更新计划设置
+PATCH   /plan-management/users/<int:id>/plans/<int:id> # 更新设置
 {
 	name          : string,
 	remark        : string,
@@ -51,39 +50,42 @@ PATHCH  /plan-management/users/<int:id>/groups   # 更新分组
 	name   : string,
 	remark : string,
 }
+GET     /plan-management/users/<int:id>/groups
 GET     /plan-management/users/<int:id>/plans?deleted=<bool>
 GET     /plan-managements/users/<int:id>/plans?group-name=<string>
 GET     /plan-management/users/<int:id>/plans?start-date=<string>&end-date=<string> # 查看时间段计划
 GET     /plan-management/users/<int:id>/plans?completed=true&deleted=false
-GET     /plan-management/users/<int:id>/plans?remark=<string>
+GET     /plan-management/users/<int:id>/plans?name=<string>&remark=<string>
 ```
 
 ### user-info 用户信息模块
+
 ```javascript
-user_info
+关联表: user_info
 GET     /user-info/users/<int:id>
 PATCH   /user-info/users/<int:id>/email
 {
-	email    : string,
+	email        : string,
 }
-PATCH   /user-info/users/<int:id>/password
+PATCH   /user-info/users/<int:id>/password-hash
 {
-	password : string,
+	passwordHash : string,
 }
-PATCH   /user-info/users/<int:id>/avatar
+PATCH   /user-info/users/<int:id>/avatar-url
 {
-	avatar   : file,
+	avatar       : file,
 }
 ```
 
 ### auth 身份验证模块
+
 ```javascript
-user_info
+关联表: user_info
 POST    /auth/login
 {
-	email    : string,
-	password : string,
-	avatar   : file,
+	email        : string,
+	passwordHash : string,
+	avatar       : file,
 }
 POST    /auth/refresh
 {
@@ -99,9 +101,9 @@ POST    /auth/deactivate
 }
 POST    /auth/register
 {
-	email    : string,
-	password : string,
-	avatar   : file,
+	email        : string,
+	passwordHash : string,
+	avatar       : file,
 	verificationCode: string,
 }
 POST    /auth/verification-code/request
@@ -113,33 +115,33 @@ POST    /auth/verification-code/verify
 	verificationCode: string,
 }
 ```
+
 ### 用户信息表 user_info
 
-| **id** | **email**   | **password_hash** | **avatar_url** | **activated** |
-| ------ | ----------- | ----------------- | -------------- | ------------- |
-| bigint | varchar(64) | varchar(256)      | varchar(64)    | tinyint       |
-
+| **id** | **email** | **password_hash** | **avatar_url** | **activated** |
+| ------------ | --------------- | ----------------------- | -------------------- | ------------------- |
+| bigint       | varchar(64)     | varchar(256)            | varchar(64)          | tinyint             |
 
 ### 计划信息表 plan_info
 
-| **id** | **name**    | **remark**  | **group_name** | **repeat_name** | **priority_name** | **start_date** | **end_date** | **completed** | **deleted** |
-| ------ | ----------- | ----------- | -------------- | --------------- | ----------------- | -------------- | ------------ | ------------- | ----------- |
-| bigint | varchar(64) | varchar(64) | varchar(64)    | varchar(64)     | varchar(64)       | date           | date         | tinyint       | tinyint     |
+| **id** | **name** | **remark** | **group_name** | **repeat_name** | **priority_name** | **start_date** | **end_date** | **completed** | **deleted** | **user_id** |
+| ------------ | -------------- | ---------------- | -------------------- | --------------------- | ----------------------- | -------------------- | ------------------ | ------------------- | ----------------- | ----------------- |
+| bigint       | varchar(64)    | varchar(64)      | varchar(64)          | varchar(64)           | varchar(64)             | date                 | date               | tinyint             | tinyint           | bigint            |
 
 ### 分组信息表 group_info
 
-| **id** | **name**    | **remark**  | **user_id** |     |
-| ------ | ----------- | ----------- | ----------- | --- |
-| bigint | varchar(64) | varchar(64) | bigint      |     |
+| **id** | **name** | **remark** | **user_id** |
+| ------------ | -------------- | ---------------- | ----------------- |
+| bigint       | varchar(64)    | varchar(64)      | bigint            |
 
 ### 计划等级表 priority_info
 
-| **id** | **name**    | **remark**  |     |
-| ------ | ----------- | ----------- | --- |
-| bigint | varchar(64) | varchar(64) |     |
+| **id** | **name** | **remark** |
+| ------------ | -------------- | ---------------- |
+| bigint       | varchar(64)    | varchar(64)      |
 
 ### 重复频率表 repeat_info
 
-| **id** | **name**    | **remark**  |
-| ------ | ----------- | ----------- |
-| bigint | varchar(64) | varchar(64) |
+| **id** | **name** | **remark** |
+| ------------ | -------------- | ---------------- |
+| bigint       | varchar(64)    | varchar(64)      |

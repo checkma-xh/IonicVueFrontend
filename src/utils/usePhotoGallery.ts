@@ -7,12 +7,10 @@ import {
 } from "@capacitor/camera";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { onMounted } from "vue";
-import dotenv from "dotenv";
 
-dotenv.configDotenv()
 
 // 定义头像文件常量
-const AVATAR_FILENAME = process.env.AVATAR_FILENAME;
+const AVATAR_FILENAME = import.meta.env.VITE_AVATAR_FILENAME;
 
 /**
  * 将 Blob 对象转换为 Base64 数据

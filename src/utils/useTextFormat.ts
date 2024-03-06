@@ -1,12 +1,13 @@
-import dotenv from "dotenv";
-dotenv.configDotenv();
+// import ...
+
 
 // 定义密码相关常量
-const PASSWORD_MAXLEN = parseInt( process.env.PASSWORD_MAXLEN );
-const PASSWORD_MINLEN = parseInt( process.env.PASSWORD_MINLEN );
-const PASSWORD_REGEX = process.env.PASSWORD_REGEX;
-const PASSWORD_NUMERIC_REGEX = process.env.PASSWORD_NUMERIC_REGEX;
-const PASSWORD_ALPHA_REGEX = process.env.PASSWORD_ALPHA_REGEX;
+const PASSWORD_MAXLEN = parseInt( import.meta.env.VITE_PASSWORD_MAXLEN );
+const PASSWORD_MINLEN = parseInt( import.meta.env.VITE_PASSWORD_MINLEN );
+const PASSWORD_REGEX = /[a-zA-Z0-9`~!@#$%^&*()_\-+={}[\]\\|:;"',<>.?]{8,64}/;
+const PASSWORD_NUMERIC_REGEX = /\d+/;
+const PASSWORD_ALPHA_REGEX = /[a-zA-Z]+/;
+
 
 export function passwordFormat ( password: string ) {
   return (
@@ -21,9 +22,11 @@ export function passwordFormat ( password: string ) {
 }
 
 // 定义邮箱相关常量
-const EMAIL_MAXLEN = parseInt( process.env.EMAIL_MAXLEN );
-const EMAIL_MINLEN = parseInt( process.env.EMAIL_MINLEN );
-const EMAIL_REGEX = process.env.EMAIL_REGEX;
+const EMAIL_MAXLEN = parseInt( import.meta.env.VITE_EMAIL_MAXLEN );
+const EMAIL_MINLEN = parseInt( import.meta.env.VITE_EMAIL_MINLEN );
+const EMAIL_REGEX =
+    /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+
 
 export function emailFormat ( email: string ) {
   return (
@@ -36,7 +39,7 @@ export function emailFormat ( email: string ) {
 }
 
 // 定义验证码相关常量
-const CODE_LEN = parseInt( process.env.CODE_LEN );
+const CODE_LEN = parseInt( import.meta.env.VITE_CODE_LEN );
 
 export function codeFormat ( code: string ) {
   return code != undefined && code != null && code.length == CODE_LEN;

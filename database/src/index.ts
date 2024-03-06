@@ -10,6 +10,7 @@ import { GroupInfo } from "./entity/GroupInfo";
 import { PriorityInfo } from "./entity/PriorityInfo";
 import { RepeatInfo } from "./entity/RepeatInfo";
 
+
 async function createData () {
   // todo 创建数据
   // UserInfo

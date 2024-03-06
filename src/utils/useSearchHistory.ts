@@ -1,11 +1,9 @@
 import { Directory, Encoding, Filesystem } from "@capacitor/filesystem";
-import dotenv from "dotenv";
 
-dotenv.configDotenv();
 
 // 定义历史记录常量
-export const SEARCH_HISTORY_FILENAME = process.env.SEARCH_HISTORY_FILENAME;
-export const MAX_HISTORY_RECORDS = parseInt( process.env.MAX_HISTORY_RECORDS );
+export const SEARCH_HISTORY_FILENAME = import.meta.env.VITE_SEARCH_HISTORY_FILENAME;
+export const MAX_HISTORY_RECORDS = parseInt( import.meta.env.VITE_MAX_HISTORY_RECORDS );
 
 // 定义历史记录类型
 export interface SearchHistory {
