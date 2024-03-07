@@ -1,15 +1,16 @@
 import {
-  addOutline,
+  addCircle,
   calendarOutline,
-  checkmarkOutline,
-  fileTrayOutline,
-  fileTrayStackedOutline,
   searchOutline,
   trashOutline,
 } from "ionicons/icons";
 import { modalController } from "@ionic/vue";
 import SearchModal from "@/components/SearchModal.vue";
 import router from "@/router";
+import { useUserStore } from "@/store/userStore";
+
+const userStore = useUserStore();
+const currentUser = userStore.currentUser;
 
 export const moduleMessages = {
   searchModuleStyle: {
@@ -18,71 +19,45 @@ export const moduleMessages = {
         component: SearchModal,
       });
       modal.present();
-    },
+    },  
     icon: searchOutline,
-    color: "primary",
+    cardColor: "light",
+    iconColor: "dark",
     title: "search",
-    subtitle: "-",
-    content: "search your plans",
-  },
-  completedModuleStyle: {
-    handleClick: () => {
-      alert("completed");
-    },
-    icon: checkmarkOutline,
-    color: "success",
-    title: "completed",
-    subtitle: "-",
-    content: "completed plans",
-  },
-  unfinishedModuleStyle: {
-    handleClick: () => {
-      alert("unfinished");
-    },
-    icon: fileTrayOutline,
-    color: "warning",
-    title: "unfinished",
-    subtitle: "-",
-    content: "unfinished plans",
+    subtitle: "",
+    content: "",
   },
   trashModuleStyle: {
     handleClick: () => {
       alert("trash");
     },
     icon: trashOutline,
-    color: "medium",
+    cardColor: "light",
+    iconColor: "medium",
     title: "trash",
-    subtitle: "-",
-    content: "deleted plans",
+    subtitle: "",
+    content: "",
   },
   plansModuleStyle: {
-    handleClick: () => {
-      alert("plans");
+    handleClick: async () => {
+      await router.push({ name: "PlanList", params: { id: currentUser.id }, query: { completed: 1} });
     },
     icon: calendarOutline,
-    color: "tertiary",
+    cardColor: "light",
+    iconColor: "danger",
     title: "plans",
-    subtitle: "-",
-    content: "plans",
-  },
-  groupsModuleStyle: {
-    handleClick: () => {
-      alert("groups");
-    },
-    icon: fileTrayStackedOutline,
-    color: "danger",
-    title: "groups",
-    subtitle: "-",
-    content: "plans in groups",
+    subtitle: "",
+    content: "",
   },
   createModuleStyle: {
     handleClick: async () => {
-      await router.push({ name: "CreatePlan", params: { id: 100 } });
+      await router.push({ name: "CreatePlan", params: { id: currentUser.id } });
     },
-    icon: addOutline,
-    color: "light",
+    icon: addCircle,
+    cardColor: "light",
+    iconColor: "primary",
     title: "create",
-    subtitle: "-",
-    content: "create new plan",
+    subtitle: "",
+    content: "",
   },
 };

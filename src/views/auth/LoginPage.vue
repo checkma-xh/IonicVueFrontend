@@ -63,6 +63,8 @@ import {
 	IonTitle,
 	IonContent,
 	IonList,
+	IonButton,
+	IonAlert,
 } from "@ionic/vue";
 import FunctionalInput from "@/components/FunctionalInput.vue";
 import { onMounted, ref } from "vue";

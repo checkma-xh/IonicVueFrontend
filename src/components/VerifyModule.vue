@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { IonButton } from "@ionic/vue";
+import { IonList, IonAvatar, IonLabel, IonChip, IonButton } from "@ionic/vue";
 import FunctionalInput from "@/components/FunctionalInput.vue";
 
 const avatarUrl = defineModel("avatarUrl", {

@@ -27,6 +27,7 @@ import "./assets/theme/variables.css";
 import "reflect-metadata";
 
 import { defineCustomElements } from "@ionic/pwa-elements/loader";
+import { useUserStore } from "./store/userStore";
 defineCustomElements( window );
 
 const pinia = createPinia().use( persist );
@@ -36,3 +37,17 @@ const app = createApp( App ).use( IonicVue ).use( router ).use( pinia );
 router.isReady().then( () => {
   app.mount( "#app" );
 } );
+
+// 用于测试, 初始化用户数据, 方便调试, 正式运行需要删除
+import {login} from "@/api/auth/login";
+const userStore = useUserStore();
+const currentUser = userStore.currentUser;
+const response = await login("checkmaxh@gmail.com", "#", "");
+
+currentUser.id = response.currentUser.id;
+currentUser.email = response.currentUser.email;
+currentUser.passwordHash = response.currentUser.passwordHash;
+currentUser.avatarUrl = response.currentUser.avatarUrl;
+currentUser.activated = response.currentUser.activated;
+userStore.accessToken = response.accessToken;
+userStore.refreshToken = response.refreshToken;

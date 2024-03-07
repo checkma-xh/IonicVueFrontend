@@ -23,7 +23,8 @@
 					:handle-click="value.handleClick"
 					:key="index"
 					:icon="value.icon"
-					:color="value.color"
+					:iconColor="value.iconColor"
+					:cardColor="value.cardColor"
 					:title="value.title"
 					:subtitle="value.subtitle"
 					:content="value.content"
@@ -36,11 +37,11 @@
 
 <script setup lang="ts">
 import {
-	IonContent,
-	IonHeader,
 	IonPage,
-	IonTitle,
+	IonHeader,
 	IonToolbar,
+	IonTitle,
+	IonContent,
 } from "@ionic/vue";
 import FunctionalModule from "@/components/FunctionalModule.vue";
 import { moduleMessages } from "@/assets/data/userInfo/moduleMessages";

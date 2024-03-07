@@ -4,16 +4,16 @@
 			<ion-router-outlet></ion-router-outlet>
 			<ion-tab-bar slot="bottom">
 				<ion-tab-button
-					tab="PlanManagement"
+					tab="plan management"
 					href="/plan-management">
 					<ion-icon
 						aria-hidden="true"
 						:src="listOutline"></ion-icon>
-					<ion-label>planManagement</ion-label>
+					<ion-label>plan management</ion-label>
 				</ion-tab-button>
 
 				<ion-tab-button
-					tab="Auth"
+					tab="auth"
 					href="/auth">
 					<ion-icon
 						aria-hidden="true"
@@ -22,12 +22,12 @@
 				</ion-tab-button>
 
 				<ion-tab-button
-					tab="UserInfo"
+					tab="user info"
 					href="/user-info">
 					<ion-icon
 						aria-hidden="true"
 						:src="cloudOutline"></ion-icon>
-					<ion-label>userInfo</ion-label>
+					<ion-label>user info</ion-label>
 				</ion-tab-button>
 			</ion-tab-bar>
 		</ion-tabs>
@@ -41,8 +41,8 @@ import {
 	IonRouterOutlet,
 	IonTabBar,
 	IonTabButton,
-	IonLabel,
 	IonIcon,
+	IonLabel,
 } from "@ionic/vue";
 import { listOutline, personOutline, cloudOutline } from "ionicons/icons";
 </script>

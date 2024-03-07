@@ -62,6 +62,7 @@ import {
 	IonList,
 	IonChip,
 	IonAvatar,
+	IonButton,
 	IonAlert,
 } from "@ionic/vue";
 import FunctionalInput from "@/components/FunctionalInput.vue";

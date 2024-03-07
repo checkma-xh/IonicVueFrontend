@@ -70,6 +70,7 @@ import {
 	IonChip,
 	IonAvatar,
 	IonButton,
+	IonAlert,
 } from "@ionic/vue";
 import { onMounted, ref } from "vue";
 import { useUserStore } from "@/store/userStore";

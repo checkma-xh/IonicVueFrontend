@@ -1,31 +1,34 @@
 <template>
 	<ion-header>
 		<ion-toolbar>
-			<ion-buttons slot="start">
-				<ion-button @click="cancel()">Cancel</ion-button>
-			</ion-buttons>
-			<ion-buttons slot="end">
-				<ion-button
-					:strong="true"
-					@click="confirm()"
-					>Confirm</ion-button
-				>
-			</ion-buttons>
+			<ion-grid>
+				<ion-row>
+					<ion-col size="10.5">
+						<ion-searchbar
+							ref="searchBarRef"
+							placeholder="Search"
+							expand="block"
+							:debounce="10"
+							show-clear-button="never"
+							label-placement="floating"
+							v-model.lazy="searchContent"
+							@ionInput="handleInput"
+							@ionBlur="handleBlur"
+							@keydown.enter="handleSearch">
+						</ion-searchbar>
+					</ion-col>
+					<ion-col size="1.5">
+						<ion-button
+							@click="handleSearch"
+							color="light"
+							><ion-icon
+								:icon="search"
+								color="primary"></ion-icon
+						></ion-button>
+					</ion-col>
+				</ion-row>
+			</ion-grid>
 		</ion-toolbar>
-		<ion-toolbar>
-			<ion-searchbar
-				ref="searchBarRef"
-				placeholder="Search"
-				expand="block"
-				:debounce="10"
-				show-clear-button="never"
-				label-placement="floating"
-				v-model.lazy="searchContent"
-				@ionInput="handleInput"
-				@ionBlur="handleBlur"
-				@keydown.enter="handleSearch">
-			</ion-searchbar
-		></ion-toolbar>
 	</ion-header>
 	<ion-content class="ion-padding">
 		<ion-list>
@@ -53,15 +56,17 @@
 					<ion-icon :icon="closeOutline"></ion-icon>
 				</ion-button>
 			</ion-item>
-			<ion-item>
-				<ion-button
-					class="centered-button"
-					@click="handleClear">
-					clear
-				</ion-button>
-			</ion-item>
 		</ion-list>
 	</ion-content>
+	<ion-footer>
+		<ion-item>
+			<ion-button
+				class="centered-button"
+				@click="handleClear">
+				clear
+			</ion-button>
+		</ion-item>
+	</ion-footer>
 </template>
 
 <script setup lang="ts">
@@ -74,17 +79,20 @@ import {
 	deleteSearchHistory,
 } from "@/utils/useSearchHistory";
 import {
+	IonHeader,
+	IonToolbar,
+	IonGrid,
+	IonRow,
+	IonCol,
 	IonSearchbar,
+	IonButton,
+	IonContent,
 	IonList,
 	IonItem,
 	IonLabel,
-	modalController,
-	IonHeader,
-	IonToolbar,
-	IonButtons,
-	IonButton,
+	IonFooter,
 } from "@ionic/vue";
-import { closeOutline } from "ionicons/icons";
+import { closeOutline, search } from "ionicons/icons";
 import { onMounted, ref, Ref } from "vue";
 
 const searchBarRef = ref();
@@ -118,7 +126,11 @@ async function handleInput() {
 
 // 搜索事件
 async function handleSearch() {
-	if (searchContent.value == "") {
+	if (
+		searchContent.value == "" ||
+		searchContent.value == undefined ||
+		searchContent.value == null
+	) {
 		return;
 	}
 	results.value = await getSearchHistory();
@@ -146,18 +158,29 @@ async function handleDelete(targetIndex: number) {
 	await handleInput();
 }
 
-const cancel = () => modalController.dismiss(null, "cancel");
-const confirm = () => modalController.dismiss(null, "confirm");
-
 onMounted(async () => {
 	results.value = await getSearchHistory();
 });
 </script>
 
 <style scoped>
-.centered-button {
-	display: block;
+inon-header ion-searchbar {
+	margin-right: 0%;
+}
+
+ion-row {
+	height: 100%;
+	width: 98%;
+}
+
+ion-col ion-button {
+	height: 100%;
 	width: 100%;
-	height: 70%;
+	margin: auto;
+}
+
+.centered-button {
+	width: 100%;
+	height: 80%;
 }
 </style>

@@ -12,39 +12,43 @@ export const moduleMessages = {
       router.push({ name: "Register" });
     },
     icon: personAddOutline,
-    color: "tertiary",
+    cardColor: "light",
+    iconColor: "primary",
     title: "register",
-    subtitle: "register",
-    content: "good luck",
+    subtitle: "",
+    content: "",
   },
   loginModuleStyle: {
     handleClick: () => {
       router.push({ name: "Login" });
     },
     icon: logInOutline,
-    color: "success",
+    cardColor: "light",
+    iconColor: "primary",
     title: "login",
-    subtitle: "login",
-    content: "good luck",
+    subtitle: "",
+    content: "",
   },
   logoutModuleStyle: {
     handleClick: () => {
       alert("logout");
     },
     icon: logOutOutline,
-    color: "warning",
+    cardColor: "light",
+    iconColor: "medium",
     title: "logout",
-    subtitle: "logout",
-    content: "good luck",
+    subtitle: "",
+    content: "",
   },
   deactivateModuleStyle: {
     handleClick: () => {
       router.push({ name: "Deactivate" });
     },
     icon: personRemoveOutline,
-    color: "danger",
+    cardColor: "light",
+    iconColor: "medium",
     title: "deactivate",
-    subtitle: "deactivate",
-    content: "good luck",
+    subtitle: "",
+    content: "",
   },
 };

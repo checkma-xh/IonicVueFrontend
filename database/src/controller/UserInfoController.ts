@@ -2,6 +2,7 @@ import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
 import { UserInfo } from "../entity/UserInfo";
 import * as dotenv from "dotenv";
+import * as jwt from "jsonwebtoken";
 
 dotenv.configDotenv();
 
@@ -10,6 +11,11 @@ export class UserInfoController {
   private UserInfoRepository = AppDataSource.getRepository( UserInfo );
 
   async getUserInfo ( request: Request, response: Response, next: NextFunction ) {
+    const decodeToken = jwt.verify(request.headers.authorization.split(" ")[1], SECRET_KEY);
+    if (!decodeToken) {
+        response.status(404).json({ message: "no permission" });
+        return;
+    }
     const id = parseInt( request.params.id );
     const user = await this.UserInfoRepository.findOneBy( { id } );
     if ( !user ) {

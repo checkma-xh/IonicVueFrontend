@@ -46,6 +46,12 @@ export const Routes = [
     controller: PlanManagementController,
     action: "getGroups",
   },
+  {
+    method: "get",
+    route: "/plan-management/users/:id/plans",
+    controller: PlanManagementController,
+    action: "getPlansByGroupName",
+  },
 
   // Other
   {

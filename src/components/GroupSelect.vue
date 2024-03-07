@@ -13,6 +13,7 @@
 </template>
 
 <script setup lang="ts">
+import { IonSelect, IonSelectOption } from "@ionic/vue";
 import { onMounted, ref } from "vue";
 import { getGroups } from "@/api/planManagement/getGroups";
 import { useUserStore } from "@/store/userStore";
@@ -28,4 +29,4 @@ onMounted(async () => {
 	const currentUser = userStore.currentUser;
 	groups.value = await getGroups(currentUser.id, userStore.accessToken);
 });
-</script>@/api/planManagement/getGroups
+</script>@/api/planManagement/getGroups@/api/planManagement/getGroup

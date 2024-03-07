@@ -1,8 +1,11 @@
 <template>
 	<ion-select
+		ref="select"
 		label="repeat"
 		placeholder="repeat"
-		:value="repeatValue">
+		v-model:repeatValue="repeatValue"
+		:value="repeatValue"
+		@ionChange="handleChange">
 		<ion-select-option
 			v-for="(item, index) of repeats"
 			:key="index"
@@ -13,16 +16,19 @@
 </template>
 
 <script setup lang="ts">
+import { IonSelect, IonSelectOption } from "@ionic/vue";
 import { getRepeats } from "@/api/other/getRepeats";
 import { useUserStore } from "@/store/userStore";
 import { onMounted, ref } from "vue";
 
 const userStore = useUserStore();
 const repeats = ref();
-const repeatValue = defineModel("repeatValue", {
-	type: String,
-	required: true,
-});
+const select = ref();
+const repeatValue = defineModel("repeatValue");
+
+async function handleChange() {
+	repeatValue.value = select.value.$el.value;
+}
 
 onMounted(async () => {
 	repeats.value = await getRepeats(userStore.accessToken);

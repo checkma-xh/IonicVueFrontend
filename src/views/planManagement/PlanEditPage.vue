@@ -31,48 +31,50 @@
 				</ion-textarea>
 
 				<!-- 选择项 -->
-				<groups-select :groupsValue="groupsValue"></groups-select>
 				<priority-select
 					:priorityValue="priorityValue"></priority-select>
-				<repeat-select :repeatValue="repeatValue"></repeat-select>
+				<group-select :groupsValue="groupsValue"></group-select>
 
-				<!-- 日期 -->
-				<ion-accordion-group
-					><ion-accordion>
-						<ion-item
-							slot="header"
-							color="light">
-							<ion-label
-								><ion-label>start date</ion-label>
-								{{ startDate }}
-							</ion-label>
-							<ion-label
-								><ion-label>end date</ion-label>
-								{{ endDate }}
-							</ion-label>
-						</ion-item>
-
-						<div
-							class="ion-padding"
-							slot="content"
-							id="date">
-							<ion-datetime
-								presentation="date"
-								:multiple="true"
-								@ionChange="handleDateChange"
-								:highlighted-dates="highlightedDates"
-								ref="datetime">
-							</ion-datetime>
-						</div> </ion-accordion
-				></ion-accordion-group>
-
-				<!-- 按钮 -->
 				<!-- 新建分组 -->
 				<ion-button
-					@click="openModal"
+					id="open-group-creation-modal"
 					color="light"
-					>add groups</ion-button
+					><strong>add groups</strong></ion-button
 				>
+				<ion-modal trigger="open-group-creation-modal">
+					<GroupCreationModule></GroupCreationModule>
+				</ion-modal>
+
+				<!-- 日期 -->
+				<ion-button
+					color="light"
+					id="open-calendar-modal"
+					><ion-grid>
+						<ion-row
+							><ion-col size="4"
+								><strong>start date-</strong
+								><ion-label>{{ startDate }}</ion-label></ion-col
+							>
+							<ion-col size="4"
+								><strong>end date-</strong
+								><ion-label>{{ endDate }}</ion-label></ion-col
+							>
+							<ion-col size="4"
+								><strong>repeat-</strong
+								><ion-label>{{ repeatValue }}</ion-label></ion-col
+							>
+						</ion-row>
+					</ion-grid></ion-button
+				>
+				<ion-modal trigger="open-calendar-modal">
+					<CalendarModule
+						v-model:startDate="startDate"
+						v-model:endDate="endDate"
+						v-model:repeatValue="repeatValue">
+					</CalendarModule>
+				</ion-modal>
+
+				<!-- 按钮 -->
 				<ion-button>cancel</ion-button>
 				<ion-button>confirm</ion-button>
 			</div>
@@ -82,96 +84,39 @@
 
 <script setup lang="ts">
 import {
-	IonContent,
-	IonHeader,
 	IonPage,
-	IonTitle,
-	IonInput,
+	IonHeader,
 	IonToolbar,
-	IonItem,
-	IonLabel,
+	IonTitle,
+	IonContent,
+	IonInput,
 	IonTextarea,
-	IonDatetime,
-	IonAccordion,
-	IonAccordionGroup,
-	modalController,
+	IonButton,
+	IonModal,
+	IonLabel,
+	IonGrid,
+	IonRow,
+	IonCol,
 } from "@ionic/vue";
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
-import GroupsSelect from "@/components/GroupsSelect.vue";
+import GroupSelect from "@/components/GroupSelect.vue";
 import PrioritySelect from "@/components/PrioritySelect.vue";
-import RepeatSelect from "@/components/RepeatSelect.vue";
-import GroupCreationModal from "@/components/GroupCreationModal.vue";
+import GroupCreationModule from "@/components/GroupCreationModule.vue";
+import CalendarModule from "@/components/CalendarModule.vue";
+import { findModuleName } from "@/utils/findModuleName";
 
 const route = useRoute();
 const moduleName = ref();
 const titleRef = ref();
+const groupsValue = ref();
+const priorityValue = ref();
 const startDate = ref();
 const endDate = ref();
-const datetime = ref();
-const groupsValue = ref();
 const repeatValue = ref();
-const priorityValue = ref();
-const highlightedDates = ref([
-	{
-		date: "2024-03-04",
-		textColor: "#800080",
-		backgroundColor: "#ffc0cb",
-	},
-]);
-
-async function handleDateChange() {
-	let dates = [];
-	let sortedDates;
-	if (datetime.value.$el.value) {
-		datetime.value.$el.value = datetime.value.$el.value.slice(-2);
-		dates = datetime.value.$el.value;
-	}
-
-	switch (dates.length) {
-		case 0:
-			startDate.value = null;
-			endDate.value = null;
-			break;
-		case 1:
-			startDate.value = dates[0];
-			endDate.value = dates[0];
-			break;
-		case 2:
-			sortedDates = dates
-				.map((dateString: string) => new Date(dateString))
-				.sort((a: any, b: any) => a - b);
-
-			startDate.value = sortedDates[0].toISOString().substring(0, 10);
-			endDate.value = sortedDates[1].toISOString().substring(0, 10);
-			break;
-		default:
-			break;
-	}
-}
-
-async function openModal() {
-	const modal = await modalController.create({
-		component: GroupCreationModal,
-	});
-	modal.present();
-}
-
-async function setModuleValue() {
-	switch (route.name) {
-		case "Create":
-			moduleName.value = "Create";
-			break;
-		case "Set":
-			moduleName.value = "Set";
-			break;
-		default:
-			break;
-	}
-}
 
 onMounted(async () => {
-	setModuleValue();
+	moduleName.value = await findModuleName(route.name as string);
 });
 </script>
 
@@ -198,11 +143,12 @@ onMounted(async () => {
 	margin-top: 2%;
 }
 
-#date {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
+.ripple-parent {
+	position: relative;
+	margin-top: 2%;
+	margin-left: 2%;
+	height: 90px;
+	width: 100%;
 }
 
 ion-datetime {
@@ -217,6 +163,11 @@ ion-accordion-group {
 
 ion-accordion {
 	margin: 0 auto;
+}
+
+ion-col {
+	align-items: center;
+	text-align: center;
 }
 
 ion-accordion ion-item[slot="header"] {

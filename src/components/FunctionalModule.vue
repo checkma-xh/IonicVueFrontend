@@ -1,35 +1,36 @@
 <template>
-	<div
-		class="ion-activatable"
+	<ion-card
+		:color="cardColor"
+		:button="true"
 		@click="handleClick">
-		<ion-card :color="color">
-			<ion-icon
-				alt="Silhouette of mountains"
-				:icon="icon"
-				class="large-icon"></ion-icon>
-			<ion-card-header>
-				<ion-card-title>{{ title }}</ion-card-title>
-				<ion-card-subtitle>{{ subtitle }}</ion-card-subtitle>
-			</ion-card-header>
-			<ion-card-content>{{ content }}</ion-card-content>
-			<ion-ripple-effect></ion-ripple-effect>
-		</ion-card>
-	</div>
+		<ion-icon
+			alt="Silhouette of mountains"
+			:icon="icon"
+			:color="iconColor"
+			class="large-icon"></ion-icon>
+		<ion-card-header>
+			<ion-card-title><strong>{{ title }}</strong></ion-card-title>
+			<ion-card-subtitle>{{ subtitle }}</ion-card-subtitle>
+		</ion-card-header>
+		<ion-card-content>{{ content }}</ion-card-content>
+	</ion-card>
 </template>
 
 <script setup lang="ts">
 import { defineModel } from "vue";
 import {
 	IonCard,
-	IonCardContent,
+	IonIcon,
 	IonCardHeader,
-	IonCardSubtitle,
 	IonCardTitle,
+	IonCardSubtitle,
+	IonCardContent,
 } from "@ionic/vue";
 
 const handleClick = defineModel("handleClick");
 const icon = defineModel("icon");
-const color = defineModel("color");
+const iconColor = defineModel("iconColor");
+const cardColor = defineModel("cardColor");
 const title = defineModel("title");
 const subtitle = defineModel("subtitle");
 const content = defineModel("content");

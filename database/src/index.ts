@@ -11,7 +11,7 @@ import { PriorityInfo } from "./entity/PriorityInfo";
 import { RepeatInfo } from "./entity/RepeatInfo";
 
 
-async function createData () {
+async function createData() {
   // todo 创建数据
   // UserInfo
   const user = new UserInfo();
@@ -46,6 +46,11 @@ async function createData () {
   weekdayRepeat.remark = "repeat weekday";
 
   // GroupInfo
+  const defaultGroup = new GroupInfo();
+  defaultGroup.name = "default";
+  defaultGroup.remark = "default group";
+  defaultGroup.user = user;
+
   const keepGroup = new GroupInfo();
   keepGroup.name = "keep";
   keepGroup.remark = "keep working";
@@ -64,6 +69,7 @@ async function createData () {
   getUp.group = dailyGroup;
   getUp.repeat = everydayRepeat;
   getUp.priority = lowPriority;
+  getUp.completed = true;
 
   const washFace = new PlanInfo();
   washFace.name = "wash face";
@@ -97,94 +103,97 @@ async function createData () {
   working.repeat = everydayRepeat;
   working.priority = lowPriority;
 
+  
+
   // todo 处理依赖
   // UserInfo
-  user.plans = [ getUp, washFace, brushTeeth, eatBreakfast, working ];
-  user.groups = [ keepGroup, dailyGroup ];
+  user.plans = [getUp, washFace, brushTeeth, eatBreakfast, working];
+  user.groups = [defaultGroup, keepGroup, dailyGroup];
 
   // PriorityInfo
   highPriority.plans = [];
   mediumPriority.plans = [];
-  lowPriority.plans = [ getUp, washFace, brushTeeth, eatBreakfast, working ];
+  lowPriority.plans = [getUp, washFace, brushTeeth, eatBreakfast, working];
 
   // RepeatInfo
-  everydayRepeat.plans = [ getUp, washFace, brushTeeth, eatBreakfast, working ];
+  everydayRepeat.plans = [getUp, washFace, brushTeeth, eatBreakfast, working];
   workdayRepeat.plans = [];
   weekdayRepeat.plans = [];
 
   // GroupInfo
+  defaultGroup.plans = [];
   keepGroup.plans = [];
-  dailyGroup.plans = [ getUp, washFace, brushTeeth, eatBreakfast, working ];
+  dailyGroup.plans = [getUp, washFace, brushTeeth, eatBreakfast, working];
 
   // PlanInfo
 
   // todo 保存数据
-  await AppDataSource.manager.save( PriorityInfo, [
+  await AppDataSource.manager.save(PriorityInfo, [
     highPriority,
     mediumPriority,
     lowPriority,
-  ] );
-  await AppDataSource.manager.save( RepeatInfo, [
+  ]);
+  await AppDataSource.manager.save(RepeatInfo, [
     everydayRepeat,
     workdayRepeat,
     weekdayRepeat,
-  ] );
-  await AppDataSource.manager.save( PlanInfo, [
+  ]);
+  await AppDataSource.manager.save(PlanInfo, [
     getUp,
     washFace,
     brushTeeth,
     eatBreakfast,
     working,
-  ] );
-  await AppDataSource.manager.save( UserInfo, [ user ] );
-  await AppDataSource.manager.save( GroupInfo, [ keepGroup, dailyGroup ] );
+  ]);
+  await AppDataSource.manager.save(UserInfo, [user]);
+  await AppDataSource.manager.save(GroupInfo, [keepGroup, dailyGroup]);
 }
 
 AppDataSource.initialize()
-  .then( async () => {
+  .then(async () => {
     // create express app
     const app = express();
-    app.use( cors( {
+    app.use(cors({
       origin: '*',
-    } ) );
-    app.use( bodyParser.json() );
-    app.use( bodyParser.urlencoded( { extended: true } ) );
+    }));
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({ extended: true }));
 
     // register express routes from defined application routes
-    Routes.forEach( ( route ) => {
-      ( app as any )[ route.method ](
+    Routes.forEach((route) => {
+      (app as any)[route.method](
         route.route,
-        ( req: Request, res: Response, next: Function ) => {
-          const result = new ( route.controller as any )()[ route.action ](
+        (req: Request, res: Response, next: Function) => {
+          const result = new (route.controller as any)()[route.action](
             req,
             res,
             next,
           );
-          if ( result instanceof Promise ) {
-            result.then( ( result ) =>
+          if (result instanceof Promise) {
+            result.then((result) =>
               result !== null && result !== undefined
-                ? res.send( result )
+                ? res.send(result)
                 : undefined,
             );
-          } else if ( result !== null && result !== undefined ) {
-            res.json( result );
+          } else if (result !== null && result !== undefined) {
+            res.json(result);
           }
         },
       );
-    } );
+    });
 
     // setup express app here
     // ...
 
     // start express server
-    app.listen( 3000 );
+    app.listen(3000);
 
-    if ( ( await AppDataSource.manager.find( UserInfo ) ).length === 0 ) {
+    if ((await AppDataSource.manager.find(UserInfo)).length === 0) {
       createData();
     }
 
     console.log(
       "Express server has started on port 3000. Open http://localhost:3000/user-info/users/1 to see results",
     );
-  } )
-  .catch( ( error ) => console.log( error ) );
+  })
+  .catch((error) => console.log(error));

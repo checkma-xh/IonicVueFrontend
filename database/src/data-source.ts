@@ -7,11 +7,12 @@ import { PriorityInfo } from "./entity/PriorityInfo";
 import { RepeatInfo } from "./entity/RepeatInfo";
 
 export const AppDataSource = new DataSource({
-  type: "sqlite",
-  database: "database.sqlite",
+  type       : "sqlite",
+  database   : "database.sqlite",
   synchronize: true,
-  logging: false,
-  entities: [UserInfo, PlanInfo, GroupInfo, PriorityInfo, RepeatInfo],
-  migrations: [],
+  logging    : false,
+  entities   : [UserInfo, PlanInfo, GroupInfo, PriorityInfo, RepeatInfo],
+  migrations : [],
   subscribers: [],
+  cache      : false,
 });

@@ -13,7 +13,7 @@ export async function deactivate ( accessToken: string ) {
       data,
       config
     );
-    return response;
+    return response.data;
   } catch ( error ) {
     console.error( "Error fetching data:", error );
   }

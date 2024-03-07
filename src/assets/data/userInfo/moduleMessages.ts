@@ -18,20 +18,22 @@ export const moduleMessages = {
       router.push({ name: "EditEmail" });
     },
     icon: mailOutline,
-    color: "dark",
+    cardColor: "light",
+    iconColor: "primary",
     title: "edit email",
-    subtitle: "edit email",
-    content: "good luck",
+    subtitle: "",
+    content: "",
   },
   editPasswordModuleStyle: {
     handleClick: () => {
       router.push({ name: "EditPassword" });
     },
     icon: eyeOutline,
-    color: "danger",
+    cardColor: "light",
+    iconColor: "primary",
     title: "edit password",
-    subtitle: "edit password",
-    content: "good luck",
+    subtitle: "",
+    content: "",
   },
   editAvatarModuleStyle: {
     handleClick: async () => {
@@ -43,9 +45,10 @@ export const moduleMessages = {
       }
     },
     icon: personCircleOutline,
-    color: "light",
+    cardColor: "light",
+    iconColor: "primary",
     title: "edit avatar",
-    subtitle: "edit avatar",
-    content: "good luck",
+    subtitle: "",
+    content: "",
   },
 };
