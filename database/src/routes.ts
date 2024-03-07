@@ -33,13 +33,84 @@ export const Routes = [
   // Auth
   {
     method: "post",
+    route: "/auth/register",
+    controller: AuthController,
+    action: "register",
+  },
+  {
+    method: "post",
     route: "/auth/login",
     controller: AuthController,
     action: "login",
   },
-
+  {
+    method: "post",
+    route: "/auth/logout",
+    controller: AuthController,
+    action: "logout",
+  },
+  {
+    method: "post",
+    route: "/auth/refresh",
+    controller: AuthController,
+    action: "refresh",
+  },
+  {
+    method: "post",
+    route: "/auth/deactivate",
+    controller: AuthController,
+    action: "deactivate",
+  },
+  {
+    method: "post",
+    route: "/auth/verification-code/request",
+    controller: AuthController,
+    action: "verificationCodeRequest",
+  },
+  {
+    method: "post",
+    route: "/auth/verification-code/verify",
+    controller: AuthController,
+    action: "verificationCodeVerify",
+  },
 
   // PlanManagement
+  {
+    method: "post",
+    route: "/plan-management/users/:id/plans",
+    controller: PlanManagementController,
+    action: "createPlan",
+  },
+  {
+    method: "get",
+    route: "/plan-management/users/:userId/plans/:planId",
+    controller: PlanManagementController,
+    action: "getPlan",
+  },
+  {
+    method: "post",
+    route: "/plan-management/users/:userId/plans/:planId",
+    controller: PlanManagementController,
+    action: "completePlan",
+  },
+  {
+    method: "delete",
+    route: "/plan-management/users/:userId/plans/:planId",
+    controller: PlanManagementController,
+    action: "deletePlan",
+  },
+  {
+    method: "patch",
+    route: "/plan-management/users/:userId/plans/:planId",
+    controller: PlanManagementController,
+    action: "setPlan",
+  },
+  {
+    method: "post",
+    route: "/plan-management/users/:id/groups",
+    controller: PlanManagementController,
+    action: "createGroup",
+  },
   {
     method: "get",
     route: "/plan-management/users/:id/groups",
@@ -47,10 +118,22 @@ export const Routes = [
     action: "getGroups",
   },
   {
+    method: "delete",
+    route: "/plan-management/users/:userId/groups/:groupId",
+    controller: PlanManagementController,
+    action: "deleteGroup",
+  },
+  {
+    method: "patch",
+    route: "/plan-management/users/:userId/groups/:groupId",
+    controller: PlanManagementController,
+    action: "setGroup",
+  },
+  {
     method: "get",
     route: "/plan-management/users/:id/plans",
     controller: PlanManagementController,
-    action: "getPlansByGroupName",
+    action: "getPlans",
   },
 
   // Other

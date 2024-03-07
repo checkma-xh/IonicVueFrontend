@@ -59,12 +59,7 @@ import {
 	IonItemOption,
 	IonItemSliding,
 } from "@ionic/vue";
-import {
-	ellipsisVertical,
-	trash,
-	cog,
-	arrowForward,
-} from "ionicons/icons";
+import { ellipsisVertical, trash, cog, arrowForward } from "ionicons/icons";
 
 const color = defineModel("color");
 const icon = defineModel("icon");

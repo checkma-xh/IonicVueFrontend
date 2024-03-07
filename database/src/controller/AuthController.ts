@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import { UserInfo } from "../entity/UserInfo";
 import * as jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
+import type { JwtPayload } from "jsonwebtoken";
 
 dotenv.configDotenv();
 
@@ -27,12 +28,14 @@ export class AuthController {
     return object;
   }
 
+  async register(request: Request, response: Response, next: NextFunction) { }
+
   async login(request: Request, response: Response, next: NextFunction) {
     const email = request.body.email;
     const passwordHash = request.body.passwordHash;
     const user = await this.UserInfoRepository
       .createQueryBuilder("user")
-      .where("user.email = :email AND user.passwordHash = :passwordHash", { email, passwordHash })
+      .where("user.email = :email AND user.passwordHash = :passwordHash AND user.activated = 1", { email, passwordHash })
       .getOne();
     if (!user) {
       response.status(404).json({ message: "userInfo not found" });
@@ -46,21 +49,75 @@ export class AuthController {
       });
   }
 
-  async logout(request: Request, response: Response, next: NextFunction) { }
+  async logout(request: Request, response: Response, next: NextFunction) {
+    const decodeToken = jwt.verify(request.headers.authorization.split(" ")[1], SECRET_KEY);
+    if (!decodeToken) {
+      response.status(404).json({ message: "no permission" });
+      return;
+    }
+    const user = await this.UserInfoRepository
+      .createQueryBuilder("user")
+      .where("user.id = :id", { id: (decodeToken as JwtPayload).id })
+      .getOne();
+    if (!user) {
+      response.status(404).json({ message: "userInfo not found" });
+      return;
+    }
+    response.json(
+      {
+        accessToken: jwt.sign(this.ORMToObject(user), SECRET_KEY, { expiresIn: 1 }),
+        refreshToken: jwt.sign(this.ORMToObject(user), SECRET_KEY, { expiresIn: 1 }),
+      });
+  }
 
-  async refresh(request: Request, response: Response, next: NextFunction) { }
+  async refresh(request: Request, response: Response, next: NextFunction) {
+    const decodeToken = jwt.verify(request.headers.authorization.split(" ")[1], SECRET_KEY);
+    if (!decodeToken) {
+      response.status(404).json({ message: "no permission" });
+      return;
+    }
+    const user = await this.UserInfoRepository
+      .createQueryBuilder("user")
+      .where("user.id = :id", { id: (decodeToken as JwtPayload).id })
+      .getOne();
+    if (!user) {
+      response.status(404).json({ message: "userInfo not found" });
+      return;
+    }
+    response.json(
+      { accessToken: jwt.sign(this.ORMToObject(user), SECRET_KEY, REFRESH_TOKEN_OPTIONS) });
+  }
 
-  async deactivate(request: Request, response: Response, next: NextFunction) { }
+  async deactivate(request: Request, response: Response, next: NextFunction) {
+    const decodeToken = jwt.verify(request.headers.authorization.split(" ")[1], SECRET_KEY);
+    if (!decodeToken) {
+      response.status(404).json({ message: "no permission" });
+      return;
+    }
+    const user = await this.UserInfoRepository
+      .createQueryBuilder("user")
+      .where("user.id = :id", { id: (decodeToken as JwtPayload).id })
+      .getOne();
+    if (!user) {
+      response.status(404).json({ message: "userInfo not found" });
+      return;
+    }
+    user.activated = false;
+    await this.UserInfoRepository.save(user);
+    response.json(
+      {
+        accessToken: jwt.sign(this.ORMToObject(user), SECRET_KEY, { expiresIn: 1 }),
+        refreshToken: jwt.sign(this.ORMToObject(user), SECRET_KEY, { expiresIn: 1 }),
+      });
+  }
 
-  async register(request: Request, response: Response, next: NextFunction) { }
-
-  async VerificationCodeRequest(
+  async verificationCodeRequest(
     request: Request,
     response: Response,
     next: NextFunction,
   ) { }
 
-  async VerificationCodeVerify(
+  async verificationCodeVerify(
     request: Request,
     response: Response,
     next: NextFunction,

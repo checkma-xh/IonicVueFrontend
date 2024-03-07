@@ -6,6 +6,7 @@ import { PriorityInfo } from "../entity/PriorityInfo";
 import { PlanInfo } from "../entity/PlanInfo";
 import * as jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
+import { group } from "console";
 
 dotenv.configDotenv();
 
@@ -55,52 +56,19 @@ export class PlanManagementController {
 
   async setGroup(request: Request, response: Response, next: NextFunction) { }
 
-  async getPlansByDeleted(
-    request: Request,
-    response: Response,
-    next: NextFunction,
-  ) { }
-
-  async getPlansByGroupName(
-    request: Request,
-    response: Response,
-    next: NextFunction,
-  ) {
-    // const decodeToken = jwt.verify(request.headers.authorization.split(" ")[1], SECRET_KEY);
-    // if (!decodeToken) {
-    //   response.status(404).json({ message: "no permission" });
-    //   return;
-    // }
-    const plans = await this.PlanInfoRepository
-    .createQueryBuilder("plan")
-    .leftJoinAndSelect("plan.user", "user")
-    .leftJoinAndSelect("plan.group", "group")
-    .where("user.id = :id", { id: 1 })
-    .andWhere("group.name = :groupName", { groupName: request.query.groupName })
-    .getMany();
-    if (!plans) {
-      response.status(404).json({ message: "plan information not found" });
-      return;
+  async getPlans(request: Request, response: Response, next: NextFunction) {
+    const decodeToken = jwt.verify(request.headers.authorization.split(" ")[1], SECRET_KEY);
+    if (!decodeToken) {
+        response.status(404).json({ message: "no permission" });
+        return;
     }
-    response.json(plans);
+    const deleted = request.query.deleted;
+    const groupName = request.query.groupName;
+    const startDate = request.query.startDate;
+    const endDate = request.query.endDate;
+    const completed = request.query.completed;
+    const name = request.query.name;
+    const remark = request.query.remark;
+    console.log(deleted, groupName, startDate, endDate, completed, name, remark);
   }
-
-  async getPlansByCompleted(
-    request: Request,
-    response: Response,
-    next: NextFunction,
-  ) { }
-
-  async getPlansByPeriod(
-    request: Request,
-    response: Response,
-    next: NextFunction,
-  ) { }
-
-
-  async getPlansByContent(
-    request: Request,
-    response: Response,
-    next: NextFunction,
-  ) { }
 }
