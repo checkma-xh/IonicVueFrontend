@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
 import { UserInfo } from "../entity/UserInfo";

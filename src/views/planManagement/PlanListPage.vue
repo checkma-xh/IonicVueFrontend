@@ -80,7 +80,7 @@ onMounted(async () => {
 		item.completedCount = 5;
         item.total = 10;
 		item.handleClick = () => {
-			alert(item.label);
+			// alert(item.label);
 		};
 	});
 	plans.value = await getPlansByGroupName(

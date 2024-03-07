@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
 import { UserInfo } from "../entity/UserInfo";
@@ -7,7 +6,6 @@ import { PriorityInfo } from "../entity/PriorityInfo";
 import { PlanInfo } from "../entity/PlanInfo";
 import * as jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
-import { userInfo } from "os";
 
 dotenv.configDotenv();
 
@@ -20,6 +18,12 @@ export class PlanManagementController {
   private PlanInfoRepository = AppDataSource.getRepository(PlanInfo);
 
   async createPlan(request: Request, response: Response, next: NextFunction) { }
+
+  async getPlan(
+    request: Request,
+    response: Response,
+    next: NextFunction,
+  ) { }
 
   async completePlan(
     request: Request,
@@ -81,6 +85,11 @@ export class PlanManagementController {
     response.json(plans);
   }
 
+  async getPlansByCompleted(
+    request: Request,
+    response: Response,
+    next: NextFunction,
+  ) { }
 
   async getPlansByPeriod(
     request: Request,

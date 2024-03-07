@@ -62,6 +62,42 @@ async function createData() {
   dailyGroup.user = user;
 
   // PlanInfo
+  const eating = new PlanInfo();
+  eating.name = "eating";
+  eating.remark = "12:00 PM";
+  eating.user = user;
+  eating.group = defaultGroup;
+  eating.repeat = everydayRepeat;
+  eating.priority = highPriority;
+  eating.completed = true;
+
+  const drinking = new PlanInfo();
+  drinking.name = "drinking";
+  drinking.remark = "3:00 PM";
+  drinking.user = user;
+  drinking.group = defaultGroup;
+  drinking.repeat = everydayRepeat;
+  drinking.priority = highPriority;
+  drinking.completed = true;
+
+  const fucking = new PlanInfo();
+  fucking.name = "fucking";
+  fucking.remark = "9:00 PM";
+  fucking.user = user;
+  fucking.group = defaultGroup;
+  fucking.repeat = everydayRepeat;
+  fucking.priority = highPriority;
+  fucking.completed = false;
+
+  const fighting = new PlanInfo();
+  fighting.name = "fighting";
+  fighting.remark = "11:00 PM";
+  fighting.user = user;
+  fighting.group = defaultGroup;
+  fighting.repeat = everydayRepeat;
+  fighting.priority = highPriority;
+  fighting.completed = false;
+
   const getUp = new PlanInfo();
   getUp.name = "get up";
   getUp.remark = "7:00 AM";
@@ -103,25 +139,25 @@ async function createData() {
   working.repeat = everydayRepeat;
   working.priority = lowPriority;
 
-  
+
 
   // todo 处理依赖
   // UserInfo
-  user.plans = [getUp, washFace, brushTeeth, eatBreakfast, working];
+  user.plans = [eating, drinking, fucking, fighting, getUp, washFace, brushTeeth, eatBreakfast, working];
   user.groups = [defaultGroup, keepGroup, dailyGroup];
 
   // PriorityInfo
-  highPriority.plans = [];
+  highPriority.plans = [eating, drinking, fucking, fighting];
   mediumPriority.plans = [];
   lowPriority.plans = [getUp, washFace, brushTeeth, eatBreakfast, working];
 
   // RepeatInfo
-  everydayRepeat.plans = [getUp, washFace, brushTeeth, eatBreakfast, working];
+  everydayRepeat.plans = [eating, drinking, fucking, fighting, getUp, washFace, brushTeeth, eatBreakfast, working];
   workdayRepeat.plans = [];
   weekdayRepeat.plans = [];
 
   // GroupInfo
-  defaultGroup.plans = [];
+  defaultGroup.plans = [eating, drinking, fucking, fighting];
   keepGroup.plans = [];
   dailyGroup.plans = [getUp, washFace, brushTeeth, eatBreakfast, working];
 
@@ -139,6 +175,10 @@ async function createData() {
     weekdayRepeat,
   ]);
   await AppDataSource.manager.save(PlanInfo, [
+    eating, 
+    drinking, 
+    fucking, 
+    fighting,
     getUp,
     washFace,
     brushTeeth,
