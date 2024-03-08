@@ -39,8 +39,8 @@ export function emailFormat ( email: string ) {
 }
 
 // 定义验证码相关常量
-const CODE_LEN = parseInt( import.meta.env.VITE_CODE_LEN );
+const VERIFICATION_CODE_LEN = parseInt( import.meta.env.VITE_VERIFICATION_CODE_LEN );
 
-export function codeFormat ( code: string ) {
-  return code != undefined && code != null && code.length == CODE_LEN;
+export function verificationCodeFormat ( verificationCode: string ) {
+  return verificationCode != undefined && verificationCode != null && verificationCode.length == VERIFICATION_CODE_LEN;
 }

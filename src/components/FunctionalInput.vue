@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { IonInput } from "@ionic/vue";
-import { emailFormat, passwordFormat, codeFormat } from "@/utils/useTextFormat";
+import { emailFormat, passwordFormat, verificationCodeFormat } from "@/utils/useTextFormat";
 
 const inputRef = ref();
 const label = ref();
@@ -44,7 +44,7 @@ function validateInput() {
 			formatResult = passwordFormat(inputValue);
 			break;
 		case "text":
-			formatResult = codeFormat(inputValue);
+			formatResult = verificationCodeFormat(inputValue);
 			break;
 		default:
 			break;

@@ -18,7 +18,7 @@
 			<div id="container">
 				<ion-list>
 					<verify-module
-						v-model:code="code"
+						v-model:verificationCode="verificationCode"
 						:avatarUrl="currentUser.avatarUrl"
 						:email="currentUser.email"
 						:handleVerify="handleVerify"></verify-module>
@@ -41,14 +41,14 @@ import { ref } from "vue";
 import { useUserStore } from "@/store/userStore";
 import VerifyModule from "@/components/VerifyModule.vue";
 import router from "@/router";
-import { codeFormat } from "@/utils/useTextFormat";
+import { verificationCodeFormat } from "@/utils/useTextFormat";
 
 const userStore = useUserStore();
 const currentUser = userStore.currentUser;
-const code = ref();
+const verificationCode = ref();
 
 async function handleVerify() {
-	if (!codeFormat(code.value)) {
+	if (!verificationCodeFormat(verificationCode.value)) {
 		alert("wrong format");
 		return;
 	}

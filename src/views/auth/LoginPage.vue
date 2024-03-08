@@ -30,7 +30,7 @@
 						id="login-alert"
 						>login</ion-button
 					>
-					<ion-button @click.stop="codeLogin">code login</ion-button>
+					<ion-button @click.stop="verificationCodeLogin">verification code login</ion-button>
 					<ion-alert
 						trigger="login-alert"
 						:header="alertHeader"
@@ -45,7 +45,7 @@
 				v-else>
 				<ion-list>
 					<verify-module
-						v-model:code="code"
+						v-model:verificationCode="verificationCode"
 						:avatarUrl="avatarUrl"
 						:email="email"
 						:handleVerify="handleVerify"></verify-module>
@@ -69,7 +69,7 @@ import {
 import FunctionalInput from "@/components/FunctionalInput.vue";
 import { onMounted, ref } from "vue";
 import router from "@/router";
-import { codeFormat, emailFormat, passwordFormat } from "@/utils/useTextFormat";
+import { verificationCodeFormat, emailFormat, passwordFormat } from "@/utils/useTextFormat";
 import VerifyModule from "@/components/VerifyModule.vue";
 import { useUserStore } from "@/store/userStore";
 import { personCircleOutline } from "ionicons/icons";
@@ -80,7 +80,7 @@ const alertSubHeader = ref("wrong format");
 const alertMessage = ref("wrong format");
 const email = ref();
 const password = ref();
-const code = ref();
+const verificationCode = ref();
 const verify = ref();
 const avatarUrl = ref(personCircleOutline);
 
@@ -131,7 +131,7 @@ function setAlert(message: string) {
 	];
 }
 
-async function codeLogin() {
+async function verificationCodeLogin() {
 	if (!emailFormat(email.value)) {
 		alert("wrong format");
 		return;
@@ -141,7 +141,7 @@ async function codeLogin() {
 }
 
 async function handleVerify() {
-	if (!codeFormat(code.value)) {
+	if (!verificationCodeFormat(verificationCode.value)) {
 		alert("wrong format");
 		return;
 	}

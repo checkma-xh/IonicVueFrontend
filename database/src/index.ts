@@ -175,9 +175,9 @@ async function createData() {
     weekdayRepeat,
   ]);
   await AppDataSource.manager.save(PlanInfo, [
-    eating, 
-    drinking, 
-    fucking, 
+    eating,
+    drinking,
+    fucking,
     fighting,
     getUp,
     washFace,
@@ -198,6 +198,11 @@ AppDataSource.initialize()
     }));
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
+    app.use((err, req, res, next) => {
+      console.error(err.stack);
+      res.status(500).send('Something went wrong!');
+    });
+
 
     // register express routes from defined application routes
     Routes.forEach((route) => {

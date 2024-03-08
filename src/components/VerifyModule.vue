@@ -10,7 +10,7 @@
 		</ion-chip>
 		<functional-input
 			inputType="text"
-			v-model="code"></functional-input>
+			v-model="verificationCode"></functional-input>
 		<ion-button @click="handleVerify()">confirm</ion-button>
 	</ion-list>
 </template>
@@ -27,7 +27,7 @@ const email = defineModel("email", {
 	type: String,
 	required: true,
 });
-const code = defineModel("code", {
+const verificationCode = defineModel("verificationCode", {
 	type: String,
 	required: true,
 });

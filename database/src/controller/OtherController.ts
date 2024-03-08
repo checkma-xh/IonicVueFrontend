@@ -2,19 +2,14 @@ import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
 import { PriorityInfo } from "../entity/PriorityInfo";
 import { RepeatInfo } from "../entity/RepeatInfo";
-import * as jwt from "jsonwebtoken";
-import * as dotenv from "dotenv";
-
-dotenv.configDotenv();
-
-const SECRET_KEY = process.env.SECRET_KEY;
+import { tokenVerify } from "../utils/tokenVerify";
 
 export class OtherController {
     private PriorityInfoRepository = AppDataSource.getRepository(PriorityInfo);
     private RepeatInfoRepository = AppDataSource.getRepository(RepeatInfo);
 
     async getPriorities(request: Request, response: Response, next: NextFunction) {
-        const decodeToken = jwt.verify(request.headers.authorization.split(" ")[1], SECRET_KEY);
+        const decodeToken = await tokenVerify(request.headers.authorization.split(" ")[1]);
         if (!decodeToken) {
             response.status(404).json({ message: "no permission" });
             return;
@@ -28,7 +23,7 @@ export class OtherController {
     }
 
     async getRepeats(request: Request, response: Response, next: NextFunction) {
-        const decodeToken = jwt.verify(request.headers.authorization.split(" ")[1], SECRET_KEY);
+        const decodeToken = await tokenVerify(request.headers.authorization.split(" ")[1]);
         if (!decodeToken) {
             response.status(404).json({ message: "no permission" });
             return;

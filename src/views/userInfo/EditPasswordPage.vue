@@ -52,7 +52,7 @@
 				v-else>
 				<ion-list>
 					<verify-module
-						v-model:code="code"
+						v-model:verificationCode="verificationCode"
 						:avatarUrl="currentUser.avatarUrl"
 						:email="targetEmail"
 						:handleVerify="handleVerify"></verify-module>
@@ -78,7 +78,7 @@ import {
 } from "@ionic/vue";
 import { onMounted, ref } from "vue";
 import { useUserStore } from "@/store/userStore";
-import { codeFormat, passwordFormat } from "@/utils/useTextFormat";
+import { verificationCodeFormat, passwordFormat } from "@/utils/useTextFormat";
 import VerifyModule from "@/components/VerifyModule.vue";
 import FunctionalInput from "@/components/FunctionalInput.vue";
 import router from "@/router";
@@ -96,7 +96,7 @@ let alertButtons = [
 const userStore = useUserStore();
 const currentUser = userStore.currentUser;
 const verify = ref();
-const code = ref();
+const verificationCode = ref();
 const password = ref();
 const confirmPassword = ref();
 const targetEmail = ref("checkma_xh@outlook.com");
@@ -138,7 +138,7 @@ async function editPassword() {
 }
 
 async function handleVerify() {
-	if (!codeFormat(code.value)) {
+	if (!verificationCodeFormat(verificationCode.value)) {
 		alert("wrong format");
 		return;
 	}

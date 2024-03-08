@@ -1,71 +1,86 @@
 import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
 import { UserInfo } from "../entity/UserInfo";
-import * as dotenv from "dotenv";
-import * as jwt from "jsonwebtoken";
+import { tokenVerify } from "../utils/tokenVerify";
+import { verificationInfoMap } from "./AuthController";
 
-dotenv.configDotenv();
-
-const SECRET_KEY = process.env.SECRET_KEY;
 export class UserInfoController {
-  private UserInfoRepository = AppDataSource.getRepository( UserInfo );
+  private UserInfoRepository = AppDataSource.getRepository(UserInfo);
 
-  async getUserInfo ( request: Request, response: Response, next: NextFunction ) {
-    const decodeToken = jwt.verify(request.headers.authorization.split(" ")[1], SECRET_KEY);
+  async getUserInfo(request: Request, response: Response, next: NextFunction) {
+    const decodeToken = await tokenVerify(request.headers.authorization.split(" ")[1]);
     if (!decodeToken) {
-        response.status(404).json({ message: "no permission" });
-        return;
-    }
-    const id = parseInt( request.params.id );
-    const user = await this.UserInfoRepository.findOneBy( { id } );
-    if ( !user ) {
-      response.status( 404 ).json( { message: "userInfo not found" } );
+      response.status(404).json({ message: "no permission" });
       return;
     }
-    response.json( user );
-  }
-
-  async editEmail ( request: Request, response: Response, next: NextFunction ) {
-    const id = parseInt( request.params.id );
-    const user = await this.UserInfoRepository.findOneBy( { id } );
-    if ( !user ) {
-      response.status( 404 ).json( { message: "userInfo not found" } );
+    const id = parseInt(request.params.id);
+    const user = await this.UserInfoRepository.findOneBy({ id });
+    if (!user) {
+      response.status(404).json({ message: "userInfo not found" });
       return;
     }
-    user.email = request.body.email;
-    await this.UserInfoRepository.save( user );
-    response.json( user );
+    response.json(user);
   }
 
-  async editPasswordHash (
+  async editEmail(request: Request, response: Response, next: NextFunction) {
+    const oldEmail: string = request.body.oldEmail;
+    const newEmail: string = request.body.newEmail;
+    const verificationInfo = verificationInfoMap.get(newEmail);
+    if (!verificationInfo?.verificationResult) {
+      response.status(400).json({ message: "Verification failed." });
+      return;
+    }
+    const user = await this.UserInfoRepository
+      .createQueryBuilder("user")
+      .where("user.email = :email AND user.activated = 1", { oldEmail })
+      .getOne();
+    user.email = newEmail;
+    await this.UserInfoRepository.save(user);
+    response.json(user);
+  }
+// redis hashtable\publisher
+// celery
+// kafka
+
+  async editPasswordHash(
     request: Request,
     response: Response,
     next: NextFunction,
   ) {
-    const id = parseInt( request.params.id );
-    const user = await this.UserInfoRepository.findOneBy( { id } );
-    if ( !user ) {
-      response.status( 404 ).json( { message: "userInfo not found" } );
+    const email: string = request.body.email;
+    const passwordHash: string = request.body.passwordHash;
+    const verificationInfo = verificationInfoMap.get(email);
+    if (!verificationInfo?.verificationResult) {
+      response.status(400).json({ message: "Verification failed." });
       return;
     }
-    user.passwordHash = request.body.passwordHash;
-    await this.UserInfoRepository.save( user );
-    response.json( user );
+    const user = await this.UserInfoRepository
+      .createQueryBuilder("user")
+      .where("user.email = :email AND user.activated = 1", { email })
+      .getOne();
+    user.passwordHash = passwordHash;
+    await this.UserInfoRepository.save(user);
+    response.json(user);
   }
 
-  async editAvatarUrl (
+  async editAvatarUrl(
     request: Request,
     response: Response,
     next: NextFunction,
   ) {
-    const id = parseInt( request.params.id );
-    const user = await this.UserInfoRepository.findOneBy( { id } );
-    if ( !user ) {
-      response.status( 404 ).json( { message: "userInfo not found" } );
+    const email: string = request.body.email;
+    const avatarUrl: string = request.body.avatarUrl;
+    const verificationInfo = verificationInfoMap.get(email);
+    if (!verificationInfo?.verificationResult) {
+      response.status(400).json({ message: "Verification failed." });
       return;
     }
-    user.avatarUrl = request.body.avatarUrl;
-    await this.UserInfoRepository.save( user );
-    response.json( user );
+    const user = await this.UserInfoRepository
+      .createQueryBuilder("user")
+      .where("user.email = :email AND user.activated = 1", { email })
+      .getOne();
+    user.passwordHash = avatarUrl;
+    await this.UserInfoRepository.save(user);
+    response.json(user);
   }
 }
