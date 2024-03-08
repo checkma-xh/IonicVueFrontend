@@ -6,11 +6,11 @@ import {
   takePhoto,
 } from "@/utils/usePhotoGallery";
 import { eyeOutline, mailOutline, personCircleOutline } from "ionicons/icons";
+import { ConfigService } from "@/utils/ConfigService";
 
-
+const config = ConfigService.getConfig();
 const userStore = useUserStore();
 const currentUser = userStore.currentUser;
-const AVATAR_FILENAME = import.meta.env.VITE_AVATAR_FILENAME;
 
 export const moduleMessages = {
   editEmailModuleStyle: {
@@ -39,8 +39,8 @@ export const moduleMessages = {
     handleClick: async () => {
       const photo = await takePhoto();
       if (photo) {
-        await savePhoto(photo, AVATAR_FILENAME);
-        const readPhoto = await loadPhoto(AVATAR_FILENAME);
+        await savePhoto(photo, config.viteAvatarFileName);
+        const readPhoto = await loadPhoto(config.viteAvatarFileName);
         currentUser.avatarUrl = `data:image/jpeg;base64,${readPhoto?.data}`;
       }
     },

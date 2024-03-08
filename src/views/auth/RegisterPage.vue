@@ -76,8 +76,9 @@ import { emailFormat, passwordFormat } from "@/utils/useTextFormat";
 import router from "@/router";
 import { useUserStore } from "@/store/userStore";
 import { personCircleOutline } from "ionicons/icons";
+import { ConfigService } from "@/utils/ConfigService";
 
-const AVATAR_FILENAME = import.meta.env.VITE_AVATAR_FILENAME;
+const config = ConfigService.getConfig();
 const userStore = useUserStore();
 const currentUser = userStore.currentUser;
 const avatarWebPath = ref(personCircleOutline);
@@ -130,8 +131,8 @@ async function register() {
 		},
 	];
 
-	await savePhoto(avatar.value, AVATAR_FILENAME);
-	avatar.value = await loadPhoto(AVATAR_FILENAME);
+	await savePhoto(avatar.value, config.viteAvatarFileName);
+	avatar.value = await loadPhoto(config.viteAvatarFileName);
 	if (avatar.value) {
 		currentUser.avatarUrl = `data:image/jpeg;base64,${avatar.value.data}`;
 	}

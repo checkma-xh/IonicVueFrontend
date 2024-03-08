@@ -9,30 +9,35 @@ export class OtherController {
     private RepeatInfoRepository = AppDataSource.getRepository(RepeatInfo);
 
     async getPriorities(request: Request, response: Response, next: NextFunction) {
-        const decodeToken = await tokenVerify(request.headers.authorization.split(" ")[1]);
-        if (!decodeToken) {
-            response.status(404).json({ message: "no permission" });
-            return;
+        try {
+            const decodeToken = await tokenVerify(request.headers.authorization.split(" ")[1]);
+            if (!decodeToken) {
+                throw new Error('Invalid token');
+            }
+
+            const priorities = await this.PriorityInfoRepository.find();
+
+            response.status(200).json(priorities);
+        } catch (error) {
+            const errorMessage = error.message || "An unexpected error occurred.";
+            response.status(500).json({ status: "error", message: errorMessage });
         }
-        const priorities = await this.PriorityInfoRepository.find();
-        if (!priorities) {
-            response.status(404).json({ message: "priorities information not found" });
-            return;
-        }
-        response.json(priorities);
     }
 
+
     async getRepeats(request: Request, response: Response, next: NextFunction) {
-        const decodeToken = await tokenVerify(request.headers.authorization.split(" ")[1]);
-        if (!decodeToken) {
-            response.status(404).json({ message: "no permission" });
-            return;
+        try {
+            const decodeToken = await tokenVerify(request.headers.authorization.split(" ")[1]);
+            if (!decodeToken) {
+                throw new Error('Invalid token');
+            }
+
+            const repeats = await this.RepeatInfoRepository.find();
+
+            response.json(repeats);
+        } catch (error) {
+            const errorMessage = error.message || "An unexpected error occurred.";
+            response.status(500).json({ status: "error", message: errorMessage });
         }
-        const repeats = await this.RepeatInfoRepository.find();
-        if (!repeats) {
-            response.status(404).json({ message: "repeats information not found" });
-            return;
-        }
-        response.json(repeats);
     }
 }

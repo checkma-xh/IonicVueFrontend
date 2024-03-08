@@ -16,4 +16,19 @@ export class VerificationInfoMap {
         }
         return VerificationInfoMap.verificationInfoMap;
     }
+
+    public static createVerificationInfo(verificationCode: string, receiverEmail: string) {
+        const verificationInfo: VerificationInfo = {
+            verificationCode,
+            email: receiverEmail,
+            timestamp: Date.now(),
+            verificationResult: false,
+            verificationCount: 0,
+        };
+        VerificationInfoMap.verificationInfoMap.set(receiverEmail, verificationInfo);
+
+        setTimeout(() => {
+            VerificationInfoMap.verificationInfoMap.delete(receiverEmail);
+        }, 120000);
+    }
 }

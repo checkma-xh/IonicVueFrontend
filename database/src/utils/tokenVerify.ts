@@ -1,16 +1,15 @@
 import * as jwt from "jsonwebtoken";
-import * as dotenv from "dotenv";
+import type { JwtPayload } from "jsonwebtoken";
+import { ConfigService } from "./ConfigService";
 
-dotenv.configDotenv();
+const config = ConfigService.getConfig();
 
-const SECRET_KEY = process.env.SECRET_KEY;
-
-export async function tokenVerify(token: string) {
+export async function tokenVerify(token: string): Promise<JwtPayload | null> {
     try {
-        const decodeToken = jwt.verify(token, SECRET_KEY);
-        return decodeToken;
+        const decodedToken = jwt.verify(token, config.secretKey) as JwtPayload;
+        return decodedToken;
     } catch (error) {
-        console.log("Token verification failed.", error);
+        console.error("Token verification failed:", error);
         return null;
     }
 }

@@ -1,9 +1,7 @@
 import { Directory, Encoding, Filesystem } from "@capacitor/filesystem";
+import { ConfigService } from "./ConfigService";
 
-
-// 定义历史记录常量
-export const SEARCH_HISTORY_FILENAME = import.meta.env.VITE_SEARCH_HISTORY_FILENAME;
-export const MAX_HISTORY_RECORDS = parseInt( import.meta.env.VITE_MAX_HISTORY_RECORDS );
+const config = ConfigService.getConfig();
 
 // 定义历史记录类型
 export interface SearchHistory {
@@ -15,7 +13,7 @@ export interface SearchHistory {
 export async function getSearchHistory (): Promise<SearchHistory[]> {
   try {
     const { data } = await Filesystem.readFile( {
-      path: SEARCH_HISTORY_FILENAME,
+      path: config.viteSearchHistoryFileName,
       directory: Directory.Data,
       encoding: Encoding.UTF8,
     } );
@@ -29,7 +27,7 @@ export async function getSearchHistory (): Promise<SearchHistory[]> {
 
 // 排序历史记录
 export async function sortSearchHistory ( targetIndex: number ): Promise<boolean> {
-  if ( targetIndex < 0 || targetIndex > MAX_HISTORY_RECORDS - 1 ) {
+  if ( targetIndex < 0 || targetIndex > config.viteMaxHistoryRecords - 1 ) {
     return false;
   }
   try {
@@ -40,7 +38,7 @@ export async function sortSearchHistory ( targetIndex: number ): Promise<boolean
     };
     data.unshift( content );
     await Filesystem.writeFile( {
-      path: SEARCH_HISTORY_FILENAME,
+      path: config.viteSearchHistoryFileName,
       data: JSON.stringify( data ),
       directory: Directory.Data,
       encoding: Encoding.UTF8,
@@ -60,8 +58,8 @@ export async function unshiftSearchHistory (
     const data = await getSearchHistory();
     data.unshift( targetHistory );
     await Filesystem.writeFile( {
-      path: SEARCH_HISTORY_FILENAME,
-      data: JSON.stringify( data.slice( 0, MAX_HISTORY_RECORDS ) ),
+      path: config.viteSearchHistoryFileName,
+      data: JSON.stringify( data.slice( 0, config.viteMaxHistoryRecords ) ),
       directory: Directory.Data,
       encoding: Encoding.UTF8,
     } );
@@ -80,7 +78,7 @@ export async function deleteSearchHistory (
     const data = await getSearchHistory();
     data.splice( targetIndex, 1 );
     await Filesystem.writeFile( {
-      path: SEARCH_HISTORY_FILENAME,
+      path: config.viteSearchHistoryFileName,
       data: JSON.stringify( data ),
       directory: Directory.Data,
       encoding: Encoding.UTF8,
@@ -96,7 +94,7 @@ export async function deleteSearchHistory (
 export async function clearSearchHistory (): Promise<boolean> {
   try {
     await Filesystem.writeFile( {
-      path: SEARCH_HISTORY_FILENAME,
+      path: config.viteSearchHistoryFileName,
       data: JSON.stringify( [] ),
       directory: Directory.Data,
       encoding: Encoding.UTF8,
