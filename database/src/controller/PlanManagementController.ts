@@ -6,7 +6,6 @@ import { PriorityInfo } from "../entity/PriorityInfo";
 import { PlanInfo } from "../entity/PlanInfo";
 import * as jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
-import { group } from "console";
 
 dotenv.configDotenv();
 

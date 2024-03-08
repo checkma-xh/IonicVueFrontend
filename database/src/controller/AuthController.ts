@@ -7,6 +7,7 @@ import type { JwtPayload } from "jsonwebtoken";
 import * as nodemailer from "nodemailer";
 import * as crypto from "crypto";
 import { tokenVerify } from "../utils/tokenVerify";
+import { VerificationInfoMap, type VerificationInfo } from "../utils/VerificationInfoMap";
 
 dotenv.configDotenv();
 
@@ -22,16 +23,7 @@ const REFRESH_TOKEN_OPTIONS = {
 const SYSTEM_EMAIL = process.env.SYSTEM_EMAIL;
 const SYSTEM_EMAIL_PASSWORD = process.env.SYSTEM_EMAIL_PASSWORD;
 const VERIFICATION_CODE_LEN = parseInt(process.env.VERIFICATION_CODE_LEN);
-
-// 定义一个类型来表示验证码信息
-interface VerificationInfo {
-  verificationCode: string;
-  email: string;
-  timestamp: number; // 时间戳
-  verificationResult: boolean;
-}
-
-export const verificationInfoMap = new Map();
+const VERIFICATION_MAX_COUNT = parseInt(process.env.VERIFICATION_MAX_COUNT);
 
 async function generateRandomCode(length: number) {
   const bytes = crypto.randomBytes(Math.ceil(length / 2));
@@ -49,6 +41,7 @@ async function ORMToObject(ORM: any) {
 
 export class AuthController {
   private UserInfoRepository = AppDataSource.getRepository(UserInfo);
+  private verificationInfoMap = VerificationInfoMap.getVerificationInfoMap();
   private transporter = nodemailer.createTransport({
     service: "outlook", // 使用 Outlook 的 SMTP 服务
     auth: {
@@ -61,7 +54,7 @@ export class AuthController {
     const email = request.body.email;
     const passwordHash = request.body.passwordHash;
     const avatarUrl = request.body.avatarUrl;
-    const verificationInfo = verificationInfoMap.get(email);
+    const verificationInfo = this.verificationInfoMap.get(email);
     if (!verificationInfo?.verificationResult) {
       response.status(400).json({ message: "Verification failed." });
       return;
@@ -87,7 +80,7 @@ export class AuthController {
   async login(request: Request, response: Response, next: NextFunction) {
     const email = request.body.email;
     const passwordHash = request.body.passwordHash;
-    const verificationInfo = verificationInfoMap.get(email);
+    const verificationInfo = this.verificationInfoMap.get(email);
     let user = null;
     if (verificationInfo?.verificationResult) {
       user = await this.UserInfoRepository
@@ -138,7 +131,6 @@ export class AuthController {
 
   async refresh(request: Request, response: Response, next: NextFunction) {
     const decodeToken = await tokenVerify(request.headers.authorization.split(" ")[1]);
-    console.log(decodeToken);
     if (!decodeToken) {
       response.status(404).json({ message: "No permission." });
       return;
@@ -161,7 +153,7 @@ export class AuthController {
 
   async deactivate(request: Request, response: Response, next: NextFunction) {
     const email = request.body.email;
-    const verificationInfo = verificationInfoMap.get(email);
+    const verificationInfo = this.verificationInfoMap.get(email);
     if (!verificationInfo?.verificationResult) {
       response.status(400).json({ message: "Verification failed." });
       return;
@@ -191,7 +183,7 @@ export class AuthController {
     next: NextFunction,
   ) {
     const receiverEmail: string = request.body.email;
-    if (verificationInfoMap.has(receiverEmail)) {
+    if (this.verificationInfoMap.has(receiverEmail)) {
       response.status(429).json({ message: "Too many requests. please wait a moment before trying again." });
       return;
     }
@@ -214,12 +206,13 @@ export class AuthController {
         email: receiverEmail,
         timestamp: Date.now(),
         verificationResult: false,
+        verificationCount: 0,
       };
-      verificationInfoMap.set(receiverEmail, verificationInfo);
+      this.verificationInfoMap.set(receiverEmail, verificationInfo);
 
       // 设置定时器，在 2 分钟后删除验证码信息
       setTimeout(() => {
-        verificationInfoMap.delete(receiverEmail);
+        this.verificationInfoMap.delete(receiverEmail);
       }, 120000);
 
       response.status(200).json({ message: "Verification code sent successfully to your email." });
@@ -238,14 +231,19 @@ export class AuthController {
   ) {
     const email: string = request.body.email;
     const verificationCode: string = request.body.verificationCode;
-    if (!verificationInfoMap.has(email)) {
+    if (!this.verificationInfoMap.has(email)) {
       response.status(400).json({ message: "Verification code has not been requested. Please request the verification code first." });
       return;
     }
-    const verificationInfo = verificationInfoMap.get(email);
+    const verificationInfo = this.verificationInfoMap.get(email);
+    if (verificationInfo.verificationCount > VERIFICATION_MAX_COUNT) {
+      response.status(429).json({ message: "Maximum number of verifications exceeded. Please try again later." });
+
+    }
     if (verificationInfo.verificationCode == verificationCode) {
       verificationInfo.verificationResult = true;
     }
+    verificationInfo.verificationCount++;
     response.status(200).json({ message: "Verification successful." });
     return;
   }
