@@ -3,7 +3,6 @@ import axios from "axios";
 export async function login (
   email: string,
   passwordHash: string,
-  verificationCode: string,
 ) {
   try {
     const config = {
@@ -14,7 +13,6 @@ export async function login (
     const data = {
       email: email,
       passwordHash: passwordHash,
-      verificationCode: verificationCode,
     };
     const response = await axios.post(
       "http://localhost:3000/auth/login",

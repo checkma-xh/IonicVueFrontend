@@ -8,7 +8,6 @@ import * as crypto from "crypto";
 import { tokenVerify } from "../utils/tokenVerify";
 import { VerificationInfoMap } from "../utils/VerificationInfoMap";
 import { ConfigService } from "../utils/ConfigService";
-import { findExistingUser } from "../utils/findExistingUser";
 
 
 const config = ConfigService.getConfig();
@@ -46,7 +45,7 @@ export class AuthController {
 		return user;
 	}
 
-	
+
 	async register(request: Request, response: Response, next: NextFunction) {
 		try {
 			const { email, passwordHash, avatarUrl } = request.body;
@@ -55,7 +54,11 @@ export class AuthController {
 				throw new Error("Verification failed.");
 			}
 
-			const user = await findExistingUser(null, email, null);
+			const user = await this.UserInfoRepository
+				.createQueryBuilder("user")
+				.where("user.email = :email", { email: email })
+				.getOne();
+
 			if (user) {
 				throw new Error("User already exists. Please use a different email or login with your existing account.");
 			}
@@ -74,9 +77,21 @@ export class AuthController {
 	async login(request: Request, response: Response, next: NextFunction) {
 		try {
 			const { email, passwordHash } = request.body;
-			const user = await findExistingUser(null, email, passwordHash);
+			const verificationInfo = this.verificationInfoMap.get(email);
+			const repository = this.UserInfoRepository
+				.createQueryBuilder("user")
+				.where("user.email = :email AND user.activated = 1", { email: email });
+
+			if (passwordHash) {
+				repository.andWhere("user.passwordHash = :passwordHash", { passwordHash: passwordHash });
+			} else if (!verificationInfo?.verificationResult) {
+				throw new Error("Verification failed.");
+			}
+
+			const user = await repository.getOne();
+
 			if (!user) {
-				throw new Error('User not found');
+				throw new Error("User not found.");
 			}
 
 			const userObject = { ...user };
@@ -101,18 +116,13 @@ export class AuthController {
 		try {
 			const decodeToken = await tokenVerify(request.headers.authorization.split(" ")[1]);
 			if (!decodeToken) {
-				throw new Error('Invalid token');
+				throw new Error("Invalid token.");
 			}
 
-			const user = await findExistingUser((decodeToken as any).id, null, null);
-			if (!user) {
-				throw new Error('User not found');
-			}
-
-			response.status(200).json({ status: 'success', message: "Logout." });
+			response.status(200).json({ status: "success", message: "Logout." });
 		} catch (error) {
-			console.error('Error during logout:', error);
-			response.status(500).json({ status: 'error', message: 'Internal server error' });
+			console.error("Error during logout:", error);
+			response.status(500).json({ status: "error", message: "Internal server error." });
 		}
 	}
 
@@ -121,7 +131,7 @@ export class AuthController {
 		try {
 			const decodeToken = await tokenVerify(request.headers.authorization.split(" ")[1]);
 			if (!decodeToken) {
-				throw new Error('Invalid token');
+				throw new Error("Invalid token.");
 			}
 
 			const user = await this.UserInfoRepository
@@ -130,7 +140,7 @@ export class AuthController {
 				.getOne();
 
 			if (!user) {
-				throw new Error('User not found');
+				throw new Error("User not found.");
 			}
 
 			const userObject = { ...user };
@@ -158,17 +168,17 @@ export class AuthController {
 
 			const user = await this.UserInfoRepository
 				.createQueryBuilder("user")
-				.where("user.email = :email AND user.activated = 1", { email })
+				.where("user.email = :email", { email })
 				.getOne();
 
 			if (!user) {
-				throw new Error('User not found');
+				throw new Error("User not found.");
 			}
 
 			user.activated = false;
 			await this.UserInfoRepository.save(user);
 
-			response.status(200).json({ status: 'success', message: "Deactivated." });
+			response.status(200).json({ status: "success", message: "Deactivated." });
 		} catch (error) {
 			const errorMessage = error.message || "An unexpected error occurred.";
 			response.status(500).json({ status: "error", message: errorMessage });
@@ -186,7 +196,7 @@ export class AuthController {
 			};
 			await this.transporter.sendMail(mailOptions);
 		} catch (error) {
-			throw new Error("Failed to send verification email");
+			throw new Error("Failed to send verification email.");
 		}
 	}
 
@@ -202,7 +212,7 @@ export class AuthController {
 				throw new Error("Verification code has already been sent to this email.");
 			}
 
-			const verificationCode = await this.generateRandomCode(VERIFICATION_CODE_LEN);
+			const verificationCode = await this.generateRandomCode(config.verificationCodeLen);
 			await this.sendVerificationEmail(receiverEmail, verificationCode);
 			VerificationInfoMap.createVerificationInfo(verificationCode, receiverEmail);
 
@@ -235,10 +245,10 @@ export class AuthController {
 			}
 			verificationInfo.verificationCount++;
 
-			response.status(200).json({ status: 'success', message: "Verification successful." });
+			response.status(200).json({ status: "success", message: "Verification successful." });
 		} catch (error) {
 			console.error("Error verifying verification code:", error);
-			response.status(500).json({ status: 'error', message: error.message });
+			response.status(500).json({ status: "error", message: error.message });
 		}
 	}
 }

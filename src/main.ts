@@ -44,10 +44,10 @@ const userStore = useUserStore();
 const currentUser = userStore.currentUser;
 const response = await login("checkmaxh@gmail.com", "#", "");
 
-currentUser.id = response.currentUser.id;
-currentUser.email = response.currentUser.email;
+currentUser.id           = response.currentUser.id;
+currentUser.email        = response.currentUser.email;
 currentUser.passwordHash = response.currentUser.passwordHash;
-currentUser.avatarUrl = response.currentUser.avatarUrl;
-currentUser.activated = response.currentUser.activated;
-userStore.accessToken = response.accessToken;
-userStore.refreshToken = response.refreshToken;
+currentUser.avatarUrl    = response.currentUser.avatarUrl;
+currentUser.activated    = response.currentUser.activated;
+userStore.accessToken    = response.accessToken;
+userStore.refreshToken   = response.refreshToken;

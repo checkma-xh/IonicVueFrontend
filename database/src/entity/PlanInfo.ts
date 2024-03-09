@@ -3,8 +3,7 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
-  CreateDateColumn,
-  UpdateDateColumn,
+  JoinColumn,
 } from "typeorm";
 import { UserInfo } from "./UserInfo";
 import { GroupInfo } from "./GroupInfo";
@@ -23,21 +22,25 @@ export class PlanInfo {
   remark: string;
 
   @ManyToOne(() => UserInfo, (userInfo) => userInfo.plans)
+  @JoinColumn({ name: 'userId' })
   user: UserInfo;
 
   @ManyToOne(() => GroupInfo, (groupInfo) => groupInfo.plans)
+  @JoinColumn({ name: 'groupId' })
   group: GroupInfo;
 
-  @ManyToOne(() => PriorityInfo, (priorityInfo) => priorityInfo.plans)
+  @ManyToOne(() => PriorityInfo)
+  @JoinColumn({ name: 'priorityId' })
   priority: PriorityInfo;
 
-  @ManyToOne(() => RepeatInfo, (repeatInfo) => repeatInfo.plans)
+  @ManyToOne(() => RepeatInfo)
+  @JoinColumn({ name: 'repeatId' })
   repeat: RepeatInfo;
 
-  @CreateDateColumn()
+  @Column('datetime')
   startDate: Date;
 
-  @UpdateDateColumn()
+  @Column('datetime')
   endDate: Date;
 
   @Column({ default: false })
@@ -45,4 +48,4 @@ export class PlanInfo {
 
   @Column({ default: false })
   deleted: boolean;
-}
+}  

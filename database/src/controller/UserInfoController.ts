@@ -4,7 +4,6 @@ import { UserInfo } from "../entity/UserInfo";
 import { tokenVerify } from "../utils/tokenVerify";
 import { VerificationInfoMap } from "../utils/VerificationInfoMap";
 import type { JwtPayload } from "jsonwebtoken";
-import { findExistingUser } from "../utils/findExistingUser";
 
 
 export class UserInfoController {
@@ -18,8 +17,10 @@ export class UserInfoController {
 				throw new Error('Invalid token');
 			}
 
-			const id = parseInt(request.params.id);
-			const user = await findExistingUser(id, null, null);
+			const user = await this.UserInfoRepository
+				.createQueryBuilder("user")
+				.where("user.id = :id", { id: (decodeToken as JwtPayload).id })
+				.getOne();
 
 			response.status(200).json(user);
 		} catch (error) {
@@ -37,7 +38,11 @@ export class UserInfoController {
 				throw new Error("Verification failed.");
 			}
 
-			const user = await findExistingUser(null, oldEmail, null);
+			const user = await this.UserInfoRepository
+				.createQueryBuilder("user")
+				.where("user.email = :email", { email: oldEmail })
+				.getOne();
+				
 			user.email = newEmail;
 			await this.UserInfoRepository.save(user);
 
@@ -61,7 +66,12 @@ export class UserInfoController {
 			if (!verificationInfo?.verificationResult) {
 				throw new Error("Verification failed.");
 			}
-			const user = await findExistingUser(null, email, null);
+
+			const user = await this.UserInfoRepository
+				.createQueryBuilder("user")
+				.where("user.email = :email", { email: email })
+				.getOne();
+
 			user.passwordHash = passwordHash;
 			await this.UserInfoRepository.save(user);
 
@@ -83,7 +93,12 @@ export class UserInfoController {
 			if (!decodeToken) {
 				throw new Error("Verification failed.");
 			}
-			const user = await findExistingUser((decodeToken as JwtPayload).id, null, null);
+
+			const user = await this.UserInfoRepository
+				.createQueryBuilder("user")
+				.where("user.id = :id", { id: (decodeToken as JwtPayload).id })
+				.getOne();
+
 			user.avatarUrl = avatarUrl;
 			await this.UserInfoRepository.save(user);
 

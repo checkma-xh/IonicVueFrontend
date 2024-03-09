@@ -4,6 +4,7 @@ import {
   Column,
   OneToMany,
   ManyToOne,
+  JoinColumn,
 } from "typeorm";
 import { UserInfo } from "./UserInfo";
 import { PlanInfo } from "./PlanInfo";
@@ -13,17 +14,21 @@ export class GroupInfo {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column( { length: 64 } )
+  @Column({ length: 64 })
   name: string;
 
-  @Column( { length: 64 } )
+  @Column({ length: 64 })
   remark: string;
 
-  @ManyToOne( () => UserInfo, ( userInfo ) => userInfo.groups )
+  @Column({ default: false })
+  deleted: boolean;
+
+  @ManyToOne(() => UserInfo, (userInfo) => userInfo.groups)
+  @JoinColumn({ name: 'userId' })
   user: UserInfo;
 
-  @OneToMany( () => PlanInfo, ( planInfo ) => planInfo.group, {
+  @OneToMany(() => PlanInfo, (planInfo) => planInfo.group, {
     cascade: true,
-  } )
+  })
   plans: PlanInfo[];
 }

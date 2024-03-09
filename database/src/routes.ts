@@ -88,7 +88,7 @@ export const Routes = [
     action: "getPlan",
   },
   {
-    method: "post",
+    method: "patch",
     route: "/plan-management/users/:userId/plans/:planId",
     controller: PlanManagementController,
     action: "completePlan",
@@ -100,10 +100,16 @@ export const Routes = [
     action: "deletePlan",
   },
   {
-    method: "patch",
+    method: "put",
     route: "/plan-management/users/:userId/plans/:planId",
     controller: PlanManagementController,
     action: "setPlan",
+  },
+  {
+    method: "get",
+    route: "/plan-management/users/:id/plans",
+    controller: PlanManagementController,
+    action: "getPlans",
   },
   {
     method: "post",
@@ -124,16 +130,10 @@ export const Routes = [
     action: "deleteGroup",
   },
   {
-    method: "patch",
+    method: "put",
     route: "/plan-management/users/:userId/groups/:groupId",
     controller: PlanManagementController,
     action: "setGroup",
-  },
-  {
-    method: "get",
-    route: "/plan-management/users/:id/plans",
-    controller: PlanManagementController,
-    action: "getPlans",
   },
 
   // Other

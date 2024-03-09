@@ -1,19 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-import { PlanInfo } from "./PlanInfo";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 @Entity()
 export class PriorityInfo {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column( { length: 64 } )
+  @Column({ length: 64, unique: true })
   name: string;
 
-  @Column( { length: 64 } )
+  @Column({ length: 64 })
   remark: string;
-
-  @OneToMany( () => PlanInfo, ( planInfo ) => planInfo.priority, {
-    cascade: true,
-  } )
-  plans: PlanInfo[];
 }

@@ -12,7 +12,7 @@ export class OtherController {
         try {
             const decodeToken = await tokenVerify(request.headers.authorization.split(" ")[1]);
             if (!decodeToken) {
-                throw new Error('Invalid token');
+                throw new Error("Invalid token.");
             }
 
             const priorities = await this.PriorityInfoRepository.find();
@@ -29,12 +29,12 @@ export class OtherController {
         try {
             const decodeToken = await tokenVerify(request.headers.authorization.split(" ")[1]);
             if (!decodeToken) {
-                throw new Error('Invalid token');
+                throw new Error("Invalid token.");
             }
 
             const repeats = await this.RepeatInfoRepository.find();
 
-            response.json(repeats);
+            response.status(200).json(repeats);
         } catch (error) {
             const errorMessage = error.message || "An unexpected error occurred.";
             response.status(500).json({ status: "error", message: errorMessage });
