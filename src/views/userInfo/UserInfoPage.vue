@@ -17,8 +17,8 @@
 
 			<div
 				id="container"
-				class="functional-modules-container">
-				<functional-module
+				class="detail-cards-container">
+				<detail-card
 					v-for="(value, index) of moduleMessages"
 					:handle-click="value.handleClick"
 					:key="index"
@@ -28,8 +28,8 @@
 					:title="value.title"
 					:subtitle="value.subtitle"
 					:content="value.content"
-					class="functional-module">
-				</functional-module>
+					class="detail-card">
+				</detail-card>
 			</div>
 		</ion-content>
 	</ion-page>
@@ -43,7 +43,7 @@ import {
 	IonTitle,
 	IonContent,
 } from "@ionic/vue";
-import FunctionalModule from "@/components/FunctionalModule.vue";
+import DetailCard from "@/components/DetailCard.vue";
 import { moduleMessages } from "@/assets/data/userInfo/moduleMessages";
 </script>
 
@@ -58,13 +58,13 @@ import { moduleMessages } from "@/assets/data/userInfo/moduleMessages";
 	padding-bottom: 5%;
 }
 
-.functional-modules-container {
+.detail-cards-container {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
 }
 
-.functional-module {
+.detail-card {
 	width: 50%;
 }
 </style>

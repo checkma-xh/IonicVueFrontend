@@ -1,3 +1,5 @@
+import { alertCircle, checkmarkCircle } from "ionicons/icons";
+
 export function matchModuleNameByRouteName(routeName: string,) {
 	switch (routeName) {
 		case "PlanManagement":
@@ -37,6 +39,28 @@ export function matchColorByPriorityName(priorityName: string) {
 			return "medium";
 		default:
 			return "danger";
+	}
+}
+
+export function matchIconColorByCompleted(completed: boolean) {
+	switch (completed) {
+		case true:
+			return "primary";
+		case false:
+			return "warning";
+		default:
+			return "danger";
+	}
+}
+
+export function matchIconByCompleted(completed: any) {
+	switch (completed) {
+		case true:
+			return checkmarkCircle;
+		case false:
+			return alertCircle;
+		default:
+			return alertCircle;
 	}
 }
 

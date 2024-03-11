@@ -24,6 +24,36 @@
 				>
 			</h3>
 			<plan-list :plans="currentGroup.plans"> </plan-list>
+
+			<!-- modal -->
+			<ion-modal ref="modal">
+				<ion-header>
+					<ion-toolbar>
+						<ion-title :color="detailRef.iconColor">
+							{{ detailRef.title }}
+						</ion-title>
+						<ion-buttons slot="end">
+							<ion-button
+								:color="detailRef.iconColor"
+								@click="detailRef.handleClick">
+								confirm
+							</ion-button>
+						</ion-buttons>
+					</ion-toolbar>
+				</ion-header>
+				<ion-content>
+					<detail-card
+						:handleClick="detailRef.handleClick"
+						:icon="detailRef.icon"
+						:iconColor="detailRef.iconColor"
+						:cardColor="detailRef.cardColor"
+						:title="detailRef.title"
+						:subtitle="detailRef.subtitle"
+						:content="detailRef.content"
+						class="detail-card-class">
+					</detail-card>
+				</ion-content>
+			</ion-modal>
 		</ion-content>
 	</ion-page>
 </template>
@@ -34,16 +64,20 @@ import {
 	IonHeader,
 	IonToolbar,
 	IonTitle,
+	IonModal,
+	IonButtons,
+	IonButton,
 	IonContent,
 	IonLabel,
 } from "@ionic/vue";
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref, watchEffect } from "vue";
 import { useRoute } from "vue-router";
 import { getGroups } from "@/api/planManagement/getGroups";
 import { useUserStore } from "@/store/userStore";
 import PlanList from "@/components/PlanList.vue";
 import GroupList from "@/components/GroupList.vue";
 import { alertCircle, checkmarkCircle, listCircle } from "ionicons/icons";
+import DetailCard from "@/components/DetailCard.vue";
 import { getPlans } from "@/api/planManagement/getPlans";
 import { completePlan } from "@/api/planManagement/completePlan";
 import { deletePlan } from "@/api/planManagement/deletePlan";
@@ -52,10 +86,22 @@ import {
 	matchModuleNameByRouteName,
 	matchColorByPriorityName,
 	matchColorByRepeatName,
+	matchIconByCompleted,
+	matchIconColorByCompleted,
 } from "@/utils/useMatchTool";
 
-const route = useRoute();
 const moduleName = ref();
+const modal = ref();
+const detailRef = reactive({
+	handleClick: null,
+	icon: null,
+	iconColor: null,
+	cardColor: null,
+	title: null,
+	subtitle: null,
+	content: null,
+});
+const route = useRoute();
 const userStore = useUserStore();
 const currentUser = userStore.currentUser;
 const groups = ref();
@@ -86,32 +132,38 @@ function arrayCycleTool(array: Array<any>) {
 
 function setPlanAtrr(group: any, plan: any) {
 	plan.handleClick = async () => {
-		alert("click");
+		modal.value.$el.isOpen     = true;
+		modal.value.$el.canDismiss = false;
+		detailRef.icon             = plan.icon;
+		detailRef.iconColor        = plan.color;
+		detailRef.handleClick      = () => {
+			modal.value.$el.canDismiss = true;
+			modal.value.$el.isOpen     = false;
+		};
+		detailRef.cardColor = "medium";
+		detailRef.title     = plan.name;
+		detailRef.subtitle  = `group-${currentGroup.name}; priority-${plan.priorityName}; repeat-${plan.repeatName}; completed-${plan.completed};`;
+		detailRef.content   = plan.remark;
 	};
 	plan.handleDetail = plan.handleClick;
 	plan.handleDelete = async () => {
-		await deletePlan(userStore.accessToken, currentUser.id, plan.id);
 		group.plans = group.plans.filter((item: any) => {
 			return item.id != plan.id;
 		});
 		currentGroup.plans = group.plans;
+		await deletePlan(userStore.accessToken, currentUser.id, plan.id);
 	};
 	plan.handleComplete = async () => {
-		await completePlan(userStore.accessToken, currentUser.id, plan.id);
 		plan.completed = true;
 		setPlanAtrr(group, plan);
+		await completePlan(userStore.accessToken, currentUser.id, plan.id);
 	};
-	plan.priorityName = plan.priority.name;
-	plan.repeatName = plan.repeat.name;
+	plan.priorityName  = plan.priority.name;
+	plan.repeatName    = plan.repeat.name;
 	plan.priorityColor = matchColorByPriorityName(plan.priorityName);
-	plan.repeatColor = matchColorByRepeatName(plan.repeatName);
-	if (plan.completed) {
-		plan.icon = checkmarkCircle;
-		plan.color = "primary";
-	} else {
-		plan.icon = alertCircle;
-		plan.color = "medium";
-	}
+	plan.repeatColor   = matchColorByRepeatName(plan.repeatName);
+	plan.icon          = matchIconByCompleted(plan.completed);
+	plan.color         = matchIconColorByCompleted(plan.completed);
 }
 
 async function setGroupAttr(group: any) {
@@ -130,30 +182,36 @@ async function setGroupAttr(group: any) {
 	group.unfinishedCount = computed(() => {
 		return group.total - group.completedCount;
 	});
-	group.handleClick = async () => {
+	group.handleClick = () => {
 		currentGroup.name = group.name;
 		currentGroup.color = group.color;
 		currentGroup.plans = group.plans;
 	};
-	group.selectPlans = async () => {
+	group.selectPlans = () => {
 		currentGroup.name = group.name;
 		currentGroup.color = group.color;
 		currentGroup.plans = group.plans;
 	};
-	group.handleDetail = async () => {
-		alert("detail");
+	group.handleDetail = () => {
+		modal.value.$el.isOpen     = true;
+		modal.value.$el.canDismiss = false;
+		detailRef.icon             = group.icon;
+		detailRef.iconColor        = group.color;
+		detailRef.handleClick      = () => {
+			modal.value.$el.canDismiss = true;
+			modal.value.$el.isOpen     = false;
+		};
+		detailRef.cardColor = "medium";
+		detailRef.title     = group.name;
+		detailRef.subtitle  = `${group.completedCount} / ${group.total}`;
+		detailRef.content   = group.remark;
 	};
 	group.handleDelete = async () => {
-		deleteGroup(userStore.accessToken, currentUser.id, group.id);
+		groups.value = groups.value.filter((item: any) => {
+			return item.id != group.id;
+		});
+		await deleteGroup(userStore.accessToken, currentUser.id, group.id);
 	};
-}
-
-function getRandomElement(array: Array<any>) {
-	if (array.length === 0) {
-		return;
-	}
-	const randomIndex = Math.floor(Math.random() * array.length);
-	return array[randomIndex];
 }
 
 onMounted(async () => {
@@ -173,24 +231,25 @@ onMounted(async () => {
 		});
 	});
 	await Promise.all(promises);
+});
+
+watchEffect(() => {
 	if (groups.value) {
-		const group = getRandomElement(groups.value);
-		currentGroup.name = group.name;
-		currentGroup.color = group.color;
-		currentGroup.plans = group.plans;
+		const group = groups.value[0];
+		currentGroup.name = group?.name;
+		currentGroup.color = group?.color;
+		currentGroup.plans = group?.plans;
 	}
 });
 </script>
 
 <style scoped>
-.functional-modules-container {
+.detail-card-class {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
-}
-
-.functional-module {
-	width: 50%;
+	text-align: center;
+	align-items: center;
 }
 
 h3 {
@@ -198,4 +257,3 @@ h3 {
 	margin-left: 2%;
 }
 </style>
-@/utils/matchTools@/utils/useMatchTools

@@ -1,5 +1,5 @@
 <template>
-	<ion-item-sliding>
+	<ion-item-sliding ref="groupSlidingItem">
 		<ion-item
 			:button="true"
 			@click="handleClick">
@@ -15,19 +15,28 @@
 			<ion-badge color="danger">{{
 				unfinishedCount + " unfinished"
 			}}</ion-badge>
-			<ion-badge color="primary">{{ 
-				total + " total" 
-			}}</ion-badge>
+			<ion-badge color="primary">{{ total + " total" }}</ion-badge>
 		</ion-item>
 		<ion-item-options slot="end">
-			<ion-item-option color="tertiary">
+			<ion-item-option
+				color="tertiary"
+				@click="
+					async () => {
+						await closeGroupSlidingItem();
+						await handleDetail();
+					}
+				">
 				<ion-icon
-					@click.stop="handleDetail"
 					slot="icon-only"
 					:icon="ellipsisVertical"></ion-icon>
 			</ion-item-option>
 			<ion-item-option
-				@click.stop="handleDelete"
+				@click="
+					async () => {
+						await closeGroupSlidingItem();
+						await handleDelete();
+					}
+				"
 				color="danger"
 				expandable="true">
 				<ion-icon
@@ -35,7 +44,12 @@
 					:icon="trash"></ion-icon>
 			</ion-item-option>
 			<ion-item-option
-				@click.stop="selectPlans"
+				@click="
+					async () => {
+						await closeGroupSlidingItem();
+						await selectPlans();
+					}
+				"
 				color="primary"
 				expandable="true">
 				<ion-icon
@@ -47,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineModel } from "vue";
+import { defineModel, ref } from "vue";
 import {
 	IonIcon,
 	IonItem,
@@ -59,6 +73,10 @@ import {
 } from "@ionic/vue";
 import { ellipsisVertical, trash, arrowForward } from "ionicons/icons";
 
+const groupSlidingItem = ref();
+async function closeGroupSlidingItem() {
+	groupSlidingItem.value.$el.closeOpened();
+}
 const color = defineModel("color");
 const icon = defineModel("icon");
 const label = defineModel("label");

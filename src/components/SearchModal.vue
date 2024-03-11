@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
 	<ion-header>
 		<ion-toolbar>
 			<ion-grid>
@@ -67,6 +67,72 @@
 			</ion-button>
 		</ion-item>
 	</ion-footer>
+</template> -->
+
+
+<template>
+	<ion-header>
+		<ion-toolbar>
+			<ion-searchbar
+				ref="searchBarRef"
+				placeholder="Search"
+				expand="block"
+				:debounce="10"
+				show-clear-button="never"
+				label-placement="floating"
+				v-model.lazy="searchContent"
+				@ionInput="handleInput"
+				@ionBlur="handleBlur"
+				@keydown.enter="handleSearch">
+			</ion-searchbar>
+			<ion-buttons slot="end">
+				<ion-button
+				@click="handleSearch"
+				color="light"
+				><ion-icon
+					:icon="search"
+					color="primary"></ion-icon
+			></ion-button>
+			</ion-buttons>
+		</ion-toolbar>
+	</ion-header>
+	<ion-content class="ion-padding">
+		<ion-list>
+			<ion-item
+				v-for="(value, index) in results"
+				button
+				:key="index"
+				@click="
+					async () => {
+						searchContent = value.content;
+						await handleSearch();
+					}
+				">
+				<ion-label class="ion-text-nowrap">
+					<h3>{{ value.content }}</h3>
+					<p>{{ value.datetime }}</p>
+				</ion-label>
+				<ion-button
+					fill="clear"
+					@click.stop="
+						async () => {
+							await handleDelete(index);
+						}
+					">
+					<ion-icon :icon="closeOutline"></ion-icon>
+				</ion-button>
+			</ion-item>
+		</ion-list>
+	</ion-content>
+	<ion-footer>
+		<ion-item>
+			<ion-button
+				class="centered-button"
+				@click="handleClear">
+				clear
+			</ion-button>
+		</ion-item>
+	</ion-footer>
 </template>
 
 <script setup lang="ts">
@@ -81,9 +147,6 @@ import {
 import {
 	IonHeader,
 	IonToolbar,
-	IonGrid,
-	IonRow,
-	IonCol,
 	IonSearchbar,
 	IonButton,
 	IonContent,
@@ -166,17 +229,6 @@ onMounted(async () => {
 <style scoped>
 inon-header ion-searchbar {
 	margin-right: 0%;
-}
-
-ion-row {
-	height: 100%;
-	width: 98%;
-}
-
-ion-col ion-button {
-	height: 100%;
-	width: 100%;
-	margin: auto;
 }
 
 .centered-button {

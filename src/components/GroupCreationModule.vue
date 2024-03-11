@@ -1,5 +1,15 @@
 <template>
+	<ion-header>
+		<ion-toolbar>
+			<ion-title>add group</ion-title>
+		</ion-toolbar>
+	</ion-header>
 	<ion-content class="ion-padding">
+		<ion-header collapse="condense">
+				<ion-toolbar>
+					<ion-title size="large">add group</ion-title>
+				</ion-toolbar>
+			</ion-header>
 		<!-- 输入框 -->
 		<ion-input
 			placeholder="title"
@@ -15,17 +25,25 @@
 			:maxlength="64"
 			v-model="remark">
 		</ion-textarea>
-		<ion-button @click="addGroups">confirm</ion-button>
+		<ion-button @click="addGroup">confirm</ion-button>
 	</ion-content>
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonInput, IonTextarea, IonButton } from "@ionic/vue";
+import {
+	IonHeader,
+	IonToolbar,
+	IonTitle,
+	IonContent,
+	IonInput,
+	IonTextarea,
+	IonButton,
+} from "@ionic/vue";
 import { ref } from "vue";
 const title = ref();
 const remark = ref();
 
-async function addGroups() {
+async function addGroup() {
 	alert(title.value + "-" + remark.value);
 }
 </script>
@@ -39,7 +57,7 @@ ion-textarea {
 }
 
 ion-button {
-	margin-top: 2%;
+	margin-top: 6%;
 	width: 100%;
 }
 </style>

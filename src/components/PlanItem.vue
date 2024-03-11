@@ -1,5 +1,5 @@
 <template>
-	<ion-item-sliding>
+	<ion-item-sliding ref="planSlidingItem">
 		<ion-item
 			:button="true"
 			:detail="false"
@@ -31,7 +31,12 @@
 		</ion-item>
 		<ion-item-options slot="end">
 			<ion-item-option
-				@click="handleDetail"
+				@click="
+					async () => {
+						await closePlanSlidingItem();
+						await handleDetail();
+					}
+				"
 				color="tertiary"
 				expandable="true">
 				<ion-icon
@@ -39,7 +44,12 @@
 					:icon="ellipsisVertical"></ion-icon>
 			</ion-item-option>
 			<ion-item-option
-				@click="handleDelete"
+				@click="
+					async () => {
+						await closePlanSlidingItem();
+						await handleDelete();
+					}
+				"
 				color="danger"
 				expandable="true">
 				<ion-icon
@@ -47,7 +57,12 @@
 					:icon="trash"></ion-icon>
 			</ion-item-option>
 			<ion-item-option
-				@click="handleComplete"
+				@click="
+					async () => {
+						await closePlanSlidingItem();
+						await handleComplete();
+					}
+				"
 				color="primary"
 				expandable="true">
 				<ion-icon
@@ -59,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineModel } from "vue";
+import { defineModel, ref } from "vue";
 import {
 	IonItemOptions,
 	IonItemOption,
@@ -77,17 +92,21 @@ import {
 	checkmarkCircle,
 } from "ionicons/icons";
 
-const icon            = defineModel("icon");
-const color           = defineModel("color");
-const name            = defineModel("name");
-const remark          = defineModel("remark");
-const priorityName    = defineModel("priorityName");
-const repeatName = defineModel("repeatName");
-const priorityColor = defineModel("priorityColor");
-const repeatColor = defineModel("repeatColor");
-const handleClick     = defineModel("handleClick");
-const handleDetail    = defineModel("handleDetail");
-const handleDelete    = defineModel("handleDelete");
+const planSlidingItem = ref();
+async function closePlanSlidingItem() {
+	planSlidingItem.value.$el.closeOpened();
+}
+const icon           = defineModel("icon");
+const color          = defineModel("color");
+const name           = defineModel("name");
+const remark         = defineModel("remark");
+const priorityName   = defineModel("priorityName");
+const repeatName     = defineModel("repeatName");
+const priorityColor  = defineModel("priorityColor");
+const repeatColor    = defineModel("repeatColor");
+const handleClick    = defineModel("handleClick");
+const handleDetail   = defineModel("handleDetail");
+const handleDelete   = defineModel("handleDelete");
 const handleComplete = defineModel("handleComplete");
 </script>
 

@@ -50,6 +50,7 @@ import {
 } from "@ionic/vue";
 import RepeatSelect from "@/components/RepeatSelect.vue";
 import { onMounted, ref, watchEffect } from "vue";
+import { getDateByRepeatName } from "@/utils/useDateTool";
 
 const datetime = ref();
 const startDate = defineModel("startDate");
@@ -57,50 +58,7 @@ const endDate = defineModel("endDate");
 const repeatValue = defineModel("repeatValue");
 const highlightedDates = ref();
 
-async function getEverydays(startDate: Date, endDate: Date): Promise<Date[]> {
-	const startMillis = startDate.getTime();
-	const endMillis = endDate.getTime();
-	const dates = [];
-
-	for (
-		let currentMillis = startMillis;
-		currentMillis <= endMillis;
-		currentMillis += 86400000
-	) {
-		dates.push(new Date(currentMillis));
-	}
-	return dates;
-}
-
-async function getWorkdays(startDate: Date, endDate: Date): Promise<Date[]> {
-	const workdays: Date[] = [];
-	const currentDate = new Date(startDate);
-
-	while (currentDate <= endDate) {
-		const dayOfWeek = currentDate.getDay();
-		if (dayOfWeek !== 6 && dayOfWeek !== 0) {
-			workdays.push(new Date(currentDate));
-		}
-		currentDate.setDate(currentDate.getDate() + 1);
-	}
-	return workdays;
-}
-
-async function getWeekdays(startDate: Date, endDate: Date): Promise<Date[]> {
-	const weekdays: Date[] = [];
-	const currentDate = new Date(startDate);
-
-	while (currentDate <= endDate) {
-		const dayOfWeek = currentDate.getDay();
-		if (dayOfWeek == 6 || dayOfWeek == 0) {
-			weekdays.push(new Date(currentDate));
-		}
-		currentDate.setDate(currentDate.getDate() + 1);
-	}
-	return weekdays;
-}
-
-async function setDates() {
+function handleDateChange() {
 	let dates = [];
 	let sortedDates;
 	if (datetime.value.$el.value) {
@@ -130,27 +88,13 @@ async function setDates() {
 	}
 }
 
-async function changeHighLightDates(
+function changeHighLightDates(
 	repeat: string,
 	dates: any,
 	startDate: Date,
 	endDate: Date
 ) {
-	let tempDates: any[] = [];
-	switch (repeat) {
-		case "everyday":
-			tempDates = await getEverydays(startDate, endDate);
-			break;
-		case "workday":
-			tempDates = await getWorkdays(startDate, endDate);
-			break;
-		case "weekday":
-			tempDates = await getWeekdays(startDate, endDate);
-			break;
-		default:
-			tempDates = [];
-			break;
-	}
+	const tempDates: Date[] = getDateByRepeatName(startDate, endDate, repeat);
 	dates.value = [];
 	tempDates.forEach((item) => {
 		const highLightDate = {
@@ -162,12 +106,8 @@ async function changeHighLightDates(
 	});
 }
 
-async function handleDateChange() {
-	await setDates();
-}
-
 watchEffect(async () => {
-	await changeHighLightDates(
+	changeHighLightDates(
 		repeatValue.value as string,
 		highlightedDates,
 		new Date(startDate.value as string),

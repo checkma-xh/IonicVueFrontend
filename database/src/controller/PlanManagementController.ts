@@ -293,6 +293,7 @@ export class PlanManagementController {
 		}
 	}
 
+	
 	async getPlans(request: Request, response: Response, next: NextFunction) {
 		try {
 			const decodeToken = await tokenVerify(request.headers.authorization.split(" ")[1]);
