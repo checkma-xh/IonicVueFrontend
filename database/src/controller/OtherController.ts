@@ -17,10 +17,10 @@ export class OtherController {
 
             const priorities = await this.PriorityInfoRepository.find();
 
-            response.status(200).json(priorities);
+            return priorities;
         } catch (error) {
             const errorMessage = error.message || "An unexpected error occurred.";
-            response.status(500).json({ status: "error", message: errorMessage });
+            return { status: "error", message: errorMessage };
         }
     }
 
@@ -34,10 +34,10 @@ export class OtherController {
 
             const repeats = await this.RepeatInfoRepository.find();
 
-            response.status(200).json(repeats);
+            return repeats;
         } catch (error) {
             const errorMessage = error.message || "An unexpected error occurred.";
-            response.status(500).json({ status: "error", message: errorMessage });
+            return { status: "error", message: errorMessage };
         }
     }
 }

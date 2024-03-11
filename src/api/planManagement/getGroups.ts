@@ -3,7 +3,7 @@ import axios from "axios";
 export async function getGroups(
   accessToken: string,
   id: number,
-  deleted: boolean
+  deleted: boolean = false
 ) {
   try {
     const config = {
@@ -11,7 +11,7 @@ export async function getGroups(
         Authorization: `Bearer ${accessToken}`
       },
       params: {
-        deleted: deleted.toString(),
+        deleted: deleted,
       }
     };
     const response = await axios.get(

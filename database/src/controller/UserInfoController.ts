@@ -22,10 +22,10 @@ export class UserInfoController {
 				.where("user.id = :id", { id: (decodeToken as JwtPayload).id })
 				.getOne();
 
-			response.status(200).json(user);
+			return user;
 		} catch (error) {
 			const errorMessage = error.message || "An unexpected error occurred.";
-			response.status(500).json({ status: "error", message: errorMessage });
+			return { status: "error", message: errorMessage };
 		}
 	}
 
@@ -46,10 +46,10 @@ export class UserInfoController {
 			user.email = newEmail;
 			await this.UserInfoRepository.save(user);
 
-			response.status(200).json(user);
+			return user;
 		} catch (error) {
 			const errorMessage = error.message || "An unexpected error occurred.";
-			response.status(500).json({ status: "error", message: errorMessage });
+			return { status: "error", message: errorMessage };
 		}
 	}
 
@@ -75,10 +75,10 @@ export class UserInfoController {
 			user.passwordHash = passwordHash;
 			await this.UserInfoRepository.save(user);
 
-			response.status(200).json(user);
+			return user;
 		} catch (error) {
 			const errorMessage = error.message || "An unexpected error occurred.";
-			response.status(500).json({ status: "error", message: errorMessage });
+			return { status: "error", message: errorMessage };
 		}
 	}
 
@@ -102,10 +102,10 @@ export class UserInfoController {
 			user.avatarUrl = avatarUrl;
 			await this.UserInfoRepository.save(user);
 
-			response.status(200).json(user);
+			return user;
 		} catch (error) {
 			const errorMessage = error.message || "An unexpected error occurred.";
-			response.status(500).json({ status: "error", message: errorMessage });
+			return { status: "error", message: errorMessage };
 		}
 	}
 }

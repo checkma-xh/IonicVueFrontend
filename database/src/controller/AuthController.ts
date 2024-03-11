@@ -66,10 +66,10 @@ export class AuthController {
 			const newUser = this.createUser(email, passwordHash, avatarUrl);
 			await this.UserInfoRepository.save(newUser);
 
-			response.status(201).json({ status: "success", message: "User registration successful. Please login to access your account." });
+			return { status: "success", message: "User registration successful. Please login to access your account." };
 		} catch (error) {
 			const errorMessage = error.message || "An error occurred during registration.";
-			response.status(400).json({ status: "error", message: errorMessage });
+			return { status: "error", message: errorMessage };
 		}
 	}
 
@@ -98,15 +98,15 @@ export class AuthController {
 			const accessToken = jwt.sign(userObject, config.secretKey, accessTokenOptions);
 			const refreshToken = jwt.sign(userObject, config.secretKey, refreshTokenOptions);
 
-			response.status(200).json({
+			return {
 				status: "success",
 				currentUser: userObject,
 				accessToken: accessToken,
 				refreshToken: refreshToken,
-			});
+			};
 		} catch (error) {
 			const errorMessage = error.message || "An unexpected error occurred.";
-			response.status(500).json({ status: "error", message: errorMessage });
+			return { status: "error", message: errorMessage };
 		}
 	}
 
@@ -119,10 +119,10 @@ export class AuthController {
 				throw new Error("Invalid token.");
 			}
 
-			response.status(200).json({ status: "success", message: "Logout." });
+			return { status: "success", message: "Logout." };
 		} catch (error) {
 			console.error("Error during logout:", error);
-			response.status(500).json({ status: "error", message: "Internal server error." });
+			return { status: "error", message: "Internal server error." };
 		}
 	}
 
@@ -146,14 +146,14 @@ export class AuthController {
 			const userObject = { ...user };
 			const accessToken = jwt.sign(userObject, config.secretKey, accessTokenOptions);
 
-			response.status(200).json({
+			return {
 				status: "success",
 				currentUser: userObject,
 				accessToken: accessToken,
-			});
+			};
 		} catch (error) {
 			const errorMessage = error.message || "An unexpected error occurred.";
-			response.status(500).json({ status: "error", message: errorMessage });
+			return { status: "error", message: errorMessage };
 		}
 	}
 
@@ -178,10 +178,10 @@ export class AuthController {
 			user.activated = false;
 			await this.UserInfoRepository.save(user);
 
-			response.status(200).json({ status: "success", message: "Deactivated." });
+			return { status: "success", message: "Deactivated." };
 		} catch (error) {
 			const errorMessage = error.message || "An unexpected error occurred.";
-			response.status(500).json({ status: "error", message: errorMessage });
+			return { status: "error", message: errorMessage };
 		}
 	}
 
@@ -216,10 +216,10 @@ export class AuthController {
 			await this.sendVerificationEmail(receiverEmail, verificationCode);
 			VerificationInfoMap.createVerificationInfo(verificationCode, receiverEmail);
 
-			response.status(200).json({ message: "Verification code sent successfully to your email." });
+			return { message: "Verification code sent successfully to your email." };
 		} catch (error) {
 			console.error("Error sending verification code:", error);
-			response.status(500).json({ message: "Failed to send verification code. Please try again later." });
+			return { message: "Failed to send verification code. Please try again later." };
 		}
 	}
 
@@ -245,10 +245,10 @@ export class AuthController {
 			}
 			verificationInfo.verificationCount++;
 
-			response.status(200).json({ status: "success", message: "Verification successful." });
+			return { status: "success", message: "Verification successful." };
 		} catch (error) {
 			console.error("Error verifying verification code:", error);
-			response.status(500).json({ status: "error", message: error.message });
+			return { status: "error", message: error.message };
 		}
 	}
 }

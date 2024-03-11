@@ -34,3 +34,4 @@ onMounted(async () => {
 	repeats.value = await getRepeats(userStore.accessToken);
 });
 </script>
+@/utils/userStore

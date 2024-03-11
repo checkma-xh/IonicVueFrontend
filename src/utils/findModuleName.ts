@@ -1,4 +1,4 @@
-export async function findModuleName(name: string,) {
+export function findModuleName(name: string,) {
 	switch (name) {
 		case "PlanManagement":
 			return "plan management";

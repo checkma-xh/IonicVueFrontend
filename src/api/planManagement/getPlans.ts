@@ -1,17 +1,31 @@
 import axios from "axios";
 
 export async function getPlans(
-    accessToken: string,
-    id: number,
-    name: string,
-    remark: string,
-    startDate: string,
-    endDate: string,
-    completed: boolean,
-    deleted: boolean,
-    groupName: string,
-    priorityName: string,
-    repeatName: string
+    {
+        accessToken,
+        id,
+        completed    = null,
+        deleted      = null,
+        name         = null,
+        remark       = null,
+        startDate    = null,
+        endDate      = null,
+        groupName    = null,
+        priorityName = null,
+        repeatName   = null,
+    }: {
+        accessToken  : string,
+        id           : number,
+        completed   ?: boolean | null,
+        deleted     ?: boolean | null,
+        name        ?: string | null,
+        remark      ?: string | null,
+        startDate   ?: string | null,
+        endDate     ?: string | null,
+        groupName   ?: string | null,
+        priorityName?: string | null,
+        repeatName  ?: string | null,
+    }
 ) {
     try {
         const config = {
@@ -19,15 +33,15 @@ export async function getPlans(
                 Authorization: `Bearer ${accessToken}`
             },
             params: {
-                name: name,
-                remark: remark,
-                startDate: startDate,
-                endDate: endDate,
-                completed: completed.toString(),
-                deleted: deleted.toString(),
-                groupName: groupName,
+                name        : name,
+                remark      : remark,
+                startDate   : startDate,
+                endDate     : endDate,
+                completed   : completed,
+                deleted     : deleted,
+                groupName   : groupName,
                 priorityName: priorityName,
-                repeatName: repeatName,
+                repeatName  : repeatName,
             },
         };
         const response = await axios.get(

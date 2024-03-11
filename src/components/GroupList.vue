@@ -7,8 +7,12 @@
 			:icon="value.icon"
 			:label="value.label"
 			:completedCount="value.completedCount"
+			:unfinishedCount="value.unfinishedCount"
 			:total="value.total"
-			@click="value.handleClick">
+			:handleClick="value.handleClick"
+			:handleDetail="value.handleDetail"
+			:handleDelete="value.handleDelete"
+			:selectPlans="value.selectPlans">
 		</group-item>
 	</ion-list>
 </template>

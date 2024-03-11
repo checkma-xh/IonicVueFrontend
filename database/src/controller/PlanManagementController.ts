@@ -47,10 +47,10 @@ export class PlanManagementController {
 			user.plans.push(plan);
 			await this.UserInfoRepository.save(user);
 
-			response.status(200).json({ status: "success" });
+			return { status: "success" };
 		} catch (error) {
 			const errorMessage = error.message || "An unexpected error occurred.";
-			response.status(500).json({ status: "error", message: errorMessage });
+			return { status: "error", message: errorMessage };
 		}
 	}
 
@@ -73,10 +73,10 @@ export class PlanManagementController {
 				.where("user.id = :userId AND plan.id = :planId", { userId: (decodeToken as JwtPayload).id, planId: planId })
 				.getOne();
 
-			response.status(200).json(plan);
+			return plan;
 		} catch (error) {
 			const errorMessage = error.message || "An unexpected error occurred.";
-			response.status(500).json({ status: "error", message: errorMessage });
+			return { status: "error", message: errorMessage };
 		}
 	}
 
@@ -101,10 +101,10 @@ export class PlanManagementController {
 
 			plan.completed = true;
 			await this.PlanInfoRepository.save(plan);
-			response.status(200).json({ status: "success" });
+			return { status: "success" };
 		} catch (error) {
 			const errorMessage = error.message || "An unexpected error occurred.";
-			response.status(500).json({ status: "error", message: errorMessage });
+			return { status: "error", message: errorMessage };
 		}
 	}
 
@@ -129,14 +129,14 @@ export class PlanManagementController {
 				plan.deleted = true;
 				await this.PlanInfoRepository.save(plan);
 			}
-			response.status(200).json({ status: "success" });
+			return { status: "success" };
 		} catch (error) {
 			const errorMessage = error.message || "An unexpected error occurred.";
-			response.status(500).json({ status: "error", message: errorMessage });
+			return { status: "error", message: errorMessage };
 		}
 	}
 
-
+	
 	async setPlan(request: Request, response: Response, next: NextFunction) {
 		try {
 			const decodeToken = await tokenVerify(request.headers.authorization.split(" ")[1]);
@@ -165,10 +165,10 @@ export class PlanManagementController {
 			plan.repeat = repeat;
 			await this.PlanInfoRepository.save(plan);
 
-			response.status(200).json({ status: "success" });
+			return { status: "success" };
 		} catch (error) {
 			const errorMessage = error.message || "An unexpected error occurred.";
-			response.status(500).json({ status: "error", message: errorMessage });
+			return { status: "error", message: errorMessage };
 		}
 	}
 
@@ -203,10 +203,10 @@ export class PlanManagementController {
 			group.plans = [];
 			await this.GroupInfoRepository.save(group);
 
-			response.status(200).json({ status: "success" });
+			return { status: "success" };
 		} catch (error) {
 			const errorMessage = error.message || "An unexpected error occurred.";
-			response.status(500).json({ status: "error", message: errorMessage });
+			return { status: "error", message: errorMessage };
 		}
 	}
 
@@ -225,10 +225,10 @@ export class PlanManagementController {
 				.where("user.id = :id AND groups.deleted = :deleted", { id: (decodeToken as JwtPayload).id, deleted: deleted })
 				.getMany();
 
-			response.status(200).json(groups);
+			return groups;
 		} catch (error) {
 			const errorMessage = error.message || "An unexpected error occurred.";
-			response.status(500).json({ status: "error", message: errorMessage });
+			return { status: "error", message: errorMessage };
 		}
 	}
 
@@ -259,10 +259,10 @@ export class PlanManagementController {
 				group.deleted = true;
 				await this.GroupInfoRepository.save(group);
 			}
-			response.status(200).json({ status: "success" });
+			return { status: "success" };
 		} catch (error) {
 			const errorMessage = error.message || "An unexpected error occurred.";
-			response.status(500).json({ status: "error", message: errorMessage });
+			return { status: "error", message: errorMessage };
 		}
 	}
 
@@ -286,10 +286,10 @@ export class PlanManagementController {
 			group.remark = remark;
 			await this.GroupInfoRepository.save(group);
 
-			response.status(200).json({ status: "success" });
+			return { status: "success" };
 		} catch (error) {
 			const errorMessage = error.message || "An unexpected error occurred.";
-			response.status(500).json({ status: "error", message: errorMessage });
+			return { status: "error", message: errorMessage };
 		}
 	}
 
@@ -304,8 +304,9 @@ export class PlanManagementController {
 			const repository = this.PlanInfoRepository
 				.createQueryBuilder("plans")
 				.innerJoinAndSelect("plans.user", "user")
-				// .where("user.id = :id", { id: (decodeToken as JwtPayload).id });
-				.where("user.id = :id", { id: 1 });
+				.innerJoinAndSelect("plans.priority", "priority")
+				.innerJoinAndSelect("plans.repeat", "repeat")
+				.where("user.id = :id", { id: (decodeToken as JwtPayload).id });
 
 			if (deleted) {
 				const fieldValue = (deleted as string).toLocaleLowerCase() === "true" ? true : false;
@@ -344,10 +345,10 @@ export class PlanManagementController {
 			}
 
 			const plans = await repository.getMany();
-			response.status(200).json(plans);
+			return plans;
 		} catch (error) {
 			const errorMessage = error.message || "An unexpected error occurred.";
-			response.status(500).json({ status: "error", message: errorMessage });
+			return { status: "error", message: errorMessage };
 		}
 	}
 }

@@ -1,6 +1,8 @@
 <template>
 	<ion-item-sliding>
-		<ion-item :button="true">
+		<ion-item
+			:button="true"
+			@click="handleClick">
 			<ion-icon
 				:color="color"
 				solt="start"
@@ -11,25 +13,21 @@
 				completedCount + " completed"
 			}}</ion-badge>
 			<ion-badge color="danger">{{
-				total - completedCount + " unfinished"
+				unfinishedCount + " unfinished"
 			}}</ion-badge>
-			<ion-badge color="primary">{{ total + " total" }}</ion-badge>
+			<ion-badge color="primary">{{ 
+				total + " total" 
+			}}</ion-badge>
 		</ion-item>
 		<ion-item-options slot="end">
-			<ion-item-option color="light">
-				<ion-icon
-					@click="handleSet"
-					slot="icon-only"
-					:icon="cog"></ion-icon>
-			</ion-item-option>
 			<ion-item-option color="tertiary">
 				<ion-icon
-					@click="handleDetail"
+					@click.stop="handleDetail"
 					slot="icon-only"
 					:icon="ellipsisVertical"></ion-icon>
 			</ion-item-option>
 			<ion-item-option
-				@click="handleTrash"
+				@click.stop="handleDelete"
 				color="danger"
 				expandable="true">
 				<ion-icon
@@ -37,7 +35,7 @@
 					:icon="trash"></ion-icon>
 			</ion-item-option>
 			<ion-item-option
-				@click="selectPlans"
+				@click.stop="selectPlans"
 				color="primary"
 				expandable="true">
 				<ion-icon
@@ -59,13 +57,18 @@ import {
 	IonItemOption,
 	IonItemSliding,
 } from "@ionic/vue";
-import { ellipsisVertical, trash, cog, arrowForward } from "ionicons/icons";
+import { ellipsisVertical, trash, arrowForward } from "ionicons/icons";
 
 const color = defineModel("color");
 const icon = defineModel("icon");
 const label = defineModel("label");
 const completedCount = defineModel("completedCount");
+const unfinishedCount = defineModel("unfinishedCount");
 const total = defineModel("total");
+const handleClick = defineModel("handleClick");
+const handleDetail = defineModel("handleDetail");
+const handleDelete = defineModel("handleDelete");
+const selectPlans = defineModel("selectPlans");
 </script>
 
 <style scoped>

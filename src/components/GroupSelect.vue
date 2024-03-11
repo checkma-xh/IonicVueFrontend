@@ -27,6 +27,6 @@ const groupsValue = defineModel("groupsValue", {
 onMounted(async () => {
 	const userStore = useUserStore();
 	const currentUser = userStore.currentUser;
-	groups.value = await getGroups(currentUser.id, userStore.accessToken);
+	groups.value = await getGroups(userStore.accessToken, currentUser.id);
 });
-</script>@/api/planManagement/getGroups@/api/planManagement/getGroup
+</script>@/api/planManagement/getGroups@/api/planManagement/getGroup@/utils/userStore

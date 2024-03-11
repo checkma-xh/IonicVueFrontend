@@ -8,7 +8,13 @@
 			:name="value.name"
 			:remark="value.remark"
 			:priorityName="value.priorityName"
-			@click="value.handleClick">
+			:repeatName="value.repeatName"
+			:priorityColor="value.priorityColor"
+			:repeatColor="value.repeatColor"
+			:handleClick="value.handleClick"
+			:handleDetail="value.handleDetail"
+			:handleDelete="value.handleDelete"
+			:handleComplete="value.handleComplete">
 		</plan-item>
 	</ion-list>
 </template>

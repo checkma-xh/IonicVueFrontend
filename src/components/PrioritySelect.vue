@@ -29,4 +29,4 @@ onMounted(async () => {
 	priorities.value = await getPriorities(userStore.accessToken);
 });
 </script>
-@/api/other/getPriority
+@/api/other/getPriority@/utils/userStore

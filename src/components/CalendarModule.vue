@@ -181,13 +181,6 @@ onMounted(() => {
 	endDate.value = "";
 	repeatValue.value = "everyday";
 });
-
-onUnmounted(() => {
-	highlightedDates.value = [];
-	startDate.value = "";
-	endDate.value = "";
-	repeatValue.value = "";
-});
 </script>
 
 <style scoped>

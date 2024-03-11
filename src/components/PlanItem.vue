@@ -2,7 +2,8 @@
 	<ion-item-sliding>
 		<ion-item
 			:button="true"
-			:detail="false">
+			:detail="false"
+			@click="handleClick">
 			<ion-icon
 				:icon="icon"
 				:color="color"></ion-icon>
@@ -17,37 +18,39 @@
 			<div
 				class="metadata-end-wrapper"
 				slot="end">
-				<ion-note color="medium">{{ priorityName }}</ion-note>
+				<ion-chip :color="priorityColor">
+					<ion-label>{{ priorityName }}</ion-label>
+				</ion-chip>
+				<ion-chip :color="repeatColor">
+					<ion-label>{{ repeatName }}</ion-label>
+				</ion-chip>
 				<ion-icon
 					color="medium"
 					:icon="chevronForward"></ion-icon>
 			</div>
 		</ion-item>
-
 		<ion-item-options slot="end">
-			<ion-item-option color="light">
+			<ion-item-option
+				@click="handleDetail"
+				color="tertiary"
+				expandable="true">
 				<ion-icon
-					@click="handleSet"
-					slot="icon-only"
-					:icon="cog"></ion-icon>
-			</ion-item-option>
-			<ion-item-option color="tertiary">
-				<ion-icon
-					@click="handleDetail"
 					slot="icon-only"
 					:icon="ellipsisVertical"></ion-icon>
 			</ion-item-option>
 			<ion-item-option
-				@click="handleTrash"
+				@click="handleDelete"
 				color="danger"
 				expandable="true">
 				<ion-icon
 					slot="icon-only"
 					:icon="trash"></ion-icon>
 			</ion-item-option>
-			<ion-item-option color="primary">
+			<ion-item-option
+				@click="handleComplete"
+				color="primary"
+				expandable="true">
 				<ion-icon
-					@click="handleCompleted"
 					slot="icon-only"
 					:icon="checkmarkCircle"></ion-icon>
 			</ion-item-option>
@@ -64,6 +67,7 @@ import {
 	IonIcon,
 	IonItem,
 	IonLabel,
+	IonChip,
 	IonNote,
 } from "@ionic/vue";
 import {
@@ -71,20 +75,20 @@ import {
 	ellipsisVertical,
 	trash,
 	checkmarkCircle,
-	cog,
 } from "ionicons/icons";
 
-const icon = defineModel("icon");
-const color = defineModel("color");
-const name = defineModel("name");
-const remark = defineModel("remark");
-const priorityName = defineModel("priorityName");
-
-async function handleDetail() {}
-
-async function handleTrash() {}
-
-async function handleCompleted() {}
+const icon            = defineModel("icon");
+const color           = defineModel("color");
+const name            = defineModel("name");
+const remark          = defineModel("remark");
+const priorityName    = defineModel("priorityName");
+const repeatName = defineModel("repeatName");
+const priorityColor = defineModel("priorityColor");
+const repeatColor = defineModel("repeatColor");
+const handleClick     = defineModel("handleClick");
+const handleDetail    = defineModel("handleDetail");
+const handleDelete    = defineModel("handleDelete");
+const handleComplete = defineModel("handleComplete");
 </script>
 
 <style scoped>

@@ -83,9 +83,9 @@ const userStore = useUserStore();
 const currentUser = userStore.currentUser;
 const avatarWebPath = ref(personCircleOutline);
 const avatar = ref();
-const email = ref("checkma_xh@outlook.com");
-const password = ref("Wlj+=9351524");
-const confirmPassword = ref("Wlj+=9351524");
+const email = ref();
+const password = ref();
+const confirmPassword = ref();
 const alertHeader = ref("wrong format");
 const alertSubHeader = ref("wrong format");
 const alertMessage = ref("wrong format");
@@ -186,3 +186,4 @@ function setAlert(message: string) {
 	margin-bottom: 0%;
 }
 </style>
+@/utils/userStore
