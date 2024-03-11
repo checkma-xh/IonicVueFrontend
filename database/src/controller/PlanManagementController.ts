@@ -4,7 +4,7 @@ import { UserInfo } from "../entity/UserInfo";
 import { GroupInfo } from "../entity/GroupInfo";
 import { PriorityInfo } from "../entity/PriorityInfo";
 import { PlanInfo } from "../entity/PlanInfo";
-import { tokenVerify } from "../utils/tokenVerify";
+import { tokenVerify } from "../utils/useVerifyTool";
 import type { JwtPayload } from "jsonwebtoken";
 import { ConfigService } from "../utils/ConfigService";
 import { RepeatInfo } from "../entity/RepeatInfo";

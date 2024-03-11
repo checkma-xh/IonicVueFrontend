@@ -2,7 +2,7 @@ import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
 import { PriorityInfo } from "../entity/PriorityInfo";
 import { RepeatInfo } from "../entity/RepeatInfo";
-import { tokenVerify } from "../utils/tokenVerify";
+import { tokenVerify } from "../utils/useVerifyTool";
 
 export class OtherController {
     private PriorityInfoRepository = AppDataSource.getRepository(PriorityInfo);

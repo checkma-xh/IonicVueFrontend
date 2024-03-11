@@ -1,7 +1,7 @@
 import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
 import { UserInfo } from "../entity/UserInfo";
-import { tokenVerify } from "../utils/tokenVerify";
+import { tokenVerify } from "../utils/useVerifyTool";
 import { VerificationInfoMap } from "../utils/VerificationInfoMap";
 import type { JwtPayload } from "jsonwebtoken";
 

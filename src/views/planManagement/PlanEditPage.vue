@@ -61,7 +61,9 @@
 							>
 							<ion-col size="4"
 								><strong>repeat-</strong
-								><ion-label>{{ repeatValue }}</ion-label></ion-col
+								><ion-label>{{
+									repeatValue
+								}}</ion-label></ion-col
 							>
 						</ion-row>
 					</ion-grid></ion-button
@@ -104,7 +106,7 @@ import GroupSelect from "@/components/GroupSelect.vue";
 import PrioritySelect from "@/components/PrioritySelect.vue";
 import GroupCreationModule from "@/components/GroupCreationModule.vue";
 import CalendarModule from "@/components/CalendarModule.vue";
-import { findModuleName } from "@/utils/findModuleName";
+import { matchModuleNameByRouteName } from "@/utils/useMatchTool";
 
 const route = useRoute();
 const moduleName = ref();
@@ -116,7 +118,7 @@ const endDate = ref();
 const repeatValue = ref();
 
 onMounted(async () => {
-	moduleName.value = await findModuleName(route.name as string);
+	moduleName.value = await matchModuleNameByRouteName(route.name as string);
 });
 </script>
 
@@ -187,3 +189,4 @@ ion-accordion.accordion-collapsed ion-item[slot="header"] {
 	--color: var(--ion-color-light-contrast);
 }
 </style>
+@/utils/matchTools@/utils/useMatchTools

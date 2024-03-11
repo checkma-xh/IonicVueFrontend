@@ -5,7 +5,7 @@ import * as jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
 import * as nodemailer from "nodemailer";
 import * as crypto from "crypto";
-import { tokenVerify } from "../utils/tokenVerify";
+import { tokenVerify } from "../utils/useVerifyTool";
 import { VerificationInfoMap } from "../utils/VerificationInfoMap";
 import { ConfigService } from "../utils/ConfigService";
 

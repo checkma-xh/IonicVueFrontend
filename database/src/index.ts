@@ -3,7 +3,7 @@ import * as cors from 'cors';
 import { Request, Response } from "express";
 import { AppDataSource } from "./data-source";
 import { Routes } from "./routes";
-import { dropDatabase, insertFakeData } from "./utils/useDataTools";
+import { dropDatabase, insertFakeData } from "./utils/useDataTool";
 
 async function initializeData() {
   await dropDatabase();

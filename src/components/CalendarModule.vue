@@ -49,7 +49,7 @@ import {
 	IonCol,
 } from "@ionic/vue";
 import RepeatSelect from "@/components/RepeatSelect.vue";
-import { onMounted, onUnmounted, ref, watchEffect } from "vue";
+import { onMounted, ref, watchEffect } from "vue";
 
 const datetime = ref();
 const startDate = defineModel("startDate");

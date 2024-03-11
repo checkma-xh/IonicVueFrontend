@@ -15,7 +15,6 @@
 				</ion-toolbar>
 			</ion-header>
 
-			<!-- GroupList, PlanList -->
 			<group-list :groups="groups"> </group-list>
 			<h3>
 				<strong
@@ -45,18 +44,22 @@ import { useUserStore } from "@/store/userStore";
 import PlanList from "@/components/PlanList.vue";
 import GroupList from "@/components/GroupList.vue";
 import { alertCircle, checkmarkCircle, listCircle } from "ionicons/icons";
-import { findModuleName } from "@/utils/findModuleName";
 import { getPlans } from "@/api/planManagement/getPlans";
 import { completePlan } from "@/api/planManagement/completePlan";
 import { deletePlan } from "@/api/planManagement/deletePlan";
 import { deleteGroup } from "@/api/planManagement/deleteGroup";
+import {
+	matchModuleNameByRouteName,
+	matchColorByPriorityName,
+	matchColorByRepeatName,
+} from "@/utils/useMatchTool";
 
 const route = useRoute();
 const moduleName = ref();
 const userStore = useUserStore();
 const currentUser = userStore.currentUser;
 const groups = ref();
-const currentGroup = reactive({name: null, color: null, plans: null});
+const currentGroup = reactive({ name: null, color: null, plans: null });
 const colorArray: string[] = [
 	"danger",
 	"tertiary",
@@ -81,32 +84,6 @@ function arrayCycleTool(array: Array<any>) {
 	return arrayCycle;
 }
 
-function matchColorByPriorityName(priorityName: string) {
-	switch (priorityName) {
-		case "high":
-			return "primary";
-		case "medium":
-			return "secondary";
-		case "low":
-			return "medium";
-		default:
-			return "danger";
-	}
-}
-
-function matchColorByRepeatName(repeatName: string) {
-	switch (repeatName) {
-		case "everyday":
-			return "success";
-		case "workday":
-			return "tertiary";
-		case "weekday":
-			return "warning";
-		default:
-			return "danger";
-	}
-}
-
 function setPlanAtrr(group: any, plan: any) {
 	plan.handleClick = async () => {
 		alert("click");
@@ -114,7 +91,9 @@ function setPlanAtrr(group: any, plan: any) {
 	plan.handleDetail = plan.handleClick;
 	plan.handleDelete = async () => {
 		await deletePlan(userStore.accessToken, currentUser.id, plan.id);
-		group.plans = group.plans.filter((item: any) => { return item.id != plan.id });
+		group.plans = group.plans.filter((item: any) => {
+			return item.id != plan.id;
+		});
 		currentGroup.plans = group.plans;
 	};
 	plan.handleComplete = async () => {
@@ -139,7 +118,7 @@ async function setGroupAttr(group: any) {
 	group.icon = listCircle;
 	group.color = colorCycle();
 	group.label = group.name;
-	if (!group?.plans){
+	if (!group?.plans) {
 		group.plans = [];
 	}
 	group.total = computed(() => {
@@ -178,7 +157,7 @@ function getRandomElement(array: Array<any>) {
 }
 
 onMounted(async () => {
-	moduleName.value = findModuleName(route.name as string);
+	moduleName.value = matchModuleNameByRouteName(route.name as string);
 
 	groups.value = await getGroups(userStore.accessToken, currentUser.id);
 	const promises = groups.value.map(async (group: any) => {
@@ -219,3 +198,4 @@ h3 {
 	margin-left: 2%;
 }
 </style>
+@/utils/matchTools@/utils/useMatchTools
