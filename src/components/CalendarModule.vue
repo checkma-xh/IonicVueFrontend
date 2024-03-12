@@ -18,7 +18,8 @@
 							><repeat-select
 								v-model:repeatValue="
 									repeatValue
-								"></repeat-select
+								"
+								v-model:handleChange="repeatHandleChange"></repeat-select
 						></strong>
 					</ion-col>
 				</ion-row>
@@ -57,6 +58,7 @@ const startDate = defineModel("startDate");
 const endDate = defineModel("endDate");
 const repeatValue = defineModel("repeatValue");
 const highlightedDates = ref();
+const repeatHandleChange = () => {};
 
 function handleDateChange() {
 	let dates = [];

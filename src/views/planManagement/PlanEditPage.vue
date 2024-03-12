@@ -99,7 +99,7 @@ import {
 	IonRow,
 	IonCol,
 } from "@ionic/vue";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watchEffect } from "vue";
 import { useRoute } from "vue-router";
 import GroupSelect from "@/components/GroupSelect.vue";
 import PrioritySelect from "@/components/PrioritySelect.vue";
@@ -116,9 +116,13 @@ const startDate     = ref();
 const endDate       = ref();
 const repeatValue   = ref();
 
-onMounted(async () => {
+onMounted(() => {
 	moduleName.value = matchModuleNameByRouteName(route.name as string);
 });
+
+watchEffect(() => {
+	alert(priorityValue.value);
+})
 </script>
 
 <style scoped>

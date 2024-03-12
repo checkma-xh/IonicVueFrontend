@@ -3,7 +3,7 @@
 		ref="select"
 		label="repeat"
 		placeholder="repeat"
-		v-model:repeatValue="repeatValue"
+		v-model="repeatValue"
 		@ionChange="handleChange">
 		<ion-select-option
 			v-for="(item, index) of repeats"
@@ -24,11 +24,7 @@ const select = ref();
 const userStore = useUserStore();
 const repeats = ref();
 const repeatValue = defineModel("repeatValue");
-
-function handleChange() {
-	repeatValue.value = select.value.$el.value;
-}
-
+const handleChange = defineModel("handleChange");
 onMounted(async () => {
 	repeats.value = await getRepeats(userStore.accessToken);
 });

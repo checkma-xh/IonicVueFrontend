@@ -3,7 +3,7 @@
 		ref="select"
 		label="priority"
 		placeholder="priority"
-		v-model:priorityValue="priorityValue"
+		v-model="priorityValue"
 		@ionChange="handleChange">
 		<ion-select-option
 			v-for="(item, index) of priorities"
@@ -24,10 +24,7 @@ const select = ref();
 const userStore = useUserStore();
 const priorities = ref();
 const priorityValue = defineModel("priorityValue");
-
-function handleChange() {
-	priorityValue.value = select.value.$el.value;
-}
+const handleChange = defineModel("handleChange");
 
 onMounted(async () => {
 	priorities.value = await getPriorities(userStore.accessToken);
