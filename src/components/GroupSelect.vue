@@ -1,8 +1,10 @@
 <template>
 	<ion-select
-		label="groups"
-		placeholder="groups"
-		:value="groupsValue">
+		ref="select"
+		label="group"
+		placeholder="group"
+		v-model:groupValue="groupValue"
+		@ionChange="handleChange">
 		<ion-select-option
 			v-for="(item, index) of groups"
 			:key="index"
@@ -18,15 +20,17 @@ import { onMounted, ref } from "vue";
 import { getGroups } from "@/api/planManagement/getGroups";
 import { useUserStore } from "@/store/userStore";
 
+const select = ref();
+const userStore = useUserStore();
+const currentUser = userStore.currentUser;
 const groups = ref();
-const groupsValue = defineModel("groupsValue", {
-	type: String,
-	required: true,
-});
+const groupValue = defineModel("groupModel");
+
+function handleChange() {
+	groupValue.value = select.value.$el.value;
+}
 
 onMounted(async () => {
-	const userStore = useUserStore();
-	const currentUser = userStore.currentUser;
 	groups.value = await getGroups(userStore.accessToken, currentUser.id);
 });
-</script>@/api/planManagement/getGroups@/api/planManagement/getGroup@/utils/userStore
+</script>

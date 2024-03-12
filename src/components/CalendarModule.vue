@@ -49,7 +49,7 @@ import {
 	IonCol,
 } from "@ionic/vue";
 import RepeatSelect from "@/components/RepeatSelect.vue";
-import { onMounted, ref, watchEffect } from "vue";
+import { ref, watchEffect } from "vue";
 import { getDateByRepeatName } from "@/utils/useDateTool";
 
 const datetime = ref();
@@ -106,20 +106,13 @@ function changeHighLightDates(
 	});
 }
 
-watchEffect(async () => {
+watchEffect(() => {
 	changeHighLightDates(
 		repeatValue.value as string,
 		highlightedDates,
 		new Date(startDate.value as string),
 		new Date(endDate.value as string)
 	);
-});
-
-onMounted(() => {
-	highlightedDates.value = [];
-	startDate.value = "";
-	endDate.value = "";
-	repeatValue.value = "everyday";
 });
 </script>
 

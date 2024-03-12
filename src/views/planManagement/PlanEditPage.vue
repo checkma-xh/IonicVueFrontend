@@ -32,7 +32,7 @@
 
 				<!-- 选择项 -->
 				<priority-select :priorityValue="priorityValue"></priority-select>
-				<group-select :groupsValue="groupsValue"></group-select>
+				<group-select :groupValue="groupValue"></group-select>
 
 				<!-- 新建分组 -->
 				<ion-button
@@ -107,17 +107,17 @@ import GroupCreationModule from "@/components/GroupCreationModule.vue";
 import CalendarModule from "@/components/CalendarModule.vue";
 import { matchModuleNameByRouteName } from "@/utils/useMatchTool";
 
-const route = useRoute();
-const moduleName = ref();
-const titleRef = ref();
-const groupsValue = ref();
+const route         = useRoute();
+const moduleName    = ref();
+const titleRef      = ref();
+const groupValue    = ref();
 const priorityValue = ref();
-const startDate = ref();
-const endDate = ref();
-const repeatValue = ref();
+const startDate     = ref();
+const endDate       = ref();
+const repeatValue   = ref();
 
 onMounted(async () => {
-	moduleName.value = await matchModuleNameByRouteName(route.name as string);
+	moduleName.value = matchModuleNameByRouteName(route.name as string);
 });
 </script>
 
@@ -188,4 +188,3 @@ ion-accordion.accordion-collapsed ion-item[slot="header"] {
 	--color: var(--ion-color-light-contrast);
 }
 </style>
-@/utils/matchTools@/utils/useMatchTools
