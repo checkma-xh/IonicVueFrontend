@@ -27,7 +27,6 @@ const repeatValue = defineModel("repeatValue");
 
 function handleChange() {
 	repeatValue.value = select.value.$el.value;
-	alert(repeatValue.value);
 }
 
 onMounted(async () => {
