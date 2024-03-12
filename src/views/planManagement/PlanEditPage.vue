@@ -31,8 +31,7 @@
 				</ion-textarea>
 
 				<!-- 选择项 -->
-				<priority-select
-					:priorityValue="priorityValue"></priority-select>
+				<priority-select :priorityValue="priorityValue"></priority-select>
 				<group-select :groupsValue="groupsValue"></group-select>
 
 				<!-- 新建分组 -->

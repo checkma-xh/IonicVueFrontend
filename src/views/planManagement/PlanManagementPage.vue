@@ -2,7 +2,7 @@
 	<ion-page>
 		<ion-header :translucent="true">
 			<ion-toolbar>
-				<ion-title>planManagement</ion-title>
+				<ion-title>plan management</ion-title>
 			</ion-toolbar>
 		</ion-header>
 
@@ -11,7 +11,7 @@
 			class="ion-padding">
 			<ion-header collapse="condense">
 				<ion-toolbar>
-					<ion-title size="large">planManagement</ion-title>
+					<ion-title size="large">plan management</ion-title>
 				</ion-toolbar>
 			</ion-header>
 

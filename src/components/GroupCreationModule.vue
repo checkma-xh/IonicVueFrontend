@@ -57,7 +57,7 @@ ion-textarea {
 }
 
 ion-button {
-	margin-top: 6%;
+	margin-top: 4%;
 	width: 100%;
 }
 </style>

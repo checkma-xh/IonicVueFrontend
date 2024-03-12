@@ -16,13 +16,21 @@
 			</ion-header>
 
 			<group-list :groups="groups"> </group-list>
-			<h3>
-				<strong
-					><ion-label :color="currentGroup.color">{{
-						currentGroup.name
-					}}</ion-label></strong
-				>
-			</h3>
+			<ion-grid>
+				<ion-row>
+					<ion-col size="1">
+						<strong
+							><ion-label :color="currentGroup.color">{{
+								currentGroup.name
+							}}</ion-label></strong
+						>
+					</ion-col>
+					<ion-col size="1">
+						<ion-toggle :checked="trashCehcked">trash</ion-toggle>
+					</ion-col>
+				</ion-row>
+			</ion-grid>
+			<RepeatSegment v-model:repeatSegmentValue="repeatSegmentValue"></RepeatSegment>
 			<plan-list :plans="currentGroup.plans"> </plan-list>
 
 			<!-- modal -->
@@ -64,20 +72,25 @@ import {
 	IonHeader,
 	IonToolbar,
 	IonTitle,
+	IonToggle,
+	IonGrid,
+	IonRow,
+	IonCol,
 	IonModal,
 	IonButtons,
 	IonButton,
 	IonContent,
 	IonLabel,
 } from "@ionic/vue";
-import { computed, onMounted, reactive, ref, watchEffect } from "vue";
+import { computed, onMounted, reactive, ref, watch, watchEffect } from "vue";
 import { useRoute } from "vue-router";
 import { getGroups } from "@/api/planManagement/getGroups";
 import { useUserStore } from "@/store/userStore";
 import PlanList from "@/components/PlanList.vue";
 import GroupList from "@/components/GroupList.vue";
-import { alertCircle, checkmarkCircle, listCircle } from "ionicons/icons";
+import RepeatSegment from "@/components/RepeatSegment.vue";
 import DetailCard from "@/components/DetailCard.vue";
+import { listCircle } from "ionicons/icons";
 import { getPlans } from "@/api/planManagement/getPlans";
 import { completePlan } from "@/api/planManagement/completePlan";
 import { deletePlan } from "@/api/planManagement/deletePlan";
@@ -92,20 +105,22 @@ import {
 
 const moduleName = ref();
 const modal = ref();
+const trashCehcked = ref(false);
+const repeatSegmentValue = ref("workday");
 const detailRef = reactive({
 	handleClick: null,
-	icon: null,
-	iconColor: null,
-	cardColor: null,
-	title: null,
-	subtitle: null,
-	content: null,
+	icon       : null,
+	iconColor  : null,
+	cardColor  : null,
+	title      : null,
+	subtitle   : null,
+	content    : null,
 });
 const route = useRoute();
 const userStore = useUserStore();
 const currentUser = userStore.currentUser;
 const groups = ref();
-const currentGroup = reactive({ name: null, color: null, plans: null });
+const currentGroup = reactive({ name: null, color: null, plans: [] });
 const colorArray: string[] = [
 	"danger",
 	"tertiary",
@@ -130,22 +145,33 @@ function arrayCycleTool(array: Array<any>) {
 	return arrayCycle;
 }
 
+function sortPlan(currentItem: any, afterItem: any) {
+	if (currentItem.completed !== afterItem.completed) {
+		return currentItem.completed ? -1 : 1;
+	}
+
+	const priorityOrder = ["high", "medium", "low"];
+	const currentItemIndex = priorityOrder.indexOf(currentItem.priorityName);
+	const afterItemIndex = priorityOrder.indexOf(afterItem.priorityName);
+
+	return currentItemIndex - afterItemIndex;
+}
+
 function setPlanAtrr(group: any, plan: any) {
 	plan.handleClick = async () => {
-		modal.value.$el.isOpen     = true;
+		modal.value.$el.isOpen = true;
 		modal.value.$el.canDismiss = false;
-		detailRef.icon             = plan.icon;
-		detailRef.iconColor        = plan.color;
-		detailRef.handleClick      = () => {
+		detailRef.icon = plan.icon;
+		detailRef.iconColor = plan.color;
+		detailRef.handleClick = () => {
 			modal.value.$el.canDismiss = true;
-			modal.value.$el.isOpen     = false;
+			modal.value.$el.isOpen = false;
 		};
-		detailRef.cardColor = "medium";
-		detailRef.title     = plan.name;
-		detailRef.subtitle  = `group-${currentGroup.name}; priority-${plan.priorityName}; repeat-${plan.repeatName}; completed-${plan.completed};`;
-		detailRef.content   = plan.remark;
+		detailRef.cardColor = "light";
+		detailRef.title = plan.name;
+		detailRef.subtitle = `group-${currentGroup.name}; priority-${plan.priorityName}; repeat-${plan.repeatName}; completed-${plan.completed};`;
+		detailRef.content = plan.remark;
 	};
-	plan.handleDetail = plan.handleClick;
 	plan.handleDelete = async () => {
 		group.plans = group.plans.filter((item: any) => {
 			return item.id != plan.id;
@@ -158,6 +184,7 @@ function setPlanAtrr(group: any, plan: any) {
 		setPlanAtrr(group, plan);
 		await completePlan(userStore.accessToken, currentUser.id, plan.id);
 	};
+	plan.handleDetail  = plan.handleClick;
 	plan.priorityName  = plan.priority.name;
 	plan.repeatName    = plan.repeat.name;
 	plan.priorityColor = matchColorByPriorityName(plan.priorityName);
@@ -167,12 +194,12 @@ function setPlanAtrr(group: any, plan: any) {
 }
 
 async function setGroupAttr(group: any) {
-	group.icon = listCircle;
-	group.color = colorCycle();
-	group.label = group.name;
 	if (!group?.plans) {
 		group.plans = [];
 	}
+	group.icon = listCircle;
+	group.color = colorCycle();
+	group.label = group.name;
 	group.total = computed(() => {
 		return group.plans.length;
 	});
@@ -201,7 +228,7 @@ async function setGroupAttr(group: any) {
 			modal.value.$el.canDismiss = true;
 			modal.value.$el.isOpen     = false;
 		};
-		detailRef.cardColor = "medium";
+		detailRef.cardColor = "light";
 		detailRef.title     = group.name;
 		detailRef.subtitle  = `${group.completedCount} / ${group.total}`;
 		detailRef.content   = group.remark;
@@ -214,10 +241,10 @@ async function setGroupAttr(group: any) {
 	};
 }
 
+
 onMounted(async () => {
 	moduleName.value = matchModuleNameByRouteName(route.name as string);
-
-	groups.value = await getGroups(userStore.accessToken, currentUser.id);
+	groups.value = await getGroups(userStore.accessToken, currentUser.id, trashCehcked.value);
 	const promises = groups.value.map(async (group: any) => {
 		await setGroupAttr(group);
 		group.plans = await getPlans({
@@ -236,11 +263,17 @@ onMounted(async () => {
 watchEffect(() => {
 	if (groups.value) {
 		const group = groups.value[0];
-		currentGroup.name = group?.name;
+		currentGroup.name = group?.name || "null";
 		currentGroup.color = group?.color;
-		currentGroup.plans = group?.plans;
+		currentGroup.plans = group?.plans.filter((item: any) => {
+			return item.repeatName == repeatSegmentValue.value;
+		});
 	}
 });
+
+watch(currentGroup, () => {
+	currentGroup.plans.sort(sortPlan);
+})
 </script>
 
 <style scoped>
@@ -252,8 +285,7 @@ watchEffect(() => {
 	align-items: center;
 }
 
-h3 {
-	margin-top: 2%;
+ion-row {
 	margin-left: 2%;
 }
 </style>
