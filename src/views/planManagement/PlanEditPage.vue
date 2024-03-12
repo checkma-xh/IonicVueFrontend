@@ -31,8 +31,8 @@
 				</ion-textarea>
 
 				<!-- 选择项 -->
-				<priority-select :priorityValue="priorityValue"></priority-select>
-				<group-select :groupValue="groupValue"></group-select>
+				<priority-select v-model:priorityValue="priorityValue"></priority-select>
+				<group-select v-model:groupValue="groupValue"></group-select>
 
 				<!-- 新建分组 -->
 				<ion-button
@@ -99,7 +99,7 @@ import {
 	IonRow,
 	IonCol,
 } from "@ionic/vue";
-import { onMounted, ref, watchEffect } from "vue";
+import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import GroupSelect from "@/components/GroupSelect.vue";
 import PrioritySelect from "@/components/PrioritySelect.vue";
@@ -119,10 +119,6 @@ const repeatValue   = ref();
 onMounted(() => {
 	moduleName.value = matchModuleNameByRouteName(route.name as string);
 });
-
-watchEffect(() => {
-	alert(priorityValue.value);
-})
 </script>
 
 <style scoped>

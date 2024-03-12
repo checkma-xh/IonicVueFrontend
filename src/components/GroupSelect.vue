@@ -24,7 +24,7 @@ const select = ref();
 const userStore = useUserStore();
 const currentUser = userStore.currentUser;
 const groups = ref();
-const groupValue = defineModel("groupModel");
+const groupValue = defineModel("groupValue");
 const handleChange = defineModel("handleChange");
 
 onMounted(async () => {
