@@ -1,14 +1,15 @@
 import axios from "axios";
 
-export async function login (
+export async function login(
   email: string,
-  passwordHash: string,
+  passwordHash: string | null,
 ) {
   try {
     const config = {
       headers: {
         "Content-Type": "application/json",
-      }
+      },
+      timeout: 2500,
     };
     const data = {
       email: email,
@@ -19,8 +20,8 @@ export async function login (
       data,
       config
     );
-    return response.data;
-  } catch ( error ) {
-    console.error( "Error fetching data:", error );
+    return response;
+  } catch (error: any) {
+    return error.response;
   }
 }

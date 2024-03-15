@@ -9,7 +9,8 @@ export async function editEmail(
         const config = {
             headers: {
                 "Content-Type": "application/json",
-            }
+            },
+            timeout: 2500,
         };
         const data = {
             newEmail: newEmail,
@@ -20,8 +21,8 @@ export async function editEmail(
             data,
             config
         );
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching data:", error);
+        return response;
+    } catch (error: any) {
+        return error.response;
     }
 }

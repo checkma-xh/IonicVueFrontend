@@ -5,14 +5,15 @@ export async function getUserInfo(accessToken: string, id: number) {
         const config = {
             headers: {
                 Authorization: `Bearer ${accessToken}`
-            }
+            },
+            timeout: 2500,
         };
         const response = await axios.get(
             `http://localhost:3000/user-info/users/${id}`,
             config,
         );
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching data:", error);
+        return response;
+    } catch (error: any) {
+        return error.response;
     }
 }

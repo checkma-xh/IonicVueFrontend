@@ -10,7 +10,8 @@ export async function createGroup(
         const config = {
             headers: {
                 Authorization: `Bearer ${accessToken}`
-            }
+            },
+            timeout: 2500,
         };
         const data = {
             name: name,
@@ -21,8 +22,8 @@ export async function createGroup(
             data,
             config
         );
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching data:", error);
+        return response;
+    } catch (error: any) {
+        return error.response;
     }
 }

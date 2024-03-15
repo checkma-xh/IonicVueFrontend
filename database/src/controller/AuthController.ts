@@ -31,7 +31,7 @@ export class AuthController {
 	});
 
 
-	private async generateRandomCode(length: number) {
+	private generateRandomCode(length: number) {
 		const bytes = crypto.randomBytes(Math.ceil(length / 2));
 		return bytes.toString("hex").slice(0, length);
 	}
@@ -47,142 +47,123 @@ export class AuthController {
 
 
 	async register(request: Request, response: Response, next: NextFunction) {
-		try {
-			const { email, passwordHash, avatarUrl } = request.body;
-			const verificationInfo = this.verificationInfoMap.get(email);
-			if (!verificationInfo?.verificationResult) {
-				throw new Error("Verification failed.");
-			}
-
-			const user = await this.UserInfoRepository
-				.createQueryBuilder("user")
-				.where("user.email = :email", { email: email })
-				.getOne();
-
-			if (user) {
-				throw new Error("User already exists. Please use a different email or login with your existing account.");
-			}
-
-			const newUser = this.createUser(email, passwordHash, avatarUrl);
-			await this.UserInfoRepository.save(newUser);
-
-			return { status: "success", message: "User registration successful. Please login to access your account." };
-		} catch (error) {
-			const errorMessage = error.message || "An error occurred during registration.";
-			return { status: "error", message: errorMessage };
+		const { email, passwordHash, avatarUrl } = request.body;
+		const verificationInfo = this.verificationInfoMap.get(email);
+		if (!verificationInfo?.verificationResult) {
+			return response.status(401).json({ message: "verification failed" });
 		}
+
+		const user = await this.UserInfoRepository
+			.createQueryBuilder("user")
+			.where("user.email = :email", { email: email })
+			.getOne();
+
+		if (user) {
+			return response.status(409).json({ message: "user already exists" });
+		}
+
+		const newUser = this.createUser(email, passwordHash, avatarUrl);
+		await this.UserInfoRepository.save(newUser);
+
+		return response.status(201).json({ message: "register successful" });
 	}
 
 
 	async login(request: Request, response: Response, next: NextFunction) {
-		try {
-			const { email, passwordHash } = request.body;
-			const verificationInfo = this.verificationInfoMap.get(email);
-			const repository = this.UserInfoRepository
-				.createQueryBuilder("user")
-				.where("user.email = :email AND user.activated = 1", { email: email });
+		const { email, passwordHash } = request.body;
+		const verificationInfo = this.verificationInfoMap.get(email);
+		const repository = this.UserInfoRepository
+			.createQueryBuilder("user")
+			.where("user.email = :email AND user.activated = 1", { email: email });
 
-			if (passwordHash) {
-				repository.andWhere("user.passwordHash = :passwordHash", { passwordHash: passwordHash });
-			} else if (!verificationInfo?.verificationResult) {
-				throw new Error("Verification failed.");
-			}
-
-			const user = await repository.getOne();
-
-			if (!user) {
-				throw new Error("User not found.");
-			}
-
-			const userObject = { ...user };
-			const accessToken = jwt.sign(userObject, config.secretKey, accessTokenOptions);
-			const refreshToken = jwt.sign(userObject, config.secretKey, refreshTokenOptions);
-
-			return {
-				status: "success",
-				currentUser: userObject,
-				accessToken: accessToken,
-				refreshToken: refreshToken,
-			};
-		} catch (error) {
-			const errorMessage = error.message || "An unexpected error occurred.";
-			return { status: "error", message: errorMessage };
+		if (passwordHash) {
+			repository.andWhere("user.passwordHash = :passwordHash", { passwordHash: passwordHash });
+		} else if (!verificationInfo?.verificationResult) {
+			return response.status(401).json({ message: "verification failed" });
 		}
+
+		const user = await repository.getOne();
+
+		if (!user) {
+			return response.status(404).json({ message: "user not found" });
+		}
+
+		const accessToken = jwt.sign({id: user.id}, config.secretKey, accessTokenOptions);
+		const refreshToken = jwt.sign({id: user.id}, config.secretKey, refreshTokenOptions);
+
+		return response.status(201).json({
+			currentUser: { ...user },
+			accessToken: accessToken,
+			refreshToken: refreshToken,
+			message: "login successful",
+		});
 	}
 
 
-
 	async logout(request: Request, response: Response, next: NextFunction) {
-		try {
-			const decodeToken = await tokenVerify(request.headers.authorization.split(" ")[1]);
-			if (!decodeToken) {
-				throw new Error("Invalid token.");
-			}
-
-			return { status: "success", message: "Logout." };
-		} catch (error) {
-			console.error("Error during logout:", error);
-			return { status: "error", message: "Internal server error." };
+		const decodeToken = await tokenVerify(request.headers?.authorization.split(" ")[1]);
+		if (!decodeToken) {
+			return response.status(400).json({ message: "bad request" });
 		}
+
+		const user = await this.UserInfoRepository
+			.createQueryBuilder("user")
+			.where("user.id = :id AND user.activated = 1", { id: (decodeToken as JwtPayload).id })
+			.getOne();
+
+		if (!user) {
+			return response.status(404).json({ message: "user not found" });
+		}
+
+		return response.status(201).json({ message: "logout successful" });
 	}
 
 
 	async refresh(request: Request, response: Response, next: NextFunction) {
-		try {
-			const decodeToken = await tokenVerify(request.headers.authorization.split(" ")[1]);
-			if (!decodeToken) {
-				throw new Error("Invalid token.");
-			}
-
-			const user = await this.UserInfoRepository
-				.createQueryBuilder("user")
-				.where("user.id = :id", { id: (decodeToken as JwtPayload).id })
-				.getOne();
-
-			if (!user) {
-				throw new Error("User not found.");
-			}
-
-			const userObject = { ...user };
-			const accessToken = jwt.sign(userObject, config.secretKey, accessTokenOptions);
-
-			return {
-				status: "success",
-				currentUser: userObject,
-				accessToken: accessToken,
-			};
-		} catch (error) {
-			const errorMessage = error.message || "An unexpected error occurred.";
-			return { status: "error", message: errorMessage };
+		const decodeToken = await tokenVerify(request.headers?.authorization.split(" ")[1]);
+		if (!decodeToken) {
+			return response.status(400).json({ message: "bad request" });
 		}
+
+		const user = await this.UserInfoRepository
+			.createQueryBuilder("user")
+			.where("user.id = :id AND user.activated = 1", { id: (decodeToken as JwtPayload).id })
+			.getOne();
+
+		if (!user) {
+			return response.status(404).json({ message: "user not found" });
+		}
+
+		const accessToken =  jwt.sign({id: user.id}, config.secretKey, accessTokenOptions);
+
+		return response.status(200).json({
+			currentUser: {...user},
+			accessToken: accessToken,
+			message: "refresh successful"
+		});
 	}
 
 
 	async deactivate(request: Request, response: Response, next: NextFunction) {
-		try {
-			const { email } = request.body;
-			const verificationInfo = this.verificationInfoMap.get(email);
-			if (!verificationInfo?.verificationResult) {
-				throw new Error("Verification failed.");
-			}
-
-			const user = await this.UserInfoRepository
-				.createQueryBuilder("user")
-				.where("user.email = :email", { email })
-				.getOne();
-
-			if (!user) {
-				throw new Error("User not found.");
-			}
-
-			user.activated = false;
-			await this.UserInfoRepository.save(user);
-
-			return { status: "success", message: "Deactivated." };
-		} catch (error) {
-			const errorMessage = error.message || "An unexpected error occurred.";
-			return { status: "error", message: errorMessage };
+		const { email } = request.body;
+		const verificationInfo = this.verificationInfoMap.get(email);
+		if (!verificationInfo?.verificationResult) {
+			return response.status(401).json({ message: "verification failed" });
 		}
+
+		const user = await this.UserInfoRepository
+			.createQueryBuilder("user")
+			.where("user.email = :email", { email })
+			.getOne();
+
+		if (!user) {
+			return response.status(401).json({ message: "verification failed" });
+		}
+
+		user.activated = false;
+		await this.UserInfoRepository.save(user);
+
+		return response.status(200).json({ message: "deactivate successful" });
 	}
 
 
@@ -191,12 +172,12 @@ export class AuthController {
 			const mailOptions = {
 				from: config.systemEmail,
 				to: receiverEmail,
-				subject: "Verification Code",
-				text: `Your verification code is: ${verificationCode}`,
+				subject: "verification Code",
+				text: `your verification code is: ${verificationCode}`,
 			};
 			await this.transporter.sendMail(mailOptions);
 		} catch (error) {
-			throw new Error("Failed to send verification email.");
+			throw new Error("failed to json verification email");
 		}
 	}
 
@@ -207,20 +188,14 @@ export class AuthController {
 		next: NextFunction
 	) {
 		const receiverEmail = request.body.email;
-		try {
-			if (this.verificationInfoMap.has(receiverEmail)) {
-				throw new Error("Verification code has already been sent to this email.");
-			}
-
-			const verificationCode = await this.generateRandomCode(config.verificationCodeLen);
-			await this.sendVerificationEmail(receiverEmail, verificationCode);
-			VerificationInfoMap.createVerificationInfo(verificationCode, receiverEmail);
-
-			return { message: "Verification code sent successfully to your email." };
-		} catch (error) {
-			console.error("Error sending verification code:", error);
-			return { message: "Failed to send verification code. Please try again later." };
+		if (this.verificationInfoMap.has(receiverEmail)) {
+			return response.status(429).json({ message: "verification code has already been sent to this email" });
 		}
+
+		const verificationCode = this.generateRandomCode(config.verificationCodeLen);
+		await this.sendVerificationEmail(receiverEmail, verificationCode);
+		VerificationInfoMap.createVerificationInfo(verificationCode, receiverEmail);
+		return response.status(200).json({ message: "verification code sent" });
 	}
 
 
@@ -229,26 +204,23 @@ export class AuthController {
 		response: Response,
 		next: NextFunction
 	) {
-		try {
-			const email = request.body.email;
-			const verificationCode = request.body.verificationCode;
-			const verificationInfo = this.verificationInfoMap.get(email);
-
-			if (!verificationInfo) {
-				throw new Error("Verification code has not been requested. Please request the verification code first.");
-			}
-			if (verificationInfo.verificationCount > config.verificationMaxCount) {
-				throw new Error("Maximum number of verifications exceeded. Please try again later.");
-			}
-			if (verificationInfo.verificationCode === verificationCode) {
-				verificationInfo.verificationResult = true;
-			}
-			verificationInfo.verificationCount++;
-
-			return { status: "success", message: "Verification successful." };
-		} catch (error) {
-			console.error("Error verifying verification code:", error);
-			return { status: "error", message: error.message };
+		const { email, verificationCode } = request.body;
+		const verificationInfo = this.verificationInfoMap.get(email);
+		if (!verificationInfo) {
+			return response.status(400).json({ message: "verification code has not been requested" });
+		}
+		
+		verificationInfo.verificationCount++;
+		
+		if (verificationInfo.verificationCount > config.verificationMaxCount) {
+			return response.status(429).json({ message: "maximum number of verifications exceeded" });
+		}
+		else if (verificationInfo.verificationCode.toLowerCase() === verificationCode.toLowerCase()) {
+			verificationInfo.verificationResult = true;
+			return response.status(200).json({ message: "verification successful" });
+		}
+		else {
+			return response.status(401).json({ message: "verification failed" });
 		}
 	}
 }

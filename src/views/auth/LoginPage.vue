@@ -15,9 +15,7 @@
 				</ion-toolbar>
 			</ion-header>
 
-			<div
-				id="container"
-				v-if="!verify">
+			<div id="container">
 				<ion-list>
 					<functional-input
 						inputType="email"
@@ -26,29 +24,33 @@
 						inputType="password"
 						v-model="password"></functional-input>
 					<ion-button
-						@click.stop="login"
+						@click.stop="handleLogin"
 						id="login-alert"
 						>login</ion-button
 					>
-					<ion-button @click.stop="verificationCodeLogin">verification code login</ion-button>
-					<ion-alert
-						trigger="login-alert"
-						:header="alertHeader"
-						:sub-header="alertSubHeader"
-						:message="alertMessage"
-						:buttons="alertButtons"></ion-alert>
-				</ion-list>
-			</div>
 
-			<div
-				id="container"
-				v-else>
-				<ion-list>
-					<verify-module
-						v-model:verificationCode="verificationCode"
-						:avatarUrl="avatarUrl"
-						:email="email"
-						:handleVerify="handleVerify"></verify-module>
+					<ion-button @click.stop="openModal"
+						>verification code login</ion-button
+					>
+					<ion-modal ref="modal">
+						<ion-header>
+							<ion-toolbar>
+								<ion-title> verification code login </ion-title>
+								<ion-buttons slot="end">
+									<ion-button @click="closeModal">
+										cancel
+									</ion-button>
+								</ion-buttons>
+							</ion-toolbar>
+						</ion-header>
+						<ion-content>
+							<verify-module
+								v-model:verificationCode="verificationCode"
+								:avatarUrl="avatarUrl"
+								:email="email"
+								:handleVerify="handleVerify"></verify-module>
+						</ion-content>
+					</ion-modal>
 				</ion-list>
 			</div>
 		</ion-content>
@@ -63,95 +65,109 @@ import {
 	IonTitle,
 	IonContent,
 	IonList,
+	IonButtons,
 	IonButton,
-	IonAlert,
+	IonModal,
 } from "@ionic/vue";
 import FunctionalInput from "@/components/FunctionalInput.vue";
-import { onMounted, ref } from "vue";
-import router from "@/router";
-import { verificationCodeFormat, emailFormat, passwordFormat } from "@/utils/useTextFormat";
+import { ref } from "vue";
+import {
+	verificationCodeFormat,
+	emailFormat,
+	passwordFormat,
+} from "@/utils/useTextFormat";
 import VerifyModule from "@/components/VerifyModule.vue";
 import { useUserStore } from "@/store/userStore";
 import { personCircleOutline } from "ionicons/icons";
+import { login } from "@/api/auth/login";
+import { verificationCodeRequest } from "@/api/auth/verificationCodeRequest";
+import { verificationCodeVerify } from "@/api/auth/verificationCodeVerify";
+import router from "@/router";
+import { showToast } from "@/utils/useToastTool";
 
+const modal = ref();
 const userStore = useUserStore();
-const alertHeader = ref("wrong format");
-const alertSubHeader = ref("wrong format");
-const alertMessage = ref("wrong format");
+const currentUser = userStore.currentUser;
 const email = ref();
 const password = ref();
 const verificationCode = ref();
-const verify = ref();
 const avatarUrl = ref(personCircleOutline);
 
-let alertButtons = [
-	{
-		text: "confirm",
-		role: "confirm",
-		handler: () => {
-			return;
-		},
-	},
-];
-
-async function login() {
-	if (!emailFormat(email.value) || !passwordFormat(password.value)) {
-		setAlert("wrong format");
-		return;
-	}
-
-	alertSubHeader.value = "success";
-	alertHeader.value = "success";
-	alertMessage.value = "success";
-	alertButtons = [
-		{
-			text: "confirm",
-			role: "confirm",
-			handler: () => {
-				router.push({ name: "PlanManagement" });
-			},
-		},
-	];
-
-	userStore.islogin = true;
-}
-
-function setAlert(message: string) {
-	alertSubHeader.value = message;
-	alertHeader.value = message;
-	alertMessage.value = message;
-	alertButtons = [
-		{
-			text: "confirm",
-			role: "confirm",
-			handler: () => {
-				return;
-			},
-		},
-	];
-}
-
-async function verificationCodeLogin() {
+async function openModal() {
 	if (!emailFormat(email.value)) {
-		alert("wrong format");
+		return await showToast("format wrong", 2000, "bottom");
+	}
+
+	modal.value.$el.isOpen = true;
+	modal.value.$el.canDismiss = false;
+
+	const response = await verificationCodeRequest(email.value);
+	return await showToast(response.data.message, 2000, "bottom");
+}
+
+async function closeModal() {
+	modal.value.$el.canDismiss = true;
+	modal.value.$el.isOpen = false;
+}
+
+async function handleLogin() {
+	if (!emailFormat(email.value) || !passwordFormat(password.value)) {
+		return await showToast("format wrong", 2000, "bottom");
+	}
+
+	const response = await login(email.value, password.value);
+	await showToast(response.data.message, 2000, "bottom");
+	if (response.status < 200 || response.status > 299) {
 		return;
 	}
-	verify.value = true;
-	userStore.islogin = true;
+
+	currentUser.id           = response.data.currentUser.id;
+	currentUser.email        = response.data.currentUser.email;
+	currentUser.passwordHash = response.data.currentUser.passwordHash;
+	currentUser.avatarUrl    = response.data.currentUser.avatarUrl;
+	currentUser.activated    = response.data.currentUser.activated;
+	userStore.accessToken    = response.data.accessToken;
+	userStore.refreshToken   = response.data.refreshToken;
+	userStore.isLogin        = true;
+
+	router.push({ name: "PlanManagement" });
 }
 
 async function handleVerify() {
 	if (!verificationCodeFormat(verificationCode.value)) {
-		alert("wrong format");
+		return await showToast("format wrong", 2000, "bottom");
+	}
+
+	let response;
+
+	response = await verificationCodeVerify(
+		email.value,
+		verificationCode.value
+	);
+	await showToast(response.data.message, 2000, "bottom");
+	if (response.status < 200 || response.status > 299) {
 		return;
 	}
-	alert("success");
+	
+	response = await login(email.value, null);
+	await showToast(response.data.message, 2000, "bottom");
+	if (response.status < 200 || response.status > 299) {
+		return;
+	}
+
+	currentUser.id           = response.data.currentUser.id;
+	currentUser.email        = response.data.currentUser.email;
+	currentUser.passwordHash = response.data.currentUser.passwordHash;
+	currentUser.avatarUrl    = response.data.currentUser.avatarUrl;
+	currentUser.activated    = response.data.currentUser.activated;
+	userStore.accessToken    = response.data.accessToken;
+	userStore.refreshToken   = response.data.refreshToken;
+	userStore.isLogin        = true;
+
+	await closeModal();
+
 	router.push({ name: "PlanManagement" });
 }
-
-onMounted(() => {
-	verify.value = false;
-});
 </script>
 
 <style scoped>
@@ -161,7 +177,6 @@ onMounted(() => {
 	justify-content: center;
 	align-items: center;
 	margin: auto 1%;
-	/* 合并 margin-top 和 margin-left */
 }
 
 #container ion-list {
@@ -177,4 +192,3 @@ onMounted(() => {
 	display: block;
 }
 </style>
-@/utils/userStore

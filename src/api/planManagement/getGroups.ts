@@ -2,8 +2,8 @@ import axios from "axios";
 
 export async function getGroups(
   accessToken: string,
-  id: number,
-  deleted: boolean = false
+  id         : number,
+  deleted    : boolean | null
 ) {
   try {
     const config = {
@@ -12,14 +12,15 @@ export async function getGroups(
       },
       params: {
         deleted: deleted,
-      }
+      },
+      timeout: 2500,
     };
     const response = await axios.get(
       `http://localhost:3000/plan-management/users/${id}/groups`,
       config
     );
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching data:", error);
+    return response;
+  } catch (error: any) {
+    return error.response;
   }
 }

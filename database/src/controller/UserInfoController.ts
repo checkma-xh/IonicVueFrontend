@@ -11,46 +11,43 @@ export class UserInfoController {
 	private verificationInfoMap = VerificationInfoMap.getVerificationInfoMap();
 
 	async getUserInfo(request: Request, response: Response, next: NextFunction) {
-		try {
-			const decodeToken = await tokenVerify(request.headers.authorization.split(" ")[1]);
-			if (!decodeToken) {
-				throw new Error('Invalid token');
-			}
-
-			const user = await this.UserInfoRepository
-				.createQueryBuilder("user")
-				.where("user.id = :id", { id: (decodeToken as JwtPayload).id })
-				.getOne();
-
-			return user;
-		} catch (error) {
-			const errorMessage = error.message || "An unexpected error occurred.";
-			return { status: "error", message: errorMessage };
+		const decodeToken = await tokenVerify(request.headers?.authorization.split(" ")[1]);
+		if (!decodeToken) {
+			return response.status(400).json({ message: "bad request" });
 		}
+
+		const user = await this.UserInfoRepository
+			.createQueryBuilder("user")
+			.where("user.id = :id AND user.activated = 1", { id: (decodeToken as JwtPayload).id })
+			.getOne();
+
+		if (!user) {
+			return response.status(404).json({ message: "user not found" });
+		}
+
+		return response.status(200).json({ currentUser: { ...user }, message: "get user information successful" });
 	}
 
 	async editEmail(request: Request, response: Response, next: NextFunction) {
-		try {
-			const { newEmail, oldEmail } = request.body;
-
-			const verificationInfo = this.verificationInfoMap.get(newEmail);
-			if (!verificationInfo?.verificationResult) {
-				throw new Error("Verification failed.");
-			}
-
-			const user = await this.UserInfoRepository
-				.createQueryBuilder("user")
-				.where("user.email = :email", { email: oldEmail })
-				.getOne();
-				
-			user.email = newEmail;
-			await this.UserInfoRepository.save(user);
-
-			return user;
-		} catch (error) {
-			const errorMessage = error.message || "An unexpected error occurred.";
-			return { status: "error", message: errorMessage };
+		const { newEmail, oldEmail } = request.body;
+		const verificationInfo = this.verificationInfoMap.get(newEmail);
+		if (!verificationInfo?.verificationResult) {
+			return response.status(400).json({ message: "verification failed" });
 		}
+
+		const user = await this.UserInfoRepository
+			.createQueryBuilder("user")
+			.where("user.email = :email AND user.activated = 1", { email: oldEmail })
+			.getOne();
+
+		if (!user) {
+			return response.status(404).json({ message: "user not found" });
+		}
+
+		user.email = newEmail;
+		await this.UserInfoRepository.save(user);
+
+		return response.status(200).json({ message: "edit email successful" });
 	}
 
 
@@ -59,27 +56,25 @@ export class UserInfoController {
 		response: Response,
 		next: NextFunction,
 	) {
-
-		try {
-			const { email, passwordHash } = request.body;
-			const verificationInfo = this.verificationInfoMap.get(email);
-			if (!verificationInfo?.verificationResult) {
-				throw new Error("Verification failed.");
-			}
-
-			const user = await this.UserInfoRepository
-				.createQueryBuilder("user")
-				.where("user.email = :email", { email: email })
-				.getOne();
-
-			user.passwordHash = passwordHash;
-			await this.UserInfoRepository.save(user);
-
-			return user;
-		} catch (error) {
-			const errorMessage = error.message || "An unexpected error occurred.";
-			return { status: "error", message: errorMessage };
+		const { email, passwordHash } = request.body;
+		const verificationInfo = this.verificationInfoMap.get(email);
+		if (!verificationInfo?.verificationResult) {
+			return response.status(400).json({ message: "verification failed" });
 		}
+
+		const user = await this.UserInfoRepository
+			.createQueryBuilder("user")
+			.where("user.email = :email AND user.activated = 1", { email: email })
+			.getOne();
+
+		if (!user) {
+			return response.status(404).json({ message: "user not found" });
+		}
+
+		user.passwordHash = passwordHash;
+		await this.UserInfoRepository.save(user);
+
+		return response.status(200).json({ message: "edit password hash successful" });
 	}
 
 	async editAvatarUrl(
@@ -87,25 +82,24 @@ export class UserInfoController {
 		response: Response,
 		next: NextFunction,
 	) {
-		try {
-			const { avatarUrl } = request.body;
-			const decodeToken = await tokenVerify(request.headers.authorization.split(" ")[1]);
-			if (!decodeToken) {
-				throw new Error("Verification failed.");
-			}
-
-			const user = await this.UserInfoRepository
-				.createQueryBuilder("user")
-				.where("user.id = :id", { id: (decodeToken as JwtPayload).id })
-				.getOne();
-
-			user.avatarUrl = avatarUrl;
-			await this.UserInfoRepository.save(user);
-
-			return user;
-		} catch (error) {
-			const errorMessage = error.message || "An unexpected error occurred.";
-			return { status: "error", message: errorMessage };
+		const { avatarUrl } = request.body;
+		const decodeToken = await tokenVerify(request.headers?.authorization.split(" ")[1]);
+		if (!decodeToken) {
+			return response.status(400).json({ message: "verification failed" });
 		}
+
+		const user = await this.UserInfoRepository
+			.createQueryBuilder("user")
+			.where("user.id = :id AND user.activated = 1", { id: (decodeToken as JwtPayload).id })
+			.getOne();
+
+		if (!user) {
+			return response.status(404).json({ message: "user not found" });
+		}
+
+		user.avatarUrl = avatarUrl;
+		await this.UserInfoRepository.save(user);
+
+		return response.status(200).json({ message: "edit avatar Url successful" });
 	}
 }

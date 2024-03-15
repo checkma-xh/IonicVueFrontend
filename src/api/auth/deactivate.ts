@@ -1,20 +1,23 @@
 import axios from "axios";
 
-export async function deactivate ( accessToken: string ) {
+export async function deactivate(email: string) {
   try {
     const config = {
       headers: {
-        Authorization: `Bearer ${ accessToken }`
-      }
+        "Content-Type": "application/json",
+      },
+      timeout: 2500,
     };
-    const data = {};
+    const data = {
+      email: email,
+    };
     const response = await axios.post(
-      "https://120.24.177.83/auth/deactivate",
+      "http://localhost:3000/auth/deactivate",
       data,
       config
     );
-    return response.data;
-  } catch ( error ) {
-    console.error( "Error fetching data:", error );
+    return response;
+  } catch (error: any) {
+    return error.response;
   }
 }

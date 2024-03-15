@@ -19,20 +19,22 @@
 				<!-- 输入框 -->
 				<ion-input
 					placeholder="title"
-					ref="titleRef"
+					v-model="title"
 					:autofocus="true"
 					:counter="true"
 					:maxlength="64"></ion-input>
 				<ion-textarea
 					placeholder="remark"
+					v-model="remark"
 					:auto-grow="true"
 					:counter="true"
 					:maxlength="64">
 				</ion-textarea>
 
 				<!-- 选择项 -->
-				<priority-select v-model:priorityValue="priorityValue"></priority-select>
-				<group-select v-model:groupValue="groupValue"></group-select>
+				<priority-select
+					v-model:priorityValue="priority"></priority-select>
+				<group-select v-model:groupValue="group"></group-select>
 
 				<!-- 新建分组 -->
 				<ion-button
@@ -60,9 +62,7 @@
 							>
 							<ion-col size="4"
 								><strong>repeat-</strong
-								><ion-label>{{
-									repeatValue
-								}}</ion-label></ion-col
+								><ion-label>{{ repeat }}</ion-label></ion-col
 							>
 						</ion-row>
 					</ion-grid></ion-button
@@ -71,13 +71,13 @@
 					<CalendarModule
 						v-model:startDate="startDate"
 						v-model:endDate="endDate"
-						v-model:repeatValue="repeatValue">
+						v-model:repeatValue="repeat">
 					</CalendarModule>
 				</ion-modal>
 
 				<!-- 按钮 -->
 				<ion-button>cancel</ion-button>
-				<ion-button>confirm</ion-button>
+				<ion-button @click="handleCreatePlan">confirm</ion-button>
 			</div>
 		</ion-content>
 	</ion-page>
@@ -101,20 +101,69 @@ import {
 } from "@ionic/vue";
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
+import router from "@/router";
 import GroupSelect from "@/components/GroupSelect.vue";
 import PrioritySelect from "@/components/PrioritySelect.vue";
 import GroupCreationModule from "@/components/GroupCreationModule.vue";
 import CalendarModule from "@/components/CalendarModule.vue";
 import { matchModuleNameByRouteName } from "@/utils/useMatchTool";
+import { showToast } from "@/utils/useToastTool";
+import { createPlan } from "@/api/planManagement/createPlan";
+import { useUserStore } from "@/store/userStore";
 
-const route         = useRoute();
-const moduleName    = ref();
-const titleRef      = ref();
-const groupValue    = ref();
-const priorityValue = ref();
-const startDate     = ref();
-const endDate       = ref();
-const repeatValue   = ref();
+
+const route       = useRoute();
+const userStore   = useUserStore();
+const currentUser = userStore.currentUser;
+const moduleName  = ref();
+const title       = ref();
+const remark      = ref();
+const group       = ref();
+const priority    = ref();
+const startDate   = ref();
+const endDate     = ref();
+const repeat      = ref();
+
+async function handleCreatePlan() {
+	if (!title.value) {
+		return await showToast("title empty", 2000, "bottom");
+	}
+	if (!remark.value) {
+		remark.value = "";
+	}
+	if (!group.value) {
+		group.value = "default";
+	}
+	if (!priority.value) {
+		priority.value = "high";
+	}
+	if (!repeat.value) {
+		repeat.value = "everyday";
+	}
+	if (!startDate.value && !endDate.value) {
+		const today = new Date();
+		const todayString = today.toISOString();
+		startDate.value = todayString;
+		endDate.value = todayString;
+	}
+	const response = await createPlan(
+		userStore.accessToken,
+		currentUser.id,
+		title.value,
+		remark.value,
+		startDate.value,
+		endDate.value,
+		group.value,
+		priority.value,
+		repeat.value
+	);
+	await showToast(response.data.message, 2000, "bottom");
+	if (response.status < 200 || response.status > 299) {
+		return;
+	}
+
+	router.push({ name: "PlanManagement" });
+}
 
 onMounted(() => {
 	moduleName.value = matchModuleNameByRouteName(route.name as string);

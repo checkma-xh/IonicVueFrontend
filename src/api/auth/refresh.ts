@@ -1,11 +1,12 @@
 import axios from "axios";
 
-export async function refresh ( refreshToken: string ) {
+export async function refresh(refreshToken: string) {
   try {
     const config = {
       headers: {
-        Authorization: `Bearer ${ refreshToken }`
-      }
+        Authorization: `Bearer ${refreshToken}`
+      },
+      timeout: 2500,
     };
     const data = {};
     const response = await axios.post(
@@ -13,8 +14,8 @@ export async function refresh ( refreshToken: string ) {
       data,
       config
     );
-    return response.data;
-  } catch ( error ) {
-    console.error( "Error fetching data:", error );
+    return response;
+  } catch (error: any) {
+    return error.response;
   }
 }

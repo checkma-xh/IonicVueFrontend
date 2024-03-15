@@ -3,7 +3,7 @@
 		<ion-chip>
 			<ion-avatar>
 				<img
-					alt="Silhouette of a person's head"
+					alt="silhouette of a person's head"
 					:src="avatarUrl" />
 			</ion-avatar>
 			<ion-label>{{ email }}</ion-label>
@@ -47,13 +47,11 @@ ion-list {
 
 ion-input {
 	margin-top: 1%;
-	width: 100%;
-	/* 让输入框铺满父容器的宽度 */
+	width: 92%;
 }
 
 ion-button {
-	margin-top: 1%;
-	width: 100%;
-	/* 让按钮铺满父容器的宽度 */
+	margin-top: 2%;
+	width: 92%;
 }
 </style>

@@ -7,6 +7,8 @@ import {
 } from "@/utils/usePhotoGallery";
 import { eyeOutline, mailOutline, personCircleOutline } from "ionicons/icons";
 import { ConfigService } from "@/utils/ConfigService";
+import { editAvatarUrl } from "@/api/userInfo/editAvatarUrl";
+import { showToast } from "@/utils/useToastTool";
 
 const config = ConfigService.getConfig();
 const userStore = useUserStore();
@@ -14,7 +16,7 @@ const currentUser = userStore.currentUser;
 
 export const moduleMessages = {
   editEmailModuleStyle: {
-    handleClick: () => {
+    handleClick: async () => {
       router.push({ name: "EditEmail" });
     },
     icon: mailOutline,
@@ -38,11 +40,23 @@ export const moduleMessages = {
   editAvatarModuleStyle: {
     handleClick: async () => {
       const photo = await takePhoto();
-      if (photo) {
-        await savePhoto(photo, config.viteAvatarFileName);
-        const readPhoto = await loadPhoto(config.viteAvatarFileName);
-        currentUser.avatarUrl = `data:image/jpeg;base64,${readPhoto?.data}`;
+
+      if (!photo) {
+        return await showToast("image acquisition failed", 2000, "bottom");
       }
+
+      await savePhoto(photo, config.viteAvatarFileName);
+      const readPhoto = await loadPhoto(config.viteAvatarFileName);
+      const targetAvatarUrl = `data:image/jpeg;base64,${readPhoto?.data}`;
+      const response = await editAvatarUrl(userStore.accessToken, currentUser.id, targetAvatarUrl);
+      await showToast(response.data.message, 2000, "bottom");
+
+      if (response.status < 200 || response.status > 299) {
+        await showToast(response.status, 2000, "bottom");
+        return;
+      }
+
+      currentUser.avatarUrl = targetAvatarUrl;
     },
     icon: personCircleOutline,
     cardColor: "light",

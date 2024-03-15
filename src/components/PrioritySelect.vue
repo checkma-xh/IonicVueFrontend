@@ -27,6 +27,11 @@ const priorityValue = defineModel("priorityValue");
 const handleChange = defineModel("handleChange");
 
 onMounted(async () => {
-	priorities.value = await getPriorities(userStore.accessToken);
+	const response = await getPriorities(userStore.accessToken);
+	if (response.status < 200 || response.status > 299) {
+		return;
+	}
+
+	priorities.value = response.data.priorities;
 });
 </script>

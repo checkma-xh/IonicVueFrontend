@@ -8,7 +8,7 @@
 				solt="start"
 				:icon="icon"
 				size="large"></ion-icon>
-			<ion-label>{{ label }}</ion-label>
+			<ion-label>{{ name }}</ion-label>
 			<ion-badge color="success">{{
 				completedCount + " completed"
 			}}</ion-badge>
@@ -47,7 +47,7 @@
 				@click="
 					async () => {
 						await closeGroupSlidingItem();
-						await selectPlans();
+						await selectPlan();
 					}
 				"
 				color="primary"
@@ -77,16 +77,16 @@ const groupSlidingItem = ref();
 async function closeGroupSlidingItem() {
 	groupSlidingItem.value.$el.closeOpened();
 }
-const color = defineModel("color");
-const icon = defineModel("icon");
-const label = defineModel("label");
-const completedCount = defineModel("completedCount");
+const color           = defineModel("color");
+const icon            = defineModel("icon");
+const name            = defineModel("name");
+const completedCount  = defineModel("completedCount");
 const unfinishedCount = defineModel("unfinishedCount");
-const total = defineModel("total");
-const handleClick = defineModel("handleClick");
-const handleDetail = defineModel("handleDetail");
-const handleDelete = defineModel("handleDelete");
-const selectPlans = defineModel("selectPlans");
+const total           = defineModel("total");
+const handleClick     = defineModel("handleClick");
+const handleDetail    = defineModel("handleDetail");
+const handleDelete    = defineModel("handleDelete");
+const selectPlan      = defineModel("selectPlan");
 </script>
 
 <style scoped>

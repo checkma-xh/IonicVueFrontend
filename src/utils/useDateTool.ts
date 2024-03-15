@@ -35,7 +35,7 @@ export function getWeekdays(startDate: Date, endDate: Date): Date[] {
 
     while (currentDate <= endDate) {
         const dayOfWeek = currentDate.getDay();
-        if (dayOfWeek == 6 || dayOfWeek == 0) {
+        if (dayOfWeek === 6 || dayOfWeek === 0) {
             weekdays.push(new Date(currentDate));
         }
         currentDate.setDate(currentDate.getDate() + 1);

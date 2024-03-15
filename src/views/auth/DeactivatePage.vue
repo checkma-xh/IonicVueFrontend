@@ -14,16 +14,11 @@
 					<ion-title size="large">deactivate</ion-title>
 				</ion-toolbar>
 			</ion-header>
-
-			<div id="container">
-				<ion-list>
-					<verify-module
-						v-model:verificationCode="verificationCode"
-						:avatarUrl="currentUser.avatarUrl"
-						:email="currentUser.email"
-						:handleVerify="handleVerify"></verify-module>
-				</ion-list>
-			</div>
+			<verify-module
+				v-model:verificationCode="verificationCode"
+				:avatarUrl="currentUser.avatarUrl"
+				:email="currentUser.email"
+				:handleVerify="handleVerify"></verify-module>
 		</ion-content>
 	</ion-page>
 </template>
@@ -35,26 +30,71 @@ import {
 	IonToolbar,
 	IonTitle,
 	IonContent,
-	IonList,
+	actionSheetController,
 } from "@ionic/vue";
-import { ref } from "vue";
+import { reactive, ref } from "vue";
 import { useUserStore } from "@/store/userStore";
 import VerifyModule from "@/components/VerifyModule.vue";
-import router from "@/router";
 import { verificationCodeFormat } from "@/utils/useTextFormat";
+import { showToast } from "@/utils/useToastTool";
+import { deactivate } from "@/api/auth/deactivate";
+import { verificationCodeVerify } from "@/api/auth/verificationCodeVerify";
+import { logout } from "@/api/auth/logout";
+import router from "@/router";
 
 const userStore = useUserStore();
 const currentUser = userStore.currentUser;
 const verificationCode = ref();
 
+const actionSheetOptions = reactive({
+	header: "deactivate",
+	buttons: [
+		{
+			text: "confirm",
+			role: "destructive",
+			data: {
+				action: "confirm",
+			},
+			handler: handleDeactivate,
+		},
+		{
+			text: "cancel",
+			role: "cancel",
+			data: {
+				action: "cancel",
+			},
+		},
+	],
+});
+
+async function showActionSheet(options: any) {
+	const actionSheet = await actionSheetController.create(options);
+	actionSheet.present();
+}
+
+async function handleDeactivate() {
+	const response = await deactivate(currentUser.email);
+	await showToast(response.data.message, 2000, "bottom");
+	if (response.status > 199 && response.status < 300) {
+		const logoutResponse = await logout(userStore.accessToken);
+		await showToast(logoutResponse.data.message, 2000, "bottom");
+		router.push({ name: "Login" });
+		userStore.reset();
+	}
+}
+
 async function handleVerify() {
 	if (!verificationCodeFormat(verificationCode.value)) {
-		alert("wrong format");
-		return;
+		return await showToast("format wrong", 2000, "bottom");
 	}
-	alert("confirm deactivate");
-	await router.push({ name: "Login" });
-	userStore.islogin = false;
+	const response = await verificationCodeVerify(
+		currentUser.email,
+		verificationCode.value
+	);
+	await showToast(response.data.message, 2000, "bottom");
+	if (response.status > 199 && response.status < 300) {
+		await showActionSheet(actionSheetOptions);
+	}
 }
 </script>
 
@@ -64,23 +104,9 @@ async function handleVerify() {
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	margin: auto 1%;
-	/* 将 margin-top 和 margin-left 合并 */
-	width: 98%;
-	/* 使用百分比宽度，以避免内容溢出 */
-}
-
-#container ion-list {
-	width: 100%;
-}
-
-#container ion-input,
-#container ion-button {
-	margin-top: 1%;
 }
 
 #container ion-button {
 	display: block;
 }
 </style>
-@/utils/userStore

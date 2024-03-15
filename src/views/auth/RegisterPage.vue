@@ -20,7 +20,7 @@
 					<ion-chip>
 						<ion-avatar>
 							<img
-								alt="Silhouette of a person's head"
+								alt="silhouette of a person's head"
 								:src="avatarWebPath"
 								@click="takeAvatar" />
 						</ion-avatar>
@@ -35,17 +35,27 @@
 					<functional-input
 						inputType="password"
 						v-model="confirmPassword"></functional-input>
-					<ion-button
-						@click="register"
-						id="register-alert">
-						register
-					</ion-button>
-					<ion-alert
-						trigger="register-alert"
-						:header="alertHeader"
-						:sub-header="alertSubHeader"
-						:message="alertMessage"
-						:buttons="alertButtons"></ion-alert>
+					<ion-button @click="openModal"> register </ion-button>
+
+					<ion-modal ref="modal">
+						<ion-header>
+							<ion-toolbar>
+								<ion-title> register </ion-title>
+								<ion-buttons slot="end">
+									<ion-button @click="closeModal">
+										cancel
+									</ion-button>
+								</ion-buttons>
+							</ion-toolbar>
+						</ion-header>
+						<ion-content>
+							<verify-module
+								v-model:verificationCode="verificationCode"
+								:avatarUrl="avatarWebPath"
+								:email="email"
+								:handleVerify="handleVerify"></verify-module>
+						</ion-content>
+					</ion-modal>
 				</ion-list>
 			</div>
 		</ion-content>
@@ -62,22 +72,30 @@ import {
 	IonList,
 	IonChip,
 	IonAvatar,
+	IonButtons,
 	IonButton,
-	IonAlert,
+	IonModal,
 } from "@ionic/vue";
 import FunctionalInput from "@/components/FunctionalInput.vue";
-import {
-	takePhoto,
-	savePhoto,
-	loadPhoto,
-} from "@/utils/usePhotoGallery";
+import { takePhoto, savePhoto, loadPhoto } from "@/utils/usePhotoGallery";
 import { ref } from "vue";
-import { emailFormat, passwordFormat } from "@/utils/useTextFormat";
-import router from "@/router";
+import {
+	emailFormat,
+	passwordFormat,
+	verificationCodeFormat,
+} from "@/utils/useTextFormat";
 import { useUserStore } from "@/store/userStore";
 import { personCircleOutline } from "ionicons/icons";
 import { ConfigService } from "@/utils/ConfigService";
+import { register } from "@/api/auth/register";
+import router from "@/router";
+import VerifyModule from "@/components/VerifyModule.vue";
+import { verificationCodeRequest } from "@/api/auth/verificationCodeRequest";
+import { verificationCodeVerify } from "@/api/auth/verificationCodeVerify";
+import { showToast } from "@/utils/useToastTool";
 
+const modal = ref();
+const verificationCode = ref();
 const config = ConfigService.getConfig();
 const userStore = useUserStore();
 const currentUser = userStore.currentUser;
@@ -86,19 +104,6 @@ const avatar = ref();
 const email = ref();
 const password = ref();
 const confirmPassword = ref();
-const alertHeader = ref("wrong format");
-const alertSubHeader = ref("wrong format");
-const alertMessage = ref("wrong format");
-
-let alertButtons = [
-	{
-		text: "confirm",
-		role: "confirm",
-		handler: () => {
-			return;
-		},
-	},
-];
 
 async function takeAvatar() {
 	avatar.value = await takePhoto();
@@ -107,50 +112,60 @@ async function takeAvatar() {
 	}
 }
 
-async function register() {
-	if (!emailFormat(email.value) || !passwordFormat(password.value)) {
-		setAlert("wrong format");
-		return;
+async function openModal() {
+	if (
+		!emailFormat(email.value) ||
+		!passwordFormat(password.value) ||
+		password.value !== confirmPassword.value
+	) {
+		return await showToast("format wrong", 2000, "bottom");
 	}
 
-	if (password.value !== confirmPassword.value) {
-		setAlert("passwords do not match");
-		return;
+	modal.value.$el.isOpen = true;
+	modal.value.$el.canDismiss = false;
+
+	const response = await verificationCodeRequest(email.value);
+	return await showToast(response.data.message, 2000, "bottom");
+}
+
+async function closeModal() {
+	modal.value.$el.canDismiss = true;
+	modal.value.$el.isOpen = false;
+}
+
+async function handleVerify() {
+	if (!verificationCodeFormat(verificationCode.value)) {
+		return await showToast("format wrong", 2000, "bottom");
 	}
 
-	alertSubHeader.value = "success";
-	alertHeader.value = "success";
-	alertMessage.value = "success";
-	alertButtons = [
-		{
-			text: "confirm",
-			role: "confirm",
-			handler: () => {
-				router.push({ name: "Login" });
-			},
-		},
-	];
+	let response;
+
+	response = await verificationCodeVerify(
+		email.value,
+		verificationCode.value
+	);
+	await showToast(response.data.message, 2000, "bottom");
+	if (response.status < 200 || response.status > 299) {
+		return await closeModal();
+	}
+
+	response = await register(
+		email.value,
+		password.value,
+		currentUser.avatarUrl
+	);
+	await showToast(response.data.message, 2000, "bottom");
+	if (response.status < 200 || response.status > 299) {
+		return await closeModal();
+	}
 
 	await savePhoto(avatar.value, config.viteAvatarFileName);
 	avatar.value = await loadPhoto(config.viteAvatarFileName);
-	if (avatar.value) {
-		currentUser.avatarUrl = `data:image/jpeg;base64,${avatar.value.data}`;
-	}
-}
+	currentUser.avatarUrl = `data:image/jpeg;base64,${avatar.value.data}`;
 
-function setAlert(message: string) {
-	alertSubHeader.value = message;
-	alertHeader.value = message;
-	alertMessage.value = message;
-	alertButtons = [
-		{
-			text: "confirm",
-			role: "confirm",
-			handler: () => {
-				return;
-			},
-		},
-	];
+	await closeModal();
+
+	router.push({ name: "Login" });
 }
 </script>
 
@@ -161,7 +176,6 @@ function setAlert(message: string) {
 	justify-content: center;
 	align-items: center;
 	margin: 0 1%;
-	/* 合并 margin-left 和 margin-right */
 }
 
 #container ion-list {
@@ -186,4 +200,3 @@ function setAlert(message: string) {
 	margin-bottom: 0%;
 }
 </style>
-@/utils/userStore

@@ -43,13 +43,14 @@ export async function getPlans(
                 priorityName: priorityName,
                 repeatName  : repeatName,
             },
+            timeout: 2500,
         };
         const response = await axios.get(
             `http://localhost:3000/plan-management/users/${id}/plans`,
             config
         );
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching data:", error);
+        return response;
+    } catch (error: any) {
+        return error.response;
     }
 }

@@ -28,6 +28,11 @@ const groupValue = defineModel("groupValue");
 const handleChange = defineModel("handleChange");
 
 onMounted(async () => {
-	groups.value = await getGroups(userStore.accessToken, currentUser.id);
+	const response = await getGroups(userStore.accessToken, currentUser.id, false);
+	if (response.status < 200 || response.status > 299) {
+		return;
+	}
+
+	groups.value = response.data.groups;
 });
 </script>

@@ -33,7 +33,6 @@ export async function insertFakeData() {
   user.id = 1;
   user.email = "checkmaxh@gmail.com";
   user.passwordHash = "Wlj+=9351524";
-  user.avatarUrl = "654321";
 
   // PriorityInfo
   const highPriority = new PriorityInfo();

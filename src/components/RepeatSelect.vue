@@ -25,7 +25,13 @@ const userStore = useUserStore();
 const repeats = ref();
 const repeatValue = defineModel("repeatValue");
 const handleChange = defineModel("handleChange");
+
 onMounted(async () => {
-	repeats.value = await getRepeats(userStore.accessToken);
+	const response = await getRepeats(userStore.accessToken);
+	if (response.status < 200 || response.status > 299) {
+		return;
+	}
+
+	repeats.value = response.data.repeats;
 });
 </script>

@@ -20,7 +20,7 @@ export async function getSearchHistory (): Promise<SearchHistory[]> {
     const SearchHistoryArray: SearchHistory[] = JSON.parse( data.toString() );
     return SearchHistoryArray;
   } catch ( error ) {
-    console.error( "Error reading file:", error );
+    console.error( "error reading file:", error );
     return [];
   }
 }
@@ -45,7 +45,7 @@ export async function sortSearchHistory ( targetIndex: number ): Promise<boolean
     } );
     return true;
   } catch ( error ) {
-    console.error( "Error sorting to file:", error );
+    console.error( "error sorting to file:", error );
     return false;
   }
 }
@@ -65,7 +65,7 @@ export async function unshiftSearchHistory (
     } );
     return true;
   } catch ( error ) {
-    console.error( "Error left appending to file:", error );
+    console.error( "error left appending to file:", error );
     return false;
   }
 }
@@ -85,7 +85,7 @@ export async function deleteSearchHistory (
     } );
     return true;
   } catch ( error ) {
-    console.error( "Error deleting to file:", error );
+    console.error( "error deleting to file:", error );
     return false;
   }
 }
@@ -101,7 +101,7 @@ export async function clearSearchHistory (): Promise<boolean> {
     } );
     return true;
   } catch ( error ) {
-    console.error( "Error clearing to file:", error );
+    console.error( "error clearing to file:", error );
     return false;
   }
 }

@@ -15,8 +15,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "plan-management",
         name: "PlanManagement",
-        component: () =>
-          import("@/views/planManagement/PlanManagementPage.vue"),
+        component: () => import("@/views/planManagement/PlanManagementPage.vue"),
       },
 
       // 计划管理模块 (新建计划、更新计划、删除计划、更新设置)(新建分组、删除分组、更新分组)
@@ -28,11 +27,6 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/views/planManagement/PlanEditPage.vue"),
       },
       // 设置计划
-      {
-        path: "plan-management/users/:id(\\d+)/plans/set",
-        name: "SetPlan",
-        component: () => import("@/views/planManagement/PlanEditPage.vue"),
-      },
       // 查看回收站计划、查看完成计划、查看分组下的计划、查看时间段内计划、查看已完成计划
       {
         path: "plan-management/users/:id(\\d+)/plans",

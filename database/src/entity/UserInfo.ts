@@ -1,6 +1,9 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { PlanInfo } from "./PlanInfo";
 import { GroupInfo } from "./GroupInfo";
+import { ConfigService } from "../utils/ConfigService";
+
+const config = ConfigService.getConfig();
 
 @Entity()
 export class UserInfo {
@@ -13,7 +16,7 @@ export class UserInfo {
   @Column({ length: 256 })
   passwordHash: string;
 
-  @Column({ length: 64 })
+  @Column({ type: "text", default: config.defaultAvatarUrl })
   avatarUrl: string;
 
   @Column({ default: true })

@@ -5,14 +5,14 @@
 			:key="index"
 			:color="value.color"
 			:icon="value.icon"
-			:label="value.label"
+			:name="value.name"
 			:completedCount="value.completedCount"
 			:unfinishedCount="value.unfinishedCount"
 			:total="value.total"
 			:handleClick="value.handleClick"
 			:handleDetail="value.handleDetail"
 			:handleDelete="value.handleDelete"
-			:selectPlans="value.selectPlans">
+			:selectPlan="value.selectPlan">
 		</group-item>
 	</ion-list>
 </template>

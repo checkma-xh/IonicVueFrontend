@@ -9,14 +9,15 @@ export async function deletePlan(
         const config = {
             headers: {
                 Authorization: `Bearer ${accessToken}`
-            }
+            },
+            timeout: 2500,
         };
         const response = await axios.delete(
             `http://localhost:3000/plan-management/users/${userId}/plans/${planId}`,
             config
         );
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching data:", error);
+        return response;
+    } catch (error: any) {
+        return error.response;
     }
 }

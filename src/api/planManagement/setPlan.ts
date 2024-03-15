@@ -1,39 +1,59 @@
 import axios from "axios";
 
 export async function setPlan(
-    accessToken: string,
-    userId: number,
-    planId: number,
-    name: string,
-    remark: string,
-    startDate: string,
-    endDate: string,
-    groupName: string,
-    priorityName: string,
-    repeatName: string
+{
+    accessToken,
+    userId,
+    planId,
+    completed    = false,
+    deleted      = false,
+    name         = null,
+    remark       = null,
+    startDate    = null,
+    endDate      = null,
+    groupName    = null,
+    priorityName = null,
+    repeatName   = null,
+}: {
+    accessToken  : string,
+    userId       : number,
+    planId       : number,
+    completed    : boolean,
+    deleted      : boolean,
+    name        ?: string | null,
+    remark      ?: string | null,
+    startDate   ?: string | null,
+    endDate     ?: string | null,
+    groupName   ?: string | null,
+    priorityName?: string | null,
+    repeatName  ?: string | null,
+}
 ) {
     try {
         const config = {
             headers: {
                 Authorization: `Bearer ${accessToken}`
-            }
+            },
+            timeout: 2500,
         };
         const data = {
-            name: name,
-            remark: remark,
-            startDate: startDate,
-            endDate: endDate,
-            groupName: groupName,
+            completed   : completed,
+            deleted     : deleted,
+            name        : name,
+            remark      : remark,
+            startDate   : startDate,
+            endDate     : endDate,
+            groupName   : groupName,
             priorityName: priorityName,
-            repeatName: repeatName,
+            repeatName  : repeatName,
         };
         const response = await axios.put(
             `http://localhost:3000/plan-management/users/${userId}/plans/${planId}`,
             data,
             config
         );
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching data:", error);
+        return response;
+    } catch (error: any) {
+        return error.response;
     }
 }

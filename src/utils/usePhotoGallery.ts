@@ -1,4 +1,3 @@
-import { useUserStore } from "@/store/userStore";
 import {
 	Camera,
 	CameraResultType,
@@ -6,10 +5,6 @@ import {
 	Photo,
 } from "@capacitor/camera";
 import { Filesystem, Directory } from "@capacitor/filesystem";
-import { onMounted } from "vue";
-import { ConfigService } from "./ConfigService";
-
-const config = ConfigService.getConfig();
 
 export function convertBlobToBase64(blob: Blob): Promise<string> {
 	return new Promise<string>((resolve, reject) => {
@@ -38,7 +33,7 @@ export async function savePhoto(
 		});
 		return true;
 	} catch (error) {
-		console.error("Unable to save photo:", error);
+		console.error("unable to save photo:", error);
 		return false;
 	}
 }
@@ -51,7 +46,7 @@ export async function deletePhoto(filepath: string): Promise<boolean> {
 		});
 		return true;
 	} catch (error) {
-		console.error("Unable to delete photo:", error);
+		console.error("unable to delete photo:", error);
 		return false;
 	}
 }
@@ -65,7 +60,7 @@ export async function loadPhoto(filepath: string) {
 		});
 		return photo;
 	} catch (error) {
-		console.error("Unable to load photo:", error);
+		console.error("unable to load photo:", error);
 		return null;
 	}
 }
@@ -80,15 +75,7 @@ export async function takePhoto(): Promise<Photo | null> {
 		});
 		return photo;
 	} catch (error) {
-		console.error("Unable to take photo:", error);
+		console.error("unable to take photo:", error);
 		return null;
 	}
 }
-
-onMounted(async () => {
-	const photo = await loadPhoto(config.viteAvatarFileName);
-	if (photo?.data) {
-		const userStore = useUserStore();
-		userStore.currentUser.avatarUrl = `data:image/jpeg;base64,${photo.data}`;
-	}
-});

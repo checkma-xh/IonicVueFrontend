@@ -2,7 +2,7 @@
 	<ion-page>
 		<ion-header :translucent="true">
 			<ion-toolbar>
-				<ion-title>editPassword</ion-title>
+				<ion-title>handleVerify</ion-title>
 			</ion-toolbar>
 		</ion-header>
 
@@ -11,18 +11,16 @@
 			class="ion-padding">
 			<ion-header collapse="condense">
 				<ion-toolbar>
-					<ion-title size="large">editPassword</ion-title>
+					<ion-title size="large">handleVerify</ion-title>
 				</ion-toolbar>
 			</ion-header>
 
-			<div
-				id="container"
-				v-if="!verify">
+			<div id="container">
 				<ion-list>
 					<ion-chip>
 						<ion-avatar>
 							<img
-								alt="Silhouette of a person's head"
+								alt="silhouette of a person's head"
 								:src="currentUser.avatarUrl" />
 						</ion-avatar>
 						<ion-label>{{ currentUser.email }}</ion-label>
@@ -33,29 +31,27 @@
 					<functional-input
 						inputType="password"
 						v-model="confirmPassword"></functional-input>
-					<ion-button
-						@click="editPassword"
-						id="edit-password-alert">
-						editPassword
-					</ion-button>
-					<ion-alert
-						trigger="edit-password-alert"
-						:header="alertHeader"
-						:sub-header="alertSubHeader"
-						:message="alertMessage"
-						:buttons="alertButtons"></ion-alert>
-				</ion-list>
-			</div>
-
-			<div
-				id="container"
-				v-else>
-				<ion-list>
-					<verify-module
-						v-model:verificationCode="verificationCode"
-						:avatarUrl="currentUser.avatarUrl"
-						:email="targetEmail"
-						:handleVerify="handleVerify"></verify-module>
+					<ion-button @click="openModal"> edit password </ion-button>
+					<ion-modal ref="modal">
+						<ion-header>
+							<ion-toolbar>
+								<ion-title> edit password </ion-title>
+								<ion-buttons slot="end">
+									<ion-button @click="closeModal">
+										cancel
+									</ion-button>
+								</ion-buttons>
+							</ion-toolbar>
+						</ion-header>
+						<ion-content>
+							<verify-module
+								v-model:verificationCode="verificationCode"
+								:avatarUrl="currentUser.avatarUrl"
+								:email="currentUser.email"
+								:handleVerify="handleVerify">
+							</verify-module>
+						</ion-content>
+					</ion-modal>
 				</ion-list>
 			</div>
 		</ion-content>
@@ -74,81 +70,78 @@ import {
 	IonAvatar,
 	IonLabel,
 	IonButton,
-	IonAlert,
+	IonModal,
 } from "@ionic/vue";
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { useUserStore } from "@/store/userStore";
 import { verificationCodeFormat, passwordFormat } from "@/utils/useTextFormat";
 import VerifyModule from "@/components/VerifyModule.vue";
 import FunctionalInput from "@/components/FunctionalInput.vue";
+import { showToast } from "@/utils/useToastTool";
+import { verificationCodeRequest } from "@/api/auth/verificationCodeRequest";
+import { verificationCodeVerify } from "@/api/auth/verificationCodeVerify";
+import { editPasswordHash } from "@/api/userInfo/editPasswordHash";
 import router from "@/router";
 
-let alertButtons = [
-	{
-		text: "confirm",
-		role: "confirm",
-		handler: () => {
-			return;
-		},
-	},
-];
-
+const modal = ref();
 const userStore = useUserStore();
 const currentUser = userStore.currentUser;
-const verify = ref();
 const verificationCode = ref();
 const password = ref();
 const confirmPassword = ref();
-const targetEmail = ref("checkma_xh@outlook.com");
-const alertHeader = ref("wrong format");
-const alertSubHeader = ref("wrong format");
-const alertMessage = ref("wrong format");
 
-async function editPassword() {
+async function openModal() {
 	if (
 		!passwordFormat(password.value) ||
-		password.value != confirmPassword.value
+		password.value !== confirmPassword.value
 	) {
-		alertSubHeader.value = "wrong format";
-		alertHeader.value = "wrong format";
-		alertMessage.value = "wrong format";
-		alertButtons = [
-			{
-				text: "confirm",
-				role: "confirm",
-				handler: () => {
-					return;
-				},
-			},
-		];
-		return;
+		return await showToast("format wrong", 2000, "bottom");
 	}
-	alertSubHeader.value = "Please pay attention to the verification code";
-	alertHeader.value = "Please pay attention to the verification code";
-	alertMessage.value = "Please pay attention to the verification code";
-	alertButtons = [
-		{
-			text: "confirm",
-			role: "confirm",
-			handler: () => {
-				verify.value = true;
-			},
-		},
-	];
+
+	modal.value.$el.isOpen = true;
+	modal.value.$el.canDismiss = false;
+
+	const response = await verificationCodeRequest(currentUser.email);
+	return await showToast(response.data.message, 2000, "bottom");
+}
+
+async function closeModal() {
+	modal.value.$el.canDismiss = true;
+	modal.value.$el.isOpen = false;
 }
 
 async function handleVerify() {
 	if (!verificationCodeFormat(verificationCode.value)) {
-		alert("wrong format");
+		return await showToast("format wrong", 2000, "bottom");
+	}
+	const response = await verificationCodeVerify(
+		currentUser.email,
+		verificationCode.value
+	);
+	await showToast(response.data.message, 2000, "bottom");
+	if (response.status < 200 || response.status > 299) {
 		return;
 	}
-	alert("success");
-	router.push({ name: "PlanManagement" });
-}
 
-onMounted(() => {
-	verify.value = false;
-});
+	const editPasswordHashResponse = await editPasswordHash(
+		currentUser.id,
+		currentUser.email,
+		password.value
+	);
+	await showToast(editPasswordHashResponse.data.message, 2000, "bottom");
+	if (
+		editPasswordHashResponse.status < 200 ||
+		editPasswordHashResponse.status > 299
+	) {
+		return;
+	}
+
+	currentUser.passwordHash = password.value;
+
+	await closeModal();
+
+	router.push({ name: "Auth" });
+}
 </script>
 
 <style scoped>
@@ -158,7 +151,6 @@ onMounted(() => {
 	justify-content: center;
 	align-items: center;
 	margin: auto 1%;
-	/* 合并 margin-top 和 margin-left/right */
 }
 
 #container ion-list {
@@ -182,7 +174,5 @@ onMounted(() => {
 
 #container ion-chip:last-child {
 	margin-bottom: 0%;
-	/* 最后一个 chip 不需要底部边距 */
 }
 </style>
-@/utils/userStore

@@ -6,11 +6,11 @@
 	</ion-header>
 	<ion-content class="ion-padding">
 		<ion-header collapse="condense">
-				<ion-toolbar>
-					<ion-title size="large">add group</ion-title>
-				</ion-toolbar>
-			</ion-header>
-		<!-- 输入框 -->
+			<ion-toolbar>
+				<ion-title size="large">add group</ion-title>
+			</ion-toolbar>
+		</ion-header>
+		
 		<ion-input
 			placeholder="title"
 			ref="titleRef"
@@ -30,6 +30,9 @@
 </template>
 
 <script setup lang="ts">
+import { createGroup } from "@/api/planManagement/createGroup";
+import { useUserStore } from "@/store/userStore";
+import { showToast } from "@/utils/useToastTool";
 import {
 	IonHeader,
 	IonToolbar,
@@ -40,11 +43,27 @@ import {
 	IonButton,
 } from "@ionic/vue";
 import { ref } from "vue";
-const title = ref();
-const remark = ref();
+const title       = ref();
+const remark      = ref();
+const userStore   = useUserStore();
+const currentUser = userStore.currentUser;
 
 async function addGroup() {
-	alert(title.value + "-" + remark.value);
+	if (!title.value || title.value === "") {
+		return await showToast(
+			"the group name empty",
+			2000,
+			"bottom"
+		);
+	}
+
+	const response = await createGroup(
+		userStore.accessToken,
+		currentUser.id,
+		title.value,
+		remark.value
+	);
+	await showToast(response.data.message, 2000, "bottom");
 }
 </script>
 

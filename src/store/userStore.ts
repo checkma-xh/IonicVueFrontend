@@ -14,7 +14,7 @@ export const useUserStore = defineStore(
     });
     let accessToken = ref();
     let refreshToken = ref();
-    let islogin = ref(false);
+    let isLogin = ref(false);
 
     async function reset() {
       currentUser = reactive({
@@ -26,7 +26,7 @@ export const useUserStore = defineStore(
       });
       accessToken = ref();
       refreshToken = ref();
-      islogin = ref(false);
+      isLogin = ref(false);
       await nextTick();
     }
 
@@ -34,7 +34,7 @@ export const useUserStore = defineStore(
       currentUser,
       accessToken,
       refreshToken,
-      islogin,
+      isLogin,
       reset,
     };
   },

@@ -1,10 +1,41 @@
+import { verificationCodeRequest } from "@/api/auth/verificationCodeRequest";
 import router from "@/router";
+import { useUserStore } from "@/store/userStore";
+import { showToast } from "@/utils/useToastTool";
+import { actionSheetController } from "@ionic/vue";
 import {
   logInOutline,
   logOutOutline,
   personAddOutline,
   personRemoveOutline,
 } from "ionicons/icons";
+import { reactive } from "vue";
+
+const userStore = useUserStore();
+const currentUser = userStore.currentUser;
+
+const actionSheetOptions = reactive({
+  header: "deactivate",
+  buttons: [
+    {
+      text: "confirm",
+      role: "destructive",
+      data: {
+        action: "confirm",
+      },
+      handler: async () => {
+        await showToast("success", 2000, "bottom");
+      },
+    },
+    {
+      text: "cancel",
+      role: "cancel",
+      data: {
+        action: "cancel",
+      },
+    },
+  ],
+});
 
 export const moduleMessages = {
   registerModuleStyle: {
@@ -30,8 +61,9 @@ export const moduleMessages = {
     content: "",
   },
   logoutModuleStyle: {
-    handleClick: () => {
-      alert("logout");
+    handleClick: async () => {
+      const actionSheet = await actionSheetController.create(actionSheetOptions);
+      actionSheet.present();
     },
     icon: logOutOutline,
     cardColor: "light",
@@ -41,8 +73,10 @@ export const moduleMessages = {
     content: "",
   },
   deactivateModuleStyle: {
-    handleClick: () => {
+    handleClick: async () => {
       router.push({ name: "Deactivate" });
+      const response = await verificationCodeRequest(currentUser.email);
+      await showToast(response.data.message, 2000, "bottom");
     },
     icon: personRemoveOutline,
     cardColor: "light",

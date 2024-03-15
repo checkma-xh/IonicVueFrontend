@@ -2,7 +2,7 @@
 	<ion-page>
 		<ion-header :translucent="true">
 			<ion-toolbar>
-				<ion-title>editEmail</ion-title>
+				<ion-title>handleVerify</ion-title>
 			</ion-toolbar>
 		</ion-header>
 
@@ -11,48 +11,45 @@
 			class="ion-padding">
 			<ion-header collapse="condense">
 				<ion-toolbar>
-					<ion-title size="large">editEmail</ion-title>
+					<ion-title size="large">handleVerify</ion-title>
 				</ion-toolbar>
 			</ion-header>
 
-			<div
-				id="container"
-				v-if="!verify">
+			<div id="container">
 				<ion-list>
 					<ion-chip>
 						<ion-avatar>
 							<img
-								alt="Silhouette of a person's head"
+								alt="silhouette of a person's head"
 								:src="currentUser.avatarUrl" />
 						</ion-avatar>
 						<ion-label>{{ currentUser.email }}</ion-label>
 					</ion-chip>
 					<functional-input
 						inputType="email"
-						v-model="targetEmail"></functional-input>
-					<ion-button
-						@click="editEmail"
-						id="edit-email-alert">
-						editEmail
-					</ion-button>
-					<ion-alert
-						trigger="edit-email-alert"
-						:header="alertHeader"
-						:sub-header="alertSubHeader"
-						:message="alertMessage"
-						:buttons="alertButtons"></ion-alert>
-				</ion-list>
-			</div>
+						v-model="email"></functional-input>
+					<ion-button @click="openModal"> edit email </ion-button>
 
-			<div
-				id="container"
-				v-else>
-				<ion-list>
-					<verify-module
-						v-model:verificationCode="verificationCode"
-						:avatarUrl="currentUser.avatarUrl"
-						:email="targetEmail"
-						:handleVerify="handleVerify"></verify-module>
+					<ion-modal ref="modal">
+						<ion-header>
+							<ion-toolbar>
+								<ion-title> edit email </ion-title>
+								<ion-buttons slot="end">
+									<ion-button @click="closeModal">
+										cancel
+									</ion-button>
+								</ion-buttons>
+							</ion-toolbar>
+						</ion-header>
+						<ion-content>
+							<verify-module
+								v-model:verificationCode="verificationCode"
+								:avatarUrl="currentUser.avatarUrl"
+								:email="currentUser.email"
+								:handleVerify="handleVerify">
+							</verify-module>
+						</ion-content>
+					</ion-modal>
 				</ion-list>
 			</div>
 		</ion-content>
@@ -70,77 +67,72 @@ import {
 	IonChip,
 	IonAvatar,
 	IonButton,
-	IonAlert,
+	IonModal,
 } from "@ionic/vue";
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { useUserStore } from "@/store/userStore";
 import { verificationCodeFormat, emailFormat } from "@/utils/useTextFormat";
 import VerifyModule from "@/components/VerifyModule.vue";
 import FunctionalInput from "@/components/FunctionalInput.vue";
+import { showToast } from "@/utils/useToastTool";
+import { verificationCodeRequest } from "@/api/auth/verificationCodeRequest";
+import { verificationCodeVerify } from "@/api/auth/verificationCodeVerify";
+import { editEmail } from "@/api/userInfo/editEmail";
 import router from "@/router";
-
-let alertButtons = [
-	{
-		text: "confirm",
-		role: "confirm",
-		handler: () => {
-			return;
-		},
-	},
-];
 
 const userStore = useUserStore();
 const currentUser = userStore.currentUser;
-const verify = ref();
 const verificationCode = ref();
-const targetEmail = ref("checkma_xh@outlook.com");
-const alertHeader = ref("wrong format");
-const alertSubHeader = ref("wrong format");
-const alertMessage = ref("wrong format");
+const email = ref();
+const modal = ref();
 
-async function editEmail() {
-	if (!emailFormat(targetEmail.value)) {
-		alertSubHeader.value = "wrong format";
-		alertHeader.value = "wrong format";
-		alertMessage.value = "wrong format";
-		alertButtons = [
-			{
-				text: "confirm",
-				role: "confirm",
-				handler: () => {
-					return;
-				},
-			},
-		];
-		return;
+async function openModal() {
+	if (!emailFormat(email.value)) {
+		return await showToast("format wrong", 2000, "bottom");
 	}
-	alertSubHeader.value = "Please pay attention to the verification code";
-	alertHeader.value = "Please pay attention to the verification code";
-	alertMessage.value = "Please pay attention to the verification code";
-	alertButtons = [
-		{
-			text: "confirm",
-			role: "confirm",
-			handler: () => {
-				verify.value = true;
-			},
-		},
-	];
+
+	modal.value.$el.isOpen = true;
+	modal.value.$el.canDismiss = false;
+
+	const response = await verificationCodeRequest(email.value);
+	return await showToast(response.data.message, 2000, "bottom");
+}
+
+async function closeModal() {
+	modal.value.$el.canDismiss = true;
+	modal.value.$el.isOpen = false;
 }
 
 async function handleVerify() {
 	if (!verificationCodeFormat(verificationCode.value)) {
-		alert("wrong format");
+		return await showToast("format wrong", 2000, "bottom");
+	}
+	const response = await verificationCodeVerify(
+		email.value,
+		verificationCode.value
+	);
+	await showToast(response.data.message, 2000, "bottom");
+	if (response.status < 200 || response.status > 299) {
 		return;
 	}
-	alert("success");
-	currentUser.email = targetEmail.value;
-	router.push({ name: "PlanManagement" });
-}
 
-onMounted(() => {
-	verify.value = false;
-});
+	const editEmailResponse = await editEmail(
+		currentUser.id,
+		email.value,
+		currentUser.email
+	);
+	await showToast(editEmailResponse.data.message, 2000, "bottom");
+	if (editEmailResponse.status < 200 || editEmailResponse.status > 299) {
+		alert("hello");
+		return;
+	}
+
+	currentUser.email = email.value;
+
+	await closeModal();
+
+	router.push({ name: "Auth" });
+}
 </script>
 
 <style scoped>
@@ -150,7 +142,6 @@ onMounted(() => {
 	justify-content: center;
 	align-items: center;
 	margin: auto 1%;
-	/* 合并 margin-top 和 margin-left/right */
 }
 
 #container ion-list {
@@ -174,7 +165,5 @@ onMounted(() => {
 
 #container ion-chip:last-child {
 	margin-bottom: 0%;
-	/* 最后一个 chip 不需要底部边距 */
 }
 </style>
-@/utils/userStore

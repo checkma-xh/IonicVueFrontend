@@ -9,7 +9,8 @@ export async function completePlan(
         const config = {
             headers: {
                 Authorization: `Bearer ${accessToken}`
-            }
+            },
+            timeout: 2500,
         };
         const data = {};
         const response = await axios.patch(
@@ -17,8 +18,8 @@ export async function completePlan(
             data,
             config
         );
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching data:", error);
+        return response;
+    } catch (error: any) {
+        return error.response;
     }
 }

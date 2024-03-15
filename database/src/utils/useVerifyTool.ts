@@ -9,7 +9,7 @@ export async function tokenVerify(token: string): Promise<JwtPayload | null> {
         const decodedToken = jwt.verify(token, config.secretKey) as JwtPayload;
         return decodedToken;
     } catch (error) {
-        console.error("Token verification failed:", error);
+        console.error("token verification failed:", error);
         return null;
     }
 }
