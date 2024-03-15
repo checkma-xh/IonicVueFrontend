@@ -37,17 +37,17 @@ export class AuthController {
 	}
 
 
-	private createUser(email: string, passwordHash: string, avatarUrl: string): UserInfo {
+	private createUser(email: string, passwordHash: string, avatar: string): UserInfo {
 		const user = new UserInfo();
 		user.email = email;
 		user.passwordHash = passwordHash;
-		user.avatarUrl = avatarUrl;
+		user.avatar = avatar;
 		return user;
 	}
 
 
 	async register(request: Request, response: Response, next: NextFunction) {
-		const { email, passwordHash, avatarUrl } = request.body;
+		const { email, passwordHash, avatar } = request.body;
 		const verificationInfo = this.verificationInfoMap.get(email);
 		if (!verificationInfo?.verificationResult) {
 			return response.status(401).json({ message: "verification failed" });
@@ -62,7 +62,7 @@ export class AuthController {
 			return response.status(409).json({ message: "user already exists" });
 		}
 
-		const newUser = this.createUser(email, passwordHash, avatarUrl);
+		const newUser = this.createUser(email, passwordHash, avatar);
 		await this.UserInfoRepository.save(newUser);
 
 		return response.status(201).json({ message: "register successful" });
@@ -92,10 +92,14 @@ export class AuthController {
 		const refreshToken = jwt.sign({id: user.id}, config.secretKey, refreshTokenOptions);
 
 		return response.status(201).json({
-			currentUser: { ...user },
-			accessToken: accessToken,
+			id          : user.id,
+			email       : user.email,
+			passwordHash: user.passwordHash,
+			avatar      : user.avatar,
+			activated   : user.activated,
+			accessToken : accessToken,
 			refreshToken: refreshToken,
-			message: "login successful",
+			message     : "login successful",
 		});
 	}
 
@@ -137,9 +141,13 @@ export class AuthController {
 		const accessToken =  jwt.sign({id: user.id}, config.secretKey, accessTokenOptions);
 
 		return response.status(200).json({
-			currentUser: {...user},
-			accessToken: accessToken,
-			message: "refresh successful"
+			id          : user.id,
+			email       : user.email,
+			passwordHash: user.passwordHash,
+			avatar      : user.avatar,
+			activated   : user.activated,
+			accessToken : accessToken,
+			message     : "refresh successful"
 		});
 	}
 

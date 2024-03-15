@@ -25,9 +25,9 @@ export const Routes = [
   },
   {
     method: "patch",
-    route: "/user-info/users/:id/avatar-url",
+    route: "/user-info/users/:id/avatar",
     controller: UserInfoController,
-    action: "editAvatarUrl",
+    action: "editAvatar",
   },
 
   // Auth

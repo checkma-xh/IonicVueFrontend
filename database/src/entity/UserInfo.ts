@@ -16,8 +16,8 @@ export class UserInfo {
   @Column({ length: 256 })
   passwordHash: string;
 
-  @Column({ type: "text", default: config.defaultAvatarUrl })
-  avatarUrl: string;
+  @Column({ type: "text", default: config.defaultAvatar })
+  avatar: string;
 
   @Column({ default: true })
   activated: boolean;

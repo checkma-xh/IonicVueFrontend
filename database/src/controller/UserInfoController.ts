@@ -25,7 +25,13 @@ export class UserInfoController {
 			return response.status(404).json({ message: "user not found" });
 		}
 
-		return response.status(200).json({ currentUser: { ...user }, message: "get user information successful" });
+		return response.status(200).json({
+			id          : user.id,
+			email       : user.email,
+			passwordHash: user.passwordHash,
+			avatar      : user.avatar,
+			activated   : user.activated,    message: "get user information successful"
+		});
 	}
 
 	async editEmail(request: Request, response: Response, next: NextFunction) {
@@ -77,12 +83,12 @@ export class UserInfoController {
 		return response.status(200).json({ message: "edit password hash successful" });
 	}
 
-	async editAvatarUrl(
+	async editAvatar(
 		request: Request,
 		response: Response,
 		next: NextFunction,
 	) {
-		const { avatarUrl } = request.body;
+		const { avatar } = request.body;
 		const decodeToken = await tokenVerify(request.headers?.authorization.split(" ")[1]);
 		if (!decodeToken) {
 			return response.status(400).json({ message: "verification failed" });
@@ -97,9 +103,9 @@ export class UserInfoController {
 			return response.status(404).json({ message: "user not found" });
 		}
 
-		user.avatarUrl = avatarUrl;
+		user.avatar = avatar;
 		await this.UserInfoRepository.save(user);
 
-		return response.status(200).json({ message: "edit avatar Url successful" });
+		return response.status(200).json({ message: "edit avatar successful" });
 	}
 }
