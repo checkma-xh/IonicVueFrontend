@@ -22,13 +22,12 @@ import { useUserStore } from "@/store/userStore";
 
 const select = ref();
 const userStore = useUserStore();
-const currentUser = userStore.currentUser;
 const groups = ref();
 const groupValue = defineModel("groupValue");
 const handleChange = defineModel("handleChange");
 
 onMounted(async () => {
-	const response = await getGroups(userStore.accessToken, currentUser.id, false);
+	const response = await getGroups(userStore.accessToken, userStore.id, false);
 	if (response.status < 200 || response.status > 299) {
 		return;
 	}

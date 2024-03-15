@@ -2,7 +2,7 @@ import axios from "axios";
 
 export async function login(
   email: string,
-  passwordHash: string | null,
+  passwordHash: string | null = null,
 ) {
   try {
     const config = {

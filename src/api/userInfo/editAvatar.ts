@@ -1,9 +1,9 @@
 import axios from "axios";
 
-export async function editAvatarUrl(
+export async function editAvatar(
     accessToken: string,
     id: number,
-    avatarUrl: string
+    avatar: string
 ) {
     try {
         const config = {
@@ -13,10 +13,10 @@ export async function editAvatarUrl(
             timeout: 2500,
         };
         const data = {
-            avatarUrl: avatarUrl,
+            avatar: avatar,
         };
         const response = await axios.patch(
-            `http://localhost:3000/user-info/users/${id}/avatar-url`,
+            `http://localhost:3000/user-info/users/${id}/avatar`,
             data,
             config
         );

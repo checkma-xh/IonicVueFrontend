@@ -15,12 +15,10 @@
 				</ion-toolbar>
 			</ion-header>
 
-			<div
-				id="container"
-				class="detail-cards-container">
+			<div id="container">
 				<detail-card
 					v-for="(value, index) of moduleMessages"
-					:handle-click="value.handleClick"
+					:handleClick="value.handleClick"
 					:key="index"
 					:icon="value.icon"
 					:iconColor="value.iconColor"
@@ -44,7 +42,81 @@ import {
 	IonContent,
 } from "@ionic/vue";
 import DetailCard from "@/components/DetailCard.vue";
-import { moduleMessages } from "@/assets/data/userInfo/moduleMessages";
+import { ConfigService } from "@/utils/ConfigService";
+import { useUserStore } from "@/store/userStore";
+import router from "@/router";
+import { eyeOutline, mailOutline, personCircleOutline } from "ionicons/icons";
+import { loadPhoto, savePhoto, takePhoto } from "@/utils/usePhotoGallery";
+import { showToast } from "@/utils/useToastTool";
+import { editAvatar } from "@/api/userInfo/editAvatar";
+import { reactive, ref } from "vue";
+
+const config = ConfigService.getConfig();
+const userStore = useUserStore();
+
+const editEmailModule = reactive({
+	handleClick: async () => {
+		router.push({ name: "EditEmail" });
+	},
+	icon     : mailOutline,
+	cardColor: "light",
+	iconColor: "primary",
+	title    : "edit email",
+	subtitle : "",
+	content  : "",
+});
+
+const editPasswordModule = reactive({
+	handleClick: () => {
+		router.push({ name: "EditPassword" });
+	},
+	icon     : eyeOutline,
+	cardColor: "light",
+	iconColor: "primary",
+	title    : "edit password",
+	subtitle : "",
+	content  : "",
+});
+
+const editAvatarModule = reactive({
+	handleClick: async () => {
+		const avatar = await takePhoto();
+		if (!avatar) {
+			return await showToast("photo retrieval failed", 2000, "bottom");
+		}
+
+		await savePhoto(avatar, config.viteUserAvatarPath);
+		const avatarBase64 = await loadPhoto(config.viteUserAvatarPath);
+		if (!avatarBase64){
+			return await showToast("photo retrieval failed", 2000, "bottom");
+		}
+
+		const newAvatar = `data:image/jpeg;base64,${avatarBase64.data}`;
+		const response = await editAvatar(
+			userStore.accessToken,
+			userStore.id,
+			newAvatar
+		);
+		await showToast(response.data.message, 2000, "bottom");
+		if (response.status < 200 || response.status > 299) {
+			return;
+		}
+
+		userStore.setConfig({argAvatar: newAvatar});
+	},
+	icon     : personCircleOutline,
+	cardColor: "light",
+	iconColor: "primary",
+	title    : "edit avatar",
+	subtitle : "",
+	content  : "",
+});
+
+const moduleMessages = ref([
+	editEmailModule,
+	editPasswordModule,
+	editAvatarModule,
+]);
 </script>
 
 <style scoped>
@@ -56,9 +128,6 @@ import { moduleMessages } from "@/assets/data/userInfo/moduleMessages";
 	width: 100%;
 	text-align: center;
 	padding-bottom: 5%;
-}
-
-.detail-cards-container {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;

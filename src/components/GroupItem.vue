@@ -67,9 +67,9 @@ import {
 	IonItem,
 	IonLabel,
 	IonBadge,
+	IonItemSliding,
 	IonItemOptions,
 	IonItemOption,
-	IonItemSliding,
 } from "@ionic/vue";
 import { ellipsisVertical, trash, arrowForward } from "ionicons/icons";
 

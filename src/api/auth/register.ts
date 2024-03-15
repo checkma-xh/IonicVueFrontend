@@ -3,7 +3,7 @@ import axios from "axios";
 export async function register(
 	email: string,
 	passwordHash: string,
-	avatarUrl: string
+	avatar: string
 ) {
 	try {
 		const config = {
@@ -15,7 +15,7 @@ export async function register(
 		const data = {
 			email: email,
 			passwordHash: passwordHash,
-			avatarUrl: avatarUrl,
+			avatar: avatar,
 		};
 		const response = await axios.post(
 			"http://localhost:3000/auth/register",

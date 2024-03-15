@@ -21,9 +21,9 @@
 						<ion-avatar>
 							<img
 								alt="silhouette of a person's head"
-								:src="currentUser.avatarUrl" />
+								:src="userStore.avatar" />
 						</ion-avatar>
-						<ion-label>{{ currentUser.email }}</ion-label>
+						<ion-label>{{ userStore.email }}</ion-label>
 					</ion-chip>
 					<functional-input
 						inputType="password"
@@ -46,8 +46,8 @@
 						<ion-content>
 							<verify-module
 								v-model:verificationCode="verificationCode"
-								:avatarUrl="currentUser.avatarUrl"
-								:email="currentUser.email"
+								:avatar="userStore.avatar"
+								:email="userStore.email"
 								:handleVerify="handleVerify">
 							</verify-module>
 						</ion-content>
@@ -85,7 +85,6 @@ import router from "@/router";
 
 const modal = ref();
 const userStore = useUserStore();
-const currentUser = userStore.currentUser;
 const verificationCode = ref();
 const password = ref();
 const confirmPassword = ref();
@@ -101,7 +100,7 @@ async function openModal() {
 	modal.value.$el.isOpen = true;
 	modal.value.$el.canDismiss = false;
 
-	const response = await verificationCodeRequest(currentUser.email);
+	const response = await verificationCodeRequest(userStore.email);
 	return await showToast(response.data.message, 2000, "bottom");
 }
 
@@ -115,7 +114,7 @@ async function handleVerify() {
 		return await showToast("format wrong", 2000, "bottom");
 	}
 	const response = await verificationCodeVerify(
-		currentUser.email,
+		userStore.email,
 		verificationCode.value
 	);
 	await showToast(response.data.message, 2000, "bottom");
@@ -124,8 +123,8 @@ async function handleVerify() {
 	}
 
 	const editPasswordHashResponse = await editPasswordHash(
-		currentUser.id,
-		currentUser.email,
+		userStore.id,
+		userStore.email,
 		password.value
 	);
 	await showToast(editPasswordHashResponse.data.message, 2000, "bottom");
@@ -136,10 +135,8 @@ async function handleVerify() {
 		return;
 	}
 
-	currentUser.passwordHash = password.value;
-
+	userStore.setConfig({ argPasswordHash: password.value });
 	await closeModal();
-
 	router.push({ name: "Auth" });
 }
 </script>

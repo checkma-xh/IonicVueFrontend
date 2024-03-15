@@ -18,10 +18,7 @@ export function convertBlobToBase64(blob: Blob): Promise<string> {
 }
 
 
-export async function savePhoto(
-	photo: Photo,
-	filepath: string,
-): Promise<boolean> {
+export async function savePhoto(photo: Photo, filepath: string): Promise<boolean> {
 	try {
 		const response = await fetch(photo.webPath!);
 		const blob = await response.blob();

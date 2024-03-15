@@ -15,12 +15,10 @@
 				</ion-toolbar>
 			</ion-header>
 
-			<div
-				id="container"
-				class="detail-cards-container">
+			<div id="container">
 				<detail-card
 					v-for="(value, index) of moduleMessages"
-					:handle-click="value.handleClick"
+					:handleClick="value.handleClick"
 					:key="index"
 					:icon="value.icon"
 					:iconColor="value.iconColor"
@@ -42,9 +40,61 @@ import {
 	IonToolbar,
 	IonTitle,
 	IonContent,
+	modalController,
 } from "@ionic/vue";
 import DetailCard from "@/components/DetailCard.vue";
-import { moduleMessages } from "@/assets/data/planManagement/moduleMessages";
+import { reactive, ref } from "vue";
+import SearchModal from "@/components/SearchModal.vue";
+import { addCircle, calendarOutline, searchOutline } from "ionicons/icons";
+import router from "@/router";
+import { useUserStore } from "@/store/userStore";
+
+const userStore = useUserStore();
+
+const searchModule = reactive({
+	handleClick: async () => {
+      const modal = await modalController.create({
+        component: SearchModal,
+      });
+      modal.present();
+    },  
+    icon     : searchOutline,
+    cardColor: "light",
+    iconColor: "dark",
+    title    : "search",
+    subtitle : "",
+    content  : "",
+})
+
+const planModule = reactive({
+	handleClick: async () => {
+      await router.push({ name: "PlanList", params: { id: userStore.id }, query: { completed: 1} });
+    },
+    icon     : calendarOutline,
+    cardColor: "light",
+    iconColor: "danger",
+    title    : "plans",
+    subtitle : "",
+    content  : "",
+})
+
+const createModule = reactive({
+    handleClick: async () => {
+      await router.push({ name: "CreatePlan", params: { id: userStore.id } });
+    },
+    icon     : addCircle,
+    cardColor: "light",
+    iconColor: "primary",
+    title    : "create",
+    subtitle : "",
+    content  : "",
+})
+
+const moduleMessages = ref([
+  searchModule,
+  planModule,
+  createModule,
+]);
 </script>
 
 <style scoped>
@@ -56,9 +106,6 @@ import { moduleMessages } from "@/assets/data/planManagement/moduleMessages";
 	width: 100%;
 	text-align: center;
 	padding-bottom: 5%;
-}
-
-.detail-cards-container {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;

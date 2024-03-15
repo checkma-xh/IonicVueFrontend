@@ -16,8 +16,8 @@
 			</ion-header>
 			<verify-module
 				v-model:verificationCode="verificationCode"
-				:avatarUrl="currentUser.avatarUrl"
-				:email="currentUser.email"
+				:avatar="userStore.avatar"
+				:email="userStore.email"
 				:handleVerify="handleVerify"></verify-module>
 		</ion-content>
 	</ion-page>
@@ -30,25 +30,44 @@ import {
 	IonToolbar,
 	IonTitle,
 	IonContent,
-	actionSheetController,
 } from "@ionic/vue";
-import { reactive, ref } from "vue";
+import { ref } from "vue";
 import { useUserStore } from "@/store/userStore";
 import VerifyModule from "@/components/VerifyModule.vue";
 import { verificationCodeFormat } from "@/utils/useTextFormat";
 import { showToast } from "@/utils/useToastTool";
 import { deactivate } from "@/api/auth/deactivate";
 import { verificationCodeVerify } from "@/api/auth/verificationCodeVerify";
-import { logout } from "@/api/auth/logout";
 import router from "@/router";
+import { showActionSheet } from "@/utils/useActionSheetTool";
 
 const userStore = useUserStore();
-const currentUser = userStore.currentUser;
 const verificationCode = ref();
 
-const actionSheetOptions = reactive({
-	header: "deactivate",
-	buttons: [
+async function handleDeactivate() {
+	const response = await deactivate(userStore.email);
+	await showToast(response.data.message, 2000, "bottom");
+	if (response.status < 200 || response.status > 299) {
+		return;
+	}
+	await userStore.reset();
+	router.push({ name: "Login" });
+}
+
+async function handleVerify() {
+	if (!verificationCodeFormat(verificationCode.value)) {
+		return await showToast("format wrong", 2000, "bottom");
+	}
+	const response = await verificationCodeVerify(
+		userStore.email,
+		verificationCode.value
+	);
+	await showToast(response.data.message, 2000, "bottom");
+	if (response.status < 200 || response.status > 299) {
+		return;
+	}
+
+	const buttons = [
 		{
 			text: "confirm",
 			role: "destructive",
@@ -64,37 +83,8 @@ const actionSheetOptions = reactive({
 				action: "cancel",
 			},
 		},
-	],
-});
-
-async function showActionSheet(options: any) {
-	const actionSheet = await actionSheetController.create(options);
-	actionSheet.present();
-}
-
-async function handleDeactivate() {
-	const response = await deactivate(currentUser.email);
-	await showToast(response.data.message, 2000, "bottom");
-	if (response.status > 199 && response.status < 300) {
-		const logoutResponse = await logout(userStore.accessToken);
-		await showToast(logoutResponse.data.message, 2000, "bottom");
-		router.push({ name: "Login" });
-		userStore.reset();
-	}
-}
-
-async function handleVerify() {
-	if (!verificationCodeFormat(verificationCode.value)) {
-		return await showToast("format wrong", 2000, "bottom");
-	}
-	const response = await verificationCodeVerify(
-		currentUser.email,
-		verificationCode.value
-	);
-	await showToast(response.data.message, 2000, "bottom");
-	if (response.status > 199 && response.status < 300) {
-		await showActionSheet(actionSheetOptions);
-	}
+	];
+	await showActionSheet("deactivate", buttons);
 }
 </script>
 

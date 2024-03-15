@@ -4,7 +4,7 @@
 			<ion-avatar>
 				<img
 					alt="silhouette of a person's head"
-					:src="avatarUrl" />
+					:src="avatar" />
 			</ion-avatar>
 			<ion-label>{{ email }}</ion-label>
 		</ion-chip>
@@ -19,7 +19,7 @@
 import { IonList, IonAvatar, IonLabel, IonChip, IonButton } from "@ionic/vue";
 import FunctionalInput from "@/components/FunctionalInput.vue";
 
-const avatarUrl = defineModel("avatarUrl", {
+const avatar = defineModel("avatar", {
 	type: String,
 	required: true,
 });

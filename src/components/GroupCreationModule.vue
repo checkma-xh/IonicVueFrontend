@@ -4,7 +4,7 @@
 			<ion-title>add group</ion-title>
 		</ion-toolbar>
 	</ion-header>
-	<ion-content class="ion-padding">
+	<ion-content :fullscreen="true" class="ion-padding">
 		<ion-header collapse="condense">
 			<ion-toolbar>
 				<ion-title size="large">add group</ion-title>
@@ -46,7 +46,6 @@ import { ref } from "vue";
 const title       = ref();
 const remark      = ref();
 const userStore   = useUserStore();
-const currentUser = userStore.currentUser;
 
 async function addGroup() {
 	if (!title.value || title.value === "") {
@@ -59,7 +58,7 @@ async function addGroup() {
 
 	const response = await createGroup(
 		userStore.accessToken,
-		currentUser.id,
+		userStore.id,
 		title.value,
 		remark.value
 	);

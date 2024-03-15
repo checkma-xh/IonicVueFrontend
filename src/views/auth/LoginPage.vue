@@ -23,12 +23,7 @@
 					<functional-input
 						inputType="password"
 						v-model="password"></functional-input>
-					<ion-button
-						@click.stop="handleLogin"
-						id="login-alert"
-						>login</ion-button
-					>
-
+					<ion-button @click.stop="handleLogin">login</ion-button>
 					<ion-button @click.stop="openModal"
 						>verification code login</ion-button
 					>
@@ -46,7 +41,7 @@
 						<ion-content>
 							<verify-module
 								v-model:verificationCode="verificationCode"
-								:avatarUrl="avatarUrl"
+								:avatar="avatar"
 								:email="email"
 								:handleVerify="handleVerify"></verify-module>
 						</ion-content>
@@ -87,11 +82,10 @@ import { showToast } from "@/utils/useToastTool";
 
 const modal = ref();
 const userStore = useUserStore();
-const currentUser = userStore.currentUser;
 const email = ref();
 const password = ref();
 const verificationCode = ref();
-const avatarUrl = ref(personCircleOutline);
+const avatar = ref(personCircleOutline);
 
 async function openModal() {
 	if (!emailFormat(email.value)) {
@@ -121,14 +115,16 @@ async function handleLogin() {
 		return;
 	}
 
-	currentUser.id           = response.data.currentUser.id;
-	currentUser.email        = response.data.currentUser.email;
-	currentUser.passwordHash = response.data.currentUser.passwordHash;
-	currentUser.avatarUrl    = response.data.currentUser.avatarUrl;
-	currentUser.activated    = response.data.currentUser.activated;
-	userStore.accessToken    = response.data.accessToken;
-	userStore.refreshToken   = response.data.refreshToken;
-	userStore.isLogin        = true;
+	await userStore.setConfig({
+		argId          : response.data.id as number,
+		argEmail       : response.data.email as string,
+		argPasswordHash: response.data.passwordHash as string,
+		argAvatar      : response.data.argAvatar as string,
+		argActivated   : response.data.activated as boolean,
+		argAccessToken : response.data.accessToken as string,
+		argRefreshToken: response.data.refreshToken as string,
+		argIsLogin     : true,
+	});
 
 	router.push({ name: "PlanManagement" });
 }
@@ -148,21 +144,23 @@ async function handleVerify() {
 	if (response.status < 200 || response.status > 299) {
 		return;
 	}
-	
-	response = await login(email.value, null);
+
+	response = await login(email.value);
 	await showToast(response.data.message, 2000, "bottom");
 	if (response.status < 200 || response.status > 299) {
 		return;
 	}
 
-	currentUser.id           = response.data.currentUser.id;
-	currentUser.email        = response.data.currentUser.email;
-	currentUser.passwordHash = response.data.currentUser.passwordHash;
-	currentUser.avatarUrl    = response.data.currentUser.avatarUrl;
-	currentUser.activated    = response.data.currentUser.activated;
-	userStore.accessToken    = response.data.accessToken;
-	userStore.refreshToken   = response.data.refreshToken;
-	userStore.isLogin        = true;
+	await userStore.setConfig({
+		argId          : response.data.id as number,
+		argEmail       : response.data.email as string,
+		argPasswordHash: response.data.passwordHash as string,
+		argAvatar      : response.data.argAvatar as string,
+		argActivated   : response.data.activated as boolean,
+		argAccessToken : response.data.accessToken as string,
+		argRefreshToken: response.data.refreshToken as string,
+		argIsLogin     : true,
+	});
 
 	await closeModal();
 

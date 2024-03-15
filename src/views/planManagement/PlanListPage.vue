@@ -99,24 +99,22 @@ import PlanList from "@/components/PlanList.vue";
 import GroupList from "@/components/GroupList.vue";
 import RepeatSegment from "@/components/RepeatSegment.vue";
 import DetailCard from "@/components/DetailCard.vue";
-import { listCircle } from "ionicons/icons";
 import { getPlans } from "@/api/planManagement/getPlans";
 import { completePlan } from "@/api/planManagement/completePlan";
 import { deletePlan } from "@/api/planManagement/deletePlan";
 import { deleteGroup } from "@/api/planManagement/deleteGroup";
+import { matchModuleNameByRouteName } from "@/utils/useRouteTool";
 import {
-	matchModuleNameByRouteName,
-	matchColorByPriorityName,
-	matchColorByRepeatName,
-	matchIconByCompleted,
-	matchIconColorByCompleted,
-} from "@/utils/useMatchTool";
+	setGroupAttribute,
+	setPlanAttribute,
+} from "@/utils/usePlanManagementTool";
 import { showToast } from "@/utils/useToastTool";
 import { getPriorities } from "@/api/other/getPriorities";
+import { formatDateWithoutTime } from "@/utils/useDateTool";
+import { sortPlan } from "@/utils/usePlanManagementTool";
 
 const route = useRoute();
 const userStore = useUserStore();
-const currentUser = userStore.currentUser;
 const moduleName = ref();
 const detailModal = ref();
 const trash = ref();
@@ -144,41 +142,6 @@ const detail = reactive({
 	subtitle: "",
 	content: "",
 });
-const colorArray: string[] = [
-	"danger",
-	"tertiary",
-	"success",
-	"warning",
-	"primary",
-	"secondary",
-	"light",
-	"medium",
-	"dark",
-];
-const colorCycle = arrayCycleTool(colorArray);
-
-function arrayCycleTool(array: Array<any>) {
-	let index: number = 0;
-	const arrayCycle = () => {
-		if (index === array.length) {
-			index = 0;
-		}
-		return array[index++];
-	};
-	return arrayCycle;
-}
-
-function sortPlan(currentItem: any, afterItem: any) {
-	if (currentItem.completed !== afterItem.completed) {
-		return currentItem.completed ? -1 : 1;
-	}
-
-	const priorityOrder = priorities.value;
-	const currentItemIndex = priorityOrder.indexOf(currentItem.priorityName);
-	const afterItemIndex = priorityOrder.indexOf(afterItem.priorityName);
-
-	return currentItemIndex - afterItemIndex;
-}
 
 function openDetailModal() {
 	detailModal.value.$el.isOpen = true;
@@ -188,126 +151,6 @@ function openDetailModal() {
 function closeDetailModal() {
 	detailModal.value.$el.canDismiss = true;
 	detailModal.value.$el.isOpen = false;
-}
-
-function setPlanAtrr(group: any, plan: any) {
-	plan.handleClick = () => {
-		detail.cardColor = "light";
-		detail.icon = plan.icon;
-		detail.iconColor = plan.color;
-		detail.handleClick = closeDetailModal;
-		detail.title = plan.name;
-		detail.content = plan.remark;
-		detail.subtitle = `group-${plan.group.name}; priority-${plan.priority.name}; repeat-${plan.repeat.name}; completed-${plan.completed};`;
-		openDetailModal();
-	};
-
-	plan.handleDelete = async () => {
-		const response = await deletePlan(
-			userStore.accessToken,
-			currentUser.id,
-			plan.id
-		);
-		await showToast(response.data.message, 2000, "bottom");
-		if (response.status < 200 || response.status > 299) {
-			return;
-		}
-		group.plans = group.plans.filter((item: any) => {
-			return item.id !== plan.id;
-		});
-		currentGroup.plans = group.plans;
-	};
-
-	plan.handleComplete = async () => {
-		const response = await completePlan(
-			userStore.accessToken,
-			currentUser.id,
-			plan.id
-		);
-		await showToast(response.data.message, 2000, "bottom");
-		if (response.status < 200 || response.status > 299) {
-			return;
-		}
-		plan.completed = true;
-	};
-
-	plan.handleDetail = computed(() => {
-		return plan.handleClick;
-	});
-	plan.priorityName = computed(() => {
-		return plan.priority.name;
-	});
-	plan.repeatName = computed(() => {
-		return plan.repeat.name;
-	});
-	plan.groupName = computed(() => {
-		return plan.group.name;
-	});
-	plan.icon = computed(() => {
-		return matchIconByCompleted(plan.completed);
-	});
-	plan.color = computed(() => {
-		return matchIconColorByCompleted(plan.completed);
-	});
-	plan.priorityColor = computed(() => {
-		return matchColorByPriorityName(plan.priority.name);
-	});
-	plan.repeatColor = computed(() => {
-		return matchColorByRepeatName(plan.repeat.name);
-	});
-}
-
-function setGroupAttr(group: any) {
-	group.icon = computed(() => {
-		return listCircle;
-	});
-	group.color = computed(() => {
-		return colorCycle();
-	});
-	group.total = computed(() => {
-		return group.plans.length;
-	});
-	group.completedCount = computed(() => {
-		return group.plans.filter((plan: any) => plan.completed).length;
-	});
-	group.unfinishedCount = computed(() => {
-		return group.total - group.completedCount;
-	});
-	group.selectPlans = computed(() => {
-		return group.handleClick;
-	});
-
-	group.handleClick = () => {
-		currentGroup.name = group.name;
-		currentGroup.color = group.color;
-		currentGroup.plans = group.plans;
-	};
-
-	group.handleDetail = () => {
-		detail.cardColor = "light";
-		detail.icon = group.icon;
-		detail.iconColor = group.color;
-		detail.handleClick = closeDetailModal;
-		detail.title = group.name;
-		detail.content = group.remark;
-		detail.subtitle = `${group.completedCount} / ${group.total}`;
-		openDetailModal();
-	};
-
-	group.handleDelete = async () => {
-		const response = await deleteGroup(
-			userStore.accessToken,
-			currentUser.id,
-			group.id
-		);
-		await showToast(response.data.message, 2000, "bottom");
-		if (response.status < 200 || response.status > 299) {
-			return;
-		}
-		currentGroups.value = currentGroups.value.filter((item: any) => {
-			return item.id !== group.id;
-		});
-	};
 }
 
 onMounted(async () => {
@@ -321,24 +164,122 @@ onMounted(async () => {
 	).data.priorities;
 
 	currentGroups.value = (
-		await getGroups(userStore.accessToken, currentUser.id, trash.value)
+		await getGroups(userStore.accessToken, userStore.id, trash.value)
 	).data.groups;
 
 	const promises = currentGroups.value.map(async (group: any) => {
 		group.plans = (
 			await getPlans({
 				accessToken: userStore.accessToken,
-				id: currentUser.id,
+				id: userStore.id,
 				groupName: group.name,
 				deleted: trash.value,
 			})
 		).data.plans;
 
 		group.plans.forEach((plan: any) => {
-			setPlanAtrr(group, plan);
+			// click
+			const planHandleClick = () => {
+				detail.cardColor = "light";
+				detail.icon = plan.icon;
+				detail.iconColor = plan.color;
+				detail.handleClick = closeDetailModal;
+				detail.title = plan.name;
+				detail.content = plan.remark;
+				detail.subtitle =
+					`${formatDateWithoutTime(new Date(plan.startDate)) + " ~ " + formatDateWithoutTime(new Date(plan.endDate))}. ` +
+					`completed: ${plan.completed}. ` +
+					`group: ${plan.group.name}. ` +
+					`priority: ${plan.priority.name}. ` +
+					`repeat: ${plan.repeat.name}. `;
+				openDetailModal();
+			};
+
+			// delete
+			const planHandleDelete = async () => {
+				const response = await deletePlan(
+					userStore.accessToken,
+					userStore.id,
+					plan.id
+				);
+				await showToast(response.data.message, 2000, "bottom");
+				if (response.status < 200 || response.status > 299) {
+					return;
+				}
+				group.plans = group.plans.filter((item: any) => {
+					return item.id !== plan.id;
+				});
+				currentGroup.plans = group.plans;
+			};
+
+			// complete
+			const planHandleComplete = async () => {
+				const response = await completePlan(
+					userStore.accessToken,
+					userStore.id,
+					plan.id
+				);
+				await showToast(response.data.message, 2000, "bottom");
+				if (response.status < 200 || response.status > 299) {
+					return;
+				}
+				plan.completed = true;
+			};
+
+			// detail
+			const planHandleDetail = computed(() => {
+				return planHandleClick;
+			});
+			setPlanAttribute({
+				plan: plan,
+				handleClick: planHandleClick,
+				handleComplete: planHandleComplete,
+				handleDelete: planHandleDelete,
+				handleDetail: planHandleDetail,
+			});
 		});
 
-		setGroupAttr(group);
+		// click
+		const groupHhandleClick = () => {
+			currentGroup.name = group.name;
+			currentGroup.color = group.color;
+			currentGroup.plans = group.plans;
+		};
+
+		// detail
+		const groupHandleDetail = () => {
+			detail.cardColor = "light";
+			detail.icon = group.icon;
+			detail.iconColor = group.color;
+			detail.handleClick = closeDetailModal;
+			detail.title = group.name;
+			detail.content = group.remark;
+			detail.subtitle = `${group.completedCount} / ${group.total}`;
+			openDetailModal();
+		};
+
+		// delete
+		const groupHandleDelete = async () => {
+			const response = await deleteGroup(
+				userStore.accessToken,
+				userStore.id,
+				group.id
+			);
+			await showToast(response.data.message, 2000, "bottom");
+			if (response.status < 200 || response.status > 299) {
+				return;
+			}
+			currentGroups.value = currentGroups.value.filter((item: any) => {
+				return item.id !== group.id;
+			});
+		};
+
+		setGroupAttribute({
+			group: group,
+			handleClick: groupHhandleClick,
+			handleDelete: groupHandleDelete,
+			handleDetail: groupHandleDetail,
+		});
 	});
 
 	await Promise.all(promises);

@@ -15,12 +15,10 @@
 				</ion-toolbar>
 			</ion-header>
 
-			<div
-				id="container"
-				class="detail-cards-container">
+			<div id="container">
 				<detail-card
 					v-for="(value, index) of moduleMessages"
-					:handle-click="value.handleClick"
+					:handleClick="value.handleClick"
 					:key="index"
 					:icon="value.icon"
 					:iconColor="value.iconColor"
@@ -43,8 +41,113 @@ import {
 	IonContent,
 	IonTitle,
 } from "@ionic/vue";
-import { moduleMessages } from "@/assets/data/auth/moduleMessages";
 import DetailCard from "@/components/DetailCard.vue";
+import { useUserStore } from "@/store/userStore";
+import { reactive, ref } from "vue";
+import { showToast } from "@/utils/useToastTool";
+import router from "@/router";
+import {
+	logInOutline,
+	logOutOutline,
+	personAddOutline,
+	personRemoveOutline,
+} from "ionicons/icons";
+import { verificationCodeRequest } from "@/api/auth/verificationCodeRequest";
+import { showActionSheet } from "@/utils/useActionSheetTool";
+import { logout } from "@/api/auth/logout";
+
+const userStore = useUserStore();
+
+const registerModule = reactive({
+	handleClick: () => {
+		router.push({ name: "Register" });
+	},
+	icon     : personAddOutline,
+	cardColor: "light",
+	iconColor: "primary",
+	title    : "register",
+	subtitle : "",
+	content  : "",
+});
+
+const loginModule = reactive({
+	handleClick: async () => {
+		if (userStore.isLogin) {
+			return await showToast("please logout", 2000, "bottom");
+		}
+		router.push({ name: "Login" });
+	},
+	icon     : logInOutline,
+	cardColor: "light",
+	iconColor: "primary",
+	title    : "login",
+	subtitle : "",
+	content  : "",
+});
+
+const logoutModule = reactive({
+	handleClick: async () => {
+		if (!userStore.isLogin) {
+			return await showToast("please login", 2000, "bottom");
+		}
+		const buttons = ref([
+			{
+				text: "confirm",
+				role: "destructive",
+				data: {
+					action: "confirm",
+				},
+				handler: async () => {
+					const response = await logout(userStore.accessToken);
+					await showToast(response.data.message, 2000, "bottom");
+					if (response.status < 200 || response.status > 299) {
+						return;
+					}
+
+					await userStore.reset();
+				},
+			},
+			{
+				text: "cancel",
+				role: "cancel",
+				data: {
+					action: "cancel",
+				},
+			},
+		]);
+		return await showActionSheet("logout", buttons.value);
+	},
+	icon     : logOutOutline,
+	cardColor: "light",
+	iconColor: "medium",
+	title    : "logout",
+	subtitle : "",
+	content  : "",
+});
+
+const deactivateModule = reactive({
+	handleClick: async () => {
+		if (!userStore.isLogin) {
+			return await showToast("please login", 2000, "bottom");
+		}
+		router.push({ name: "Deactivate" });
+		const response = await verificationCodeRequest(userStore.email);
+		await showToast(response.data.message, 2000, "bottom");
+	},
+	icon     : personRemoveOutline,
+	cardColor: "light",
+	iconColor: "medium",
+	title    : "deactivate",
+	subtitle : "",
+	content  : "",
+});
+
+const moduleMessages = ref([
+	registerModule,
+	loginModule,
+	logoutModule,
+	deactivateModule,
+]);
 </script>
 
 <style scoped>
@@ -56,9 +159,6 @@ import DetailCard from "@/components/DetailCard.vue";
 	width: 100%;
 	text-align: center;
 	padding-bottom: 5%;
-}
-
-.detail-cards-container {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;

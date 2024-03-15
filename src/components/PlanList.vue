@@ -6,6 +6,8 @@
 			:icon="value.icon"
 			:color="value.color"
 			:name="value.name"
+			:startDate="value.startDate"
+			:endDate="value.endDate"
 			:remark="value.remark"
 			:priorityName="value.priorityName"
 			:repeatName="value.repeatName"

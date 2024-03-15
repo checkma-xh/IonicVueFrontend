@@ -21,9 +21,9 @@
 						<ion-avatar>
 							<img
 								alt="silhouette of a person's head"
-								:src="currentUser.avatarUrl" />
+								:src="userStore.avatar" />
 						</ion-avatar>
-						<ion-label>{{ currentUser.email }}</ion-label>
+						<ion-label>{{ userStore.email }}</ion-label>
 					</ion-chip>
 					<functional-input
 						inputType="email"
@@ -44,8 +44,8 @@
 						<ion-content>
 							<verify-module
 								v-model:verificationCode="verificationCode"
-								:avatarUrl="currentUser.avatarUrl"
-								:email="currentUser.email"
+								:avatar="userStore.avatar"
+								:email="userStore.email"
 								:handleVerify="handleVerify">
 							</verify-module>
 						</ion-content>
@@ -81,7 +81,6 @@ import { editEmail } from "@/api/userInfo/editEmail";
 import router from "@/router";
 
 const userStore = useUserStore();
-const currentUser = userStore.currentUser;
 const verificationCode = ref();
 const email = ref();
 const modal = ref();
@@ -117,20 +116,17 @@ async function handleVerify() {
 	}
 
 	const editEmailResponse = await editEmail(
-		currentUser.id,
+		userStore.id,
 		email.value,
-		currentUser.email
+		userStore.email
 	);
 	await showToast(editEmailResponse.data.message, 2000, "bottom");
 	if (editEmailResponse.status < 200 || editEmailResponse.status > 299) {
-		alert("hello");
 		return;
 	}
 
-	currentUser.email = email.value;
-
+	userStore.setConfig({ argEmail: email.value });
 	await closeModal();
-
 	router.push({ name: "Auth" });
 }
 </script>

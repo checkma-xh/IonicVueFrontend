@@ -56,3 +56,7 @@ export function getDateByRepeatName(startDate: Date, endDate: Date, repeatName: 
             return [];
     }
 }
+
+export function formatDateWithoutTime(date: Date) {
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+}

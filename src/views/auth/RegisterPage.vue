@@ -22,7 +22,7 @@
 							<img
 								alt="silhouette of a person's head"
 								:src="avatarWebPath"
-								@click="takeAvatar" />
+								@click="setAvatar" />
 						</ion-avatar>
 						<ion-label>{{ email }}</ion-label>
 					</ion-chip>
@@ -51,7 +51,7 @@
 						<ion-content>
 							<verify-module
 								v-model:verificationCode="verificationCode"
-								:avatarUrl="avatarWebPath"
+								:avatar="avatarWebPath"
 								:email="email"
 								:handleVerify="handleVerify"></verify-module>
 						</ion-content>
@@ -98,18 +98,27 @@ const modal = ref();
 const verificationCode = ref();
 const config = ConfigService.getConfig();
 const userStore = useUserStore();
-const currentUser = userStore.currentUser;
 const avatarWebPath = ref(personCircleOutline);
-const avatar = ref();
 const email = ref();
 const password = ref();
 const confirmPassword = ref();
 
-async function takeAvatar() {
-	avatar.value = await takePhoto();
-	if (avatar.value) {
-		avatarWebPath.value = avatar.value.webPath!;
+async function setAvatar() {
+	const avatar = await takePhoto();
+	if (!avatar) {
+		return await showToast("photo retrieval failed", 2000, "bottom");
 	}
+
+	avatarWebPath.value = avatar.webPath!;
+	await savePhoto(avatar, config.viteUserAvatarPath);
+	const avatarBase64 = await loadPhoto(config.viteUserAvatarPath);
+
+	if (!avatarBase64) {
+		return await showToast("photo retrieval failed", 2000, "bottom");
+	}
+	userStore.setConfig({
+		argAvatar: `data:image/jpeg;base64,${avatarBase64.data}`,
+	});
 }
 
 async function openModal() {
@@ -138,33 +147,23 @@ async function handleVerify() {
 		return await showToast("format wrong", 2000, "bottom");
 	}
 
-	let response;
-
-	response = await verificationCodeVerify(
+	let response = await verificationCodeVerify(
 		email.value,
 		verificationCode.value
 	);
 	await showToast(response.data.message, 2000, "bottom");
 	if (response.status < 200 || response.status > 299) {
-		return await closeModal();
+		return;
 	}
 
-	response = await register(
-		email.value,
-		password.value,
-		currentUser.avatarUrl
-	);
+	response = await register(email.value, password.value, userStore.avatar);
 	await showToast(response.data.message, 2000, "bottom");
 	if (response.status < 200 || response.status > 299) {
-		return await closeModal();
+		await userStore.reset();
+		return;
 	}
 
-	await savePhoto(avatar.value, config.viteAvatarFileName);
-	avatar.value = await loadPhoto(config.viteAvatarFileName);
-	currentUser.avatarUrl = `data:image/jpeg;base64,${avatar.value.data}`;
-
 	await closeModal();
-
 	router.push({ name: "Login" });
 }
 </script>

@@ -106,7 +106,7 @@ import GroupSelect from "@/components/GroupSelect.vue";
 import PrioritySelect from "@/components/PrioritySelect.vue";
 import GroupCreationModule from "@/components/GroupCreationModule.vue";
 import CalendarModule from "@/components/CalendarModule.vue";
-import { matchModuleNameByRouteName } from "@/utils/useMatchTool";
+import { matchModuleNameByRouteName } from "@/utils/useRouteTool";
 import { showToast } from "@/utils/useToastTool";
 import { createPlan } from "@/api/planManagement/createPlan";
 import { useUserStore } from "@/store/userStore";
@@ -114,7 +114,6 @@ import { useUserStore } from "@/store/userStore";
 
 const route       = useRoute();
 const userStore   = useUserStore();
-const currentUser = userStore.currentUser;
 const moduleName  = ref();
 const title       = ref();
 const remark      = ref();
@@ -148,7 +147,7 @@ async function handleCreatePlan() {
 	}
 	const response = await createPlan(
 		userStore.accessToken,
-		currentUser.id,
+		userStore.id,
 		title.value,
 		remark.value,
 		startDate.value,
@@ -237,3 +236,4 @@ ion-accordion.accordion-collapsed ion-item[slot="header"] {
 	--color: var(--ion-color-light-contrast);
 }
 </style>
+@/utils/useRouteTool
