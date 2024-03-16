@@ -33,6 +33,8 @@ npm-debug.log*
 /plugins
 /www
 
+.vscode/
+.idea/
 .vscode
 .idea
 .env
