@@ -5,9 +5,9 @@ export class RepeatInfo {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 64, unique: true })
+  @Column({ length: 256, unique: true })
   name: string;
 
-  @Column({ length: 64 })
+  @Column({ length: 256 })
   remark: string;
 }

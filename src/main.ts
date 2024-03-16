@@ -1,4 +1,4 @@
-import { createApp, ref } from "vue";
+import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
 
@@ -41,6 +41,7 @@ router.isReady().then(() => {
 });
 
 
+// todo 定时刷新访问令牌
 import { Preferences } from "@capacitor/preferences";
 import { ConfigService } from "./utils/ConfigService";
 import { refresh } from "./api/auth/refresh";

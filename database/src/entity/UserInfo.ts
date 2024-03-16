@@ -10,7 +10,7 @@ export class UserInfo {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 64, unique: true })
+  @Column({ length: 256, unique: true })
   email: string;
 
   @Column({ length: 256 })

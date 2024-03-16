@@ -15,10 +15,10 @@ export class PlanInfo {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 64 })
+  @Column({ length: 256 })
   name: string;
 
-  @Column({ length: 64 })
+  @Column({ length: 256 })
   remark: string;
 
   @ManyToOne(() => UserInfo, (userInfo) => userInfo.plans)
