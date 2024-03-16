@@ -77,14 +77,13 @@ import {
 	IonModal,
 } from "@ionic/vue";
 import FunctionalInput from "@/components/FunctionalInput.vue";
-import { takePhoto, savePhoto, loadPhoto } from "@/utils/usePhotoGallery";
+import { takePhoto, savePhoto, loadPhoto, deletePhoto } from "@/utils/usePhotoGallery";
 import { ref } from "vue";
 import {
 	emailFormat,
 	passwordFormat,
 	verificationCodeFormat,
 } from "@/utils/useTextFormat";
-import { useUserStore } from "@/store/userStore";
 import { personCircleOutline } from "ionicons/icons";
 import { ConfigService } from "@/utils/ConfigService";
 import { register } from "@/api/auth/register";
@@ -97,7 +96,6 @@ import { showToast } from "@/utils/useToastTool";
 const modal = ref();
 const verificationCode = ref();
 const config = ConfigService.getConfig();
-const userStore = useUserStore();
 const avatarWebPath = ref(personCircleOutline);
 const email = ref();
 const password = ref();
@@ -116,9 +114,8 @@ async function setAvatar() {
 	if (!avatarBase64) {
 		return await showToast("photo retrieval failed", 2000, "bottom");
 	}
-	userStore.setConfig({
-		argAvatar: `data:image/jpeg;base64,${avatarBase64.data}`,
-	});
+
+	avatarWebPath.value = `data:image/jpeg;base64,${avatarBase64.data}`;
 }
 
 async function openModal() {
@@ -156,10 +153,11 @@ async function handleVerify() {
 		return;
 	}
 
-	response = await register(email.value, password.value, userStore.avatar);
+	response = await register(email.value, password.value, avatarWebPath.value);
 	await showToast(response.data.message, 2000, "bottom");
 	if (response.status < 200 || response.status > 299) {
-		await userStore.reset();
+		await deletePhoto(config.viteUserAvatarPath);
+		avatarWebPath.value = personCircleOutline;
 		return;
 	}
 

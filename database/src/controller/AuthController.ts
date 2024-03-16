@@ -37,17 +37,17 @@ export class AuthController {
 	}
 
 
-	private createUser(email: string, passwordHash: string, avatar: string): UserInfo {
+	private createUser(email: string, password: string, avatar: string): UserInfo {
 		const user = new UserInfo();
 		user.email = email;
-		user.passwordHash = passwordHash;
+		user.password = password;
 		user.avatar = avatar;
 		return user;
 	}
 
 
 	async register(request: Request, response: Response, next: NextFunction) {
-		const { email, passwordHash, avatar } = request.body;
+		const { email, password, avatar } = request.body;
 		const verificationInfo = this.verificationInfoMap.get(email);
 		if (!verificationInfo?.verificationResult) {
 			return response.status(401).json({ message: "verification failed" });
@@ -62,7 +62,7 @@ export class AuthController {
 			return response.status(409).json({ message: "user already exists" });
 		}
 
-		const newUser = this.createUser(email, passwordHash, avatar);
+		const newUser = this.createUser(email, password, avatar);
 		await this.UserInfoRepository.save(newUser);
 
 		return response.status(201).json({ message: "register successful" });
@@ -70,14 +70,14 @@ export class AuthController {
 
 
 	async login(request: Request, response: Response, next: NextFunction) {
-		const { email, passwordHash } = request.body;
+		const { email, password } = request.body;
 		const verificationInfo = this.verificationInfoMap.get(email);
 		const repository = this.UserInfoRepository
 			.createQueryBuilder("user")
 			.where("user.email = :email AND user.activated = 1", { email: email });
 
-		if (passwordHash) {
-			repository.andWhere("user.passwordHash = :passwordHash", { passwordHash: passwordHash });
+		if (password) {
+			repository.andWhere("user.password = :password", { password: password });
 		} else if (!verificationInfo?.verificationResult) {
 			return response.status(401).json({ message: "verification failed" });
 		}
@@ -92,14 +92,15 @@ export class AuthController {
 		const refreshToken = jwt.sign({id: user.id}, config.secretKey, refreshTokenOptions);
 
 		return response.status(201).json({
-			id          : user.id,
-			email       : user.email,
-			passwordHash: user.passwordHash,
-			avatar      : user.avatar,
-			activated   : user.activated,
-			accessToken : accessToken,
-			refreshToken: refreshToken,
-			message     : "login successful",
+			id                   : user.id,
+			email                : user.email,
+			password             : user.password,
+			avatar               : user.avatar,
+			activated            : user.activated,
+			accessToken          : accessToken,
+			accessTokenExpiration: config.accessTokenExpiration,
+			refreshToken         : refreshToken,
+			message              : "login successful",
 		});
 	}
 
@@ -141,13 +142,14 @@ export class AuthController {
 		const accessToken =  jwt.sign({id: user.id}, config.secretKey, accessTokenOptions);
 
 		return response.status(200).json({
-			id          : user.id,
-			email       : user.email,
-			passwordHash: user.passwordHash,
-			avatar      : user.avatar,
-			activated   : user.activated,
-			accessToken : accessToken,
-			message     : "refresh successful"
+			id                   : user.id,
+			email                : user.email,
+			password             : user.password,
+			avatar               : user.avatar,
+			activated            : user.activated,
+			accessToken          : accessToken,
+			accessTokenExpiration: config.accessTokenExpiration,
+			message              : "refresh successful"
 		});
 	}
 

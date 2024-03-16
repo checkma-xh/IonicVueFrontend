@@ -2,7 +2,7 @@ import axios from "axios";
 
 export async function login(
   email: string,
-  passwordHash: string | null = null,
+  password: string | null = null,
 ) {
   try {
     const config = {
@@ -13,7 +13,7 @@ export async function login(
     };
     const data = {
       email: email,
-      passwordHash: passwordHash,
+      password: password,
     };
     const response = await axios.post(
       "http://localhost:3000/auth/login",

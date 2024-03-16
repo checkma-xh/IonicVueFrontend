@@ -1,6 +1,6 @@
 import { Directory, Encoding, Filesystem } from "@capacitor/filesystem";
 
-export async function getTextFile(filePath: string): Promise<string | Blob | null> {
+export async function readTextFile(filePath: string): Promise<string | Blob | null> {
   try {
     const { data } = await Filesystem.readFile({
       path: filePath,

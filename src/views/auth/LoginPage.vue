@@ -79,9 +79,12 @@ import { verificationCodeRequest } from "@/api/auth/verificationCodeRequest";
 import { verificationCodeVerify } from "@/api/auth/verificationCodeVerify";
 import router from "@/router";
 import { showToast } from "@/utils/useToastTool";
+import { ConfigService } from "@/utils/ConfigService";
+import { Preferences } from "@capacitor/preferences";
 
-const modal = ref();
 const userStore = useUserStore();
+const config = ConfigService.getConfig();
+const modal = ref();
 const email = ref();
 const password = ref();
 const verificationCode = ref();
@@ -118,14 +121,18 @@ async function handleLogin() {
 	await userStore.setConfig({
 		argId          : response.data.id as number,
 		argEmail       : response.data.email as string,
-		argPasswordHash: response.data.passwordHash as string,
+		argPassword    : response.data.password as string,
 		argAvatar      : response.data.argAvatar as string,
 		argActivated   : response.data.activated as boolean,
 		argAccessToken : response.data.accessToken as string,
 		argRefreshToken: response.data.refreshToken as string,
 		argIsLogin     : true,
 	});
-
+	await Preferences.set({
+		key  : config.viteUserRefreshTokenPath,
+		value: userStore.refreshToken,
+	});
+	
 	router.push({ name: "PlanManagement" });
 }
 
@@ -154,14 +161,17 @@ async function handleVerify() {
 	await userStore.setConfig({
 		argId          : response.data.id as number,
 		argEmail       : response.data.email as string,
-		argPasswordHash: response.data.passwordHash as string,
+		argPassword    : response.data.password as string,
 		argAvatar      : response.data.argAvatar as string,
 		argActivated   : response.data.activated as boolean,
 		argAccessToken : response.data.accessToken as string,
 		argRefreshToken: response.data.refreshToken as string,
 		argIsLogin     : true,
 	});
-
+	await Preferences.set({
+		key  : config.viteUserRefreshTokenPath,
+		value: userStore.refreshToken,
+	});
 	await closeModal();
 
 	router.push({ name: "PlanManagement" });

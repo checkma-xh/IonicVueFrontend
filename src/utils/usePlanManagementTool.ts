@@ -1,7 +1,6 @@
 import { checkmarkCircle, alertCircle, sparkles, listCircle } from "ionicons/icons";
 import { computed, ref } from "vue";
 
-export const priorities = ref(["high", "medium", "low"]);
 export const colorArray = ref([
     "danger",
     "tertiary",
@@ -14,42 +13,36 @@ export const colorArray = ref([
     "dark",
 ]);
 
-// ! Export prohibited
-const colorCycle = arrayCycleTool(colorArray.value);
+// ! export prohibited
+const colorCycler = arrayCycleTool(colorArray.value);
 
 export function arrayCycleTool(array: Array<any>) {
     let index: number = 0;
-    const arrayCycle = () => {
+    const arrayCycler = () => {
         if (index === array.length) {
             index = 0;
         }
         return array[index++];
     };
-    return arrayCycle;
+    return arrayCycler;
 }
+
 export function sortPlan(currentItem: any, afterItem: any) {
     if (currentItem.completed !== afterItem.completed) {
         return currentItem.completed ? -1 : 1;
     }
 
-    const priorityOrder = priorities.value;
-
     if (currentItem.completed) {
-        const currentItemIndex = priorityOrder.indexOf(
-            currentItem.priorityName
-        );
-        const afterItemIndex = priorityOrder.indexOf(afterItem.priorityName);
-        return currentItemIndex - afterItemIndex;
-    } else {
-        if (currentItem.expired !== afterItem.expired) {
-            return currentItem.expired ? 1 : -1;
-        }
-        return (
-            priorityOrder.indexOf(currentItem.priorityName) -
-            priorityOrder.indexOf(afterItem.priorityName)
-        );
+        return currentItem.priority.id - afterItem.priority.id;
     }
+
+    if (currentItem.expired !== afterItem.expired) {
+        return currentItem.expired ? 1 : -1;
+    }
+
+    return currentItem.priority.id - afterItem.priority.id;
 }
+
 
 export function colorByPriorityName(priorityName: string) {
     switch (priorityName) {
@@ -182,12 +175,12 @@ export function setGroupAttribute({
     handleDetail,
     handleDelete,
 }: {
-    group       : any,
-    handleClick : any,
+    group: any,
+    handleClick: any,
     handleDetail: any,
     handleDelete: any,
 }) {
-    group.handleClick  = handleClick;
+    group.handleClick = handleClick;
     group.handleDetail = handleDetail;
     group.handleDelete = handleDelete;
 
@@ -195,7 +188,7 @@ export function setGroupAttribute({
         return listCircle;
     });
     group.color = computed(() => {
-        return colorCycle();
+        return colorCycler();
     });
     group.total = computed(() => {
         return group.plans.length;

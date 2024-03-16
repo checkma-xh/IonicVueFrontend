@@ -80,7 +80,7 @@ import FunctionalInput from "@/components/FunctionalInput.vue";
 import { showToast } from "@/utils/useToastTool";
 import { verificationCodeRequest } from "@/api/auth/verificationCodeRequest";
 import { verificationCodeVerify } from "@/api/auth/verificationCodeVerify";
-import { editPasswordHash } from "@/api/userInfo/editPasswordHash";
+import { editPassword } from "@/api/userInfo/editPassword";
 import router from "@/router";
 
 const modal = ref();
@@ -122,20 +122,20 @@ async function handleVerify() {
 		return;
 	}
 
-	const editPasswordHashResponse = await editPasswordHash(
+	const editPasswordResponse = await editPassword(
 		userStore.id,
 		userStore.email,
 		password.value
 	);
-	await showToast(editPasswordHashResponse.data.message, 2000, "bottom");
+	await showToast(editPasswordResponse.data.message, 2000, "bottom");
 	if (
-		editPasswordHashResponse.status < 200 ||
-		editPasswordHashResponse.status > 299
+		editPasswordResponse.status < 200 ||
+		editPasswordResponse.status > 299
 	) {
 		return;
 	}
 
-	userStore.setConfig({ argPasswordHash: password.value });
+	userStore.setConfig({ argPassword: password.value });
 	await closeModal();
 	router.push({ name: "Auth" });
 }

@@ -2,7 +2,7 @@ import axios from "axios";
 
 export async function register(
 	email: string,
-	passwordHash: string,
+	password: string,
 	avatar: string
 ) {
 	try {
@@ -14,7 +14,7 @@ export async function register(
 		};
 		const data = {
 			email: email,
-			passwordHash: passwordHash,
+			password: password,
 			avatar: avatar,
 		};
 		const response = await axios.post(

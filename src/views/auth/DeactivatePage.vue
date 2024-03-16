@@ -40,8 +40,13 @@ import { deactivate } from "@/api/auth/deactivate";
 import { verificationCodeVerify } from "@/api/auth/verificationCodeVerify";
 import router from "@/router";
 import { showActionSheet } from "@/utils/useActionSheetTool";
+import { ConfigService } from "@/utils/ConfigService";
+import { Preferences } from "@capacitor/preferences";
+import { deleteSearchHistory } from "@/utils/useSearchHistory";
+import { deletePhoto } from "@/utils/usePhotoGallery";
 
 const userStore = useUserStore();
+const config = ConfigService.getConfig();
 const verificationCode = ref();
 
 async function handleDeactivate() {
@@ -50,7 +55,12 @@ async function handleDeactivate() {
 	if (response.status < 200 || response.status > 299) {
 		return;
 	}
+
 	await userStore.reset();
+	await Preferences.remove({ key: config.viteUserRefreshTokenPath });
+	await deletePhoto(config.viteUserAvatarPath);
+	await deleteSearchHistory();
+
 	router.push({ name: "Login" });
 }
 

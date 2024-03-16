@@ -1,9 +1,9 @@
 import axios from "axios";
 
-export async function editPasswordHash(
+export async function editPassword(
     id: number,
     email: string,
-    passwordHash: string,
+    password: string,
 ) {
     try {
         const config = {
@@ -14,10 +14,10 @@ export async function editPasswordHash(
         };
         const data = {
             email: email,
-            passwordHash: passwordHash,
+            password: password,
         };
         const response = await axios.patch(
-            `http://localhost:3000/user-info/users/${id}/password-hash`,
+            `http://localhost:3000/user-info/users/${id}/password`,
             data,
             config
         );

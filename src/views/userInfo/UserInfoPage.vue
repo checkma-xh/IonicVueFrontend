@@ -46,7 +46,7 @@ import { ConfigService } from "@/utils/ConfigService";
 import { useUserStore } from "@/store/userStore";
 import router from "@/router";
 import { eyeOutline, mailOutline, personCircleOutline } from "ionicons/icons";
-import { loadPhoto, savePhoto, takePhoto } from "@/utils/usePhotoGallery";
+import { deletePhoto, loadPhoto, savePhoto, takePhoto } from "@/utils/usePhotoGallery";
 import { showToast } from "@/utils/useToastTool";
 import { editAvatar } from "@/api/userInfo/editAvatar";
 import { reactive, ref } from "vue";
@@ -99,6 +99,7 @@ const editAvatarModule = reactive({
 		);
 		await showToast(response.data.message, 2000, "bottom");
 		if (response.status < 200 || response.status > 299) {
+			await deletePhoto(config.viteUserAvatarPath);
 			return;
 		}
 

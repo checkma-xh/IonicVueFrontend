@@ -32,7 +32,7 @@ export async function insertFakeData() {
   const user = new UserInfo();
   user.id = 1;
   user.email = "checkmaxh@gmail.com";
-  user.passwordHash = "Wlj+=9351524";
+  user.password = "Wlj+=9351524";
 
   // PriorityInfo
   const highPriority = new PriorityInfo();

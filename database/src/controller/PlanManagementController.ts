@@ -285,12 +285,6 @@ export class PlanManagementController {
 				endDate: new Date(endDate as string)
 			});
 		}
-		if (name) {
-			repository.andWhere("plans.name LIKE :name", { name: `%${name}%` });
-		}
-		if (remark) {
-			repository.andWhere("plans.remark LIKE :remark", { remark: `%${remark}%` });
-		}
 		if (groupName) {
 			repository
 				.innerJoinAndSelect("plans.group", "group")
@@ -305,6 +299,16 @@ export class PlanManagementController {
 			repository
 				.innerJoinAndSelect("plans.repeat", "repeat")
 				.andWhere("repeat.name = :repeatName", { repeatName: repeatName });
+		}
+
+		if (name && remark) {
+			repository.andWhere("plans.name LIKE :name OR plans.remark LIKE :remark", { name: `%${name}%`, remark: `%${remark}%` });
+		}
+		else if (name) {
+			repository.andWhere("plans.name LIKE :name", { name: `%${name}%` });
+		}
+		else if (remark) {
+			repository.andWhere("plans.remark LIKE :remark", { remark: `%${remark}%` });
 		}
 
 		const plans = await repository.getMany();

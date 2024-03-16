@@ -55,9 +55,13 @@ import {
 import { verificationCodeRequest } from "@/api/auth/verificationCodeRequest";
 import { showActionSheet } from "@/utils/useActionSheetTool";
 import { logout } from "@/api/auth/logout";
+import { ConfigService } from "@/utils/ConfigService";
+import { Preferences } from "@capacitor/preferences";
+import { deleteSearchHistory } from "@/utils/useSearchHistory";
+import { deletePhoto } from "@/utils/usePhotoGallery";
 
 const userStore = useUserStore();
-
+const config = ConfigService.getConfig();
 const registerModule = reactive({
 	handleClick: () => {
 		router.push({ name: "Register" });
@@ -105,6 +109,11 @@ const logoutModule = reactive({
 					}
 
 					await userStore.reset();
+					await Preferences.remove({ key: config.viteUserRefreshTokenPath });
+					await deletePhoto(config.viteUserAvatarPath);
+					await deleteSearchHistory();
+
+					router.push({name: "Login"});
 				},
 			},
 			{

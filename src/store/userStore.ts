@@ -7,7 +7,7 @@ export const useUserStore = defineStore(
 	() => {
 		const id           = ref(0);
 		const email        = ref("");
-		const passwordHash = ref("");
+		const password     = ref("");
 		const avatar       = ref(personCircleOutline);
 		const activated    = ref(false);
 		const accessToken  = ref("");
@@ -17,7 +17,7 @@ export const useUserStore = defineStore(
 		async function reset() {
 			id.value           = 0;
 			email.value        = "";
-			passwordHash.value = "";
+			password.value     = "";
 			avatar.value       = "";
 			activated.value    = false;
 			accessToken.value  = "";
@@ -29,7 +29,7 @@ export const useUserStore = defineStore(
 		async function setConfig(
 			{ argId = null,
 				argEmail        = null,
-				argPasswordHash = null,
+				argPassword     = null,
 				argAvatar       = null,
 				argActivated    = null,
 				argAccessToken  = null,
@@ -38,7 +38,7 @@ export const useUserStore = defineStore(
 			}: {
 				argId          ?: number | null,
 				argEmail       ?: string | null,
-				argPasswordHash?: string | null,
+				argPassword    ?: string | null,
 				argAvatar      ?: string | null,
 				argActivated   ?: boolean | null,
 				argAccessToken ?: string | null,
@@ -47,7 +47,7 @@ export const useUserStore = defineStore(
 			}) {
 			if (argId) { id.value = argId; }
 			if (argEmail) { email.value = argEmail; }
-			if (argPasswordHash) { passwordHash.value = argPasswordHash; }
+			if (argPassword) { password.value = argPassword; }
 			if (argAvatar) { avatar.value = argAvatar; }
 			if (argActivated) { activated.value = argActivated; }
 			if (argAccessToken) { accessToken.value = argAccessToken; }
@@ -59,7 +59,7 @@ export const useUserStore = defineStore(
 		return {
 			id,
 			email,
-			passwordHash,
+			password,
 			avatar,
 			activated,
 			accessToken,

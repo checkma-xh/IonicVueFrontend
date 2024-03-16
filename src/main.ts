@@ -1,4 +1,4 @@
-import { createApp } from "vue";
+import { createApp, ref } from "vue";
 import App from "./App.vue";
 import router from "./router";
 
@@ -39,3 +39,46 @@ const app = createApp(App)
 router.isReady().then(() => {
   app.mount("#app");
 });
+
+
+import { Preferences } from "@capacitor/preferences";
+import { ConfigService } from "./utils/ConfigService";
+import { refresh } from "./api/auth/refresh";
+import { useUserStore } from "./store/userStore";
+import { deleteTextFile } from "./utils/useTextFileTool";
+import { deleteSearchHistory } from "./utils/useSearchHistory";
+import { showToast } from "./utils/useToastTool";
+
+const config = ConfigService.getConfig();
+const userStore = useUserStore();
+
+let regularRefresh = setTimeout(async function func() {
+  const readResult   = await Preferences.get({ key: config.viteUserRefreshTokenPath });
+  const refreshToken = readResult.value ? readResult.value : "";
+  const response     = await refresh(refreshToken);
+
+  if (response.status < 200 || response.status > 299) {
+    await userStore.reset();
+    await Preferences.remove({ key: config.viteUserRefreshTokenPath });
+    await deleteTextFile(config.viteUserAvatarPath);
+    await deleteSearchHistory();
+    await showToast("please login again", 2000, "bottom");
+    router.push({ name: "Login" });
+    regularRefresh = setTimeout(func, 3600000);
+    return;
+  }
+
+  await userStore.setConfig({
+    argId          : response.data.id as number,
+    argEmail       : response.data.email as string,
+    argPassword    : response.data.password as string,
+    argAvatar      : response.data.argAvatar as string,
+    argActivated   : response.data.activated as boolean,
+    argAccessToken : response.data.accessToken as string,
+    argRefreshToken: refreshToken,
+    argIsLogin     : true,
+  });
+
+  const refreshTime = response.data.accessTokenExpiration - 60;
+  regularRefresh = setTimeout(func, refreshTime * 1000);
+}, 100);

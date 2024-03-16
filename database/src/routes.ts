@@ -19,9 +19,9 @@ export const Routes = [
   },
   {
     method: "patch",
-    route: "/user-info/users/:id/password-hash",
+    route: "/user-info/users/:id/password",
     controller: UserInfoController,
-    action: "editPasswordHash",
+    action: "editPassword",
   },
   {
     method: "patch",

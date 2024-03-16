@@ -14,7 +14,7 @@ export class UserInfo {
   email: string;
 
   @Column({ length: 256 })
-  passwordHash: string;
+  password: string;
 
   @Column({ type: "text", default: config.defaultAvatar })
   avatar: string;

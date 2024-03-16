@@ -26,11 +26,11 @@ export class UserInfoController {
 		}
 
 		return response.status(200).json({
-			id          : user.id,
-			email       : user.email,
-			passwordHash: user.passwordHash,
-			avatar      : user.avatar,
-			activated   : user.activated,    message: "get user information successful"
+			id       : user.id,
+			email    : user.email,
+			password : user.password,
+			avatar   : user.avatar,
+			activated: user.activated, message: "get user information successful"
 		});
 	}
 
@@ -57,12 +57,12 @@ export class UserInfoController {
 	}
 
 
-	async editPasswordHash(
+	async editPassword(
 		request: Request,
 		response: Response,
 		next: NextFunction,
 	) {
-		const { email, passwordHash } = request.body;
+		const { email, password } = request.body;
 		const verificationInfo = this.verificationInfoMap.get(email);
 		if (!verificationInfo?.verificationResult) {
 			return response.status(400).json({ message: "verification failed" });
@@ -77,10 +77,10 @@ export class UserInfoController {
 			return response.status(404).json({ message: "user not found" });
 		}
 
-		user.passwordHash = passwordHash;
+		user.password = password;
 		await this.UserInfoRepository.save(user);
 
-		return response.status(200).json({ message: "edit password hash successful" });
+		return response.status(200).json({ message: "edit password successful" });
 	}
 
 	async editAvatar(
