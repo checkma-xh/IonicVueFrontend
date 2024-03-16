@@ -1,5 +1,7 @@
+import { ConfigService } from "@/utils/ConfigService";
 import axios from "axios";
 
+const envConfig = ConfigService.getConfig();
 export async function editPassword(
     id: number,
     email: string,
@@ -17,7 +19,7 @@ export async function editPassword(
             password: password,
         };
         const response = await axios.patch(
-            `http://localhost:3000/user-info/users/${id}/password`,
+            `http://${envConfig.viteApplicationDomain}:${envConfig.viteApplicationPort}/user-info/users/${id}/password`,
             data,
             config
         );

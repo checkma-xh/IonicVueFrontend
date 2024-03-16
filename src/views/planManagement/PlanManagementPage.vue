@@ -49,8 +49,8 @@ import { addCircle, calendarOutline, searchOutline } from "ionicons/icons";
 import router from "@/router";
 import { useUserStore } from "@/store/userStore";
 
-const userStore = useUserStore();
 
+const userStore = useUserStore();
 const searchModule = reactive({
 	handleClick: async () => {
       const modal = await modalController.create({
@@ -59,10 +59,10 @@ const searchModule = reactive({
       modal.present();
     },  
     icon     : searchOutline,
-    cardColor: "light",
-    iconColor: "dark",
+    cardColor: "primary",
+    iconColor: "light",
     title    : "search",
-    subtitle : "",
+    subtitle : "search your plans",
     content  : "",
 })
 
@@ -71,10 +71,10 @@ const planModule = reactive({
       await router.push({ name: "PlanList", params: { id: userStore.id }, query: { completed: 1} });
     },
     icon     : calendarOutline,
-    cardColor: "light",
-    iconColor: "danger",
+    cardColor: "danger",
+    iconColor: "light",
     title    : "plans",
-    subtitle : "",
+    subtitle : "your plans",
     content  : "",
 })
 
@@ -83,10 +83,10 @@ const createModule = reactive({
       await router.push({ name: "CreatePlan", params: { id: userStore.id } });
     },
     icon     : addCircle,
-    cardColor: "light",
-    iconColor: "primary",
+    cardColor: "success",
+    iconColor: "light",
     title    : "create",
-    subtitle : "",
+    subtitle : "create plan",
     content  : "",
 })
 
@@ -99,19 +99,20 @@ const moduleMessages = ref([
 
 <style scoped>
 #container {
+	display: flex;
+	flex-wrap: wrap;
+	text-align: center;
+	justify-content: center;
 	position: absolute;
 	left: 50%;
 	transform: translateX(-50%);
 	top: auto;
 	width: 100%;
-	text-align: center;
 	padding-bottom: 5%;
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
 }
 
 .detail-card {
-	width: 50%;
+	flex: 0 0 calc(40%);
+	box-sizing: border-box;
 }
 </style>

@@ -1,5 +1,7 @@
+import { ConfigService } from "@/utils/ConfigService";
 import axios from "axios";
 
+const envConfig = ConfigService.getConfig();
 export async function logout(accessToken: string) {
   try {
     const config = {
@@ -10,7 +12,7 @@ export async function logout(accessToken: string) {
     };
     const data = {};
     const response = await axios.post(
-      "http://localhost:3000/auth/logout",
+      `http://${envConfig.viteApplicationDomain}:${envConfig.viteApplicationPort}/auth/logout`,
       data,
       config
     );

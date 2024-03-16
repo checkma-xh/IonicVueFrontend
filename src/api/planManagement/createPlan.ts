@@ -1,5 +1,7 @@
+import { ConfigService } from "@/utils/ConfigService";
 import axios from "axios";
 
+const envConfig = ConfigService.getConfig();
 export async function createPlan(
     accessToken: string,
     id: number,
@@ -28,7 +30,7 @@ export async function createPlan(
             repeatName: repeatName,
         };
         const response = await axios.post(
-            `http://localhost:3000/plan-management/users/${id}/plans`,
+            `http://${envConfig.viteApplicationDomain}:${envConfig.viteApplicationPort}/plan-management/users/${id}/plans`,
             data,
             config
         );

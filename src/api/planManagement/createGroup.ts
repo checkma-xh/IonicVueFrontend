@@ -1,5 +1,7 @@
+import { ConfigService } from "@/utils/ConfigService";
 import axios from "axios";
 
+const envConfig = ConfigService.getConfig();
 export async function createGroup(
     accessToken: string,
     id: number,
@@ -18,7 +20,7 @@ export async function createGroup(
             remark: remark,
         };
         const response = await axios.post(
-            `http://localhost:3000/plan-management/users/${id}/groups`,
+            `http://${envConfig.viteApplicationDomain}:${envConfig.viteApplicationPort}/plan-management/users/${id}/groups`,
             data,
             config
         );

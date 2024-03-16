@@ -1,5 +1,7 @@
+import { ConfigService } from "@/utils/ConfigService";
 import axios from "axios";
 
+const envConfig = ConfigService.getConfig();
 export async function refresh(refreshToken: string) {
   try {
     const config = {
@@ -10,7 +12,7 @@ export async function refresh(refreshToken: string) {
     };
     const data = {};
     const response = await axios.post(
-      "http://localhost:3000/auth/refresh",
+      `http://${envConfig.viteApplicationDomain}:${envConfig.viteApplicationPort}/auth/refresh`,
       data,
       config
     );

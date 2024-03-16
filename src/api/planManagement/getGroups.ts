@@ -1,5 +1,7 @@
+import { ConfigService } from "@/utils/ConfigService";
 import axios from "axios";
 
+const envConfig = ConfigService.getConfig();
 export async function getGroups(
   accessToken: string,
   id         : number,
@@ -16,7 +18,7 @@ export async function getGroups(
       timeout: 2500,
     };
     const response = await axios.get(
-      `http://localhost:3000/plan-management/users/${id}/groups`,
+      `http://${envConfig.viteApplicationDomain}:${envConfig.viteApplicationPort}/plan-management/users/${id}/groups`,
       config
     );
     return response;

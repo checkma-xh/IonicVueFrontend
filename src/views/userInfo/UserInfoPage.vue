@@ -122,19 +122,20 @@ const moduleMessages = ref([
 
 <style scoped>
 #container {
+	display: flex;
+	flex-wrap: wrap;
+	text-align: center;
+	justify-content: center;
 	position: absolute;
 	left: 50%;
 	transform: translateX(-50%);
 	top: auto;
 	width: 100%;
-	text-align: center;
 	padding-bottom: 5%;
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
 }
 
 .detail-card {
-	width: 50%;
+	flex: 0 0 calc(40%);
+	box-sizing: border-box;
 }
 </style>

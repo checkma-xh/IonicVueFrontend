@@ -1,5 +1,7 @@
+import { ConfigService } from "@/utils/ConfigService";
 import axios from "axios";
 
+const envConfig = ConfigService.getConfig();
 export async function editAvatar(
     accessToken: string,
     id: number,
@@ -16,7 +18,7 @@ export async function editAvatar(
             avatar: avatar,
         };
         const response = await axios.patch(
-            `http://localhost:3000/user-info/users/${id}/avatar`,
+            `http://${envConfig.viteApplicationDomain}:${envConfig.viteApplicationPort}/user-info/users/${id}/avatar`,
             data,
             config
         );

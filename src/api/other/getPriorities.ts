@@ -1,5 +1,7 @@
+import { ConfigService } from "@/utils/ConfigService";
 import axios from "axios";
 
+const envConfig = ConfigService.getConfig();
 export async function getPriorities(accessToken: string) {
   try {
     const config = {
@@ -9,7 +11,7 @@ export async function getPriorities(accessToken: string) {
       timeout: 2500,
     };
     const response = await axios.get(
-      `http://localhost:3000/other/priorities`,
+      `http://${envConfig.viteApplicationDomain}:${envConfig.viteApplicationPort}/other/priorities`,
       config,
     );
     return response;

@@ -1,5 +1,7 @@
+import { ConfigService } from "@/utils/ConfigService";
 import axios from "axios";
 
+const envConfig = ConfigService.getConfig();
 export async function getPlan(
     accessToken: string,
     userId: number,
@@ -13,7 +15,7 @@ export async function getPlan(
             timeout: 2500,
         };
         const response = await axios.get(
-            `http://localhost:3000/plan-management/users/${userId}/plans/${planId}`,
+            `http://${envConfig.viteApplicationDomain}:${envConfig.viteApplicationPort}/plan-management/users/${userId}/plans/${planId}`,
             config
         );
         return response;

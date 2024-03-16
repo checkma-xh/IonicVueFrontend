@@ -1,5 +1,7 @@
+import { ConfigService } from "@/utils/ConfigService";
 import axios from "axios";
 
+const envConfig = ConfigService.getConfig();
 export async function verificationCodeVerify(email: string, verificationCode: string) {
   try {
     const config = {
@@ -13,7 +15,7 @@ export async function verificationCodeVerify(email: string, verificationCode: st
       verificationCode: verificationCode,
     };
     const response = await axios.post(
-      "http://localhost:3000/auth/verification-code/verify",
+      `http://${envConfig.viteApplicationDomain}:${envConfig.viteApplicationPort}/auth/verification-code/verify`,
       data,
       config
     );

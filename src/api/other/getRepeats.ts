@@ -1,5 +1,6 @@
+import { ConfigService } from "@/utils/ConfigService";
 import axios from "axios";
-
+const envConfig = ConfigService.getConfig();
 export async function getRepeats(accessToken: string) {
   try {
     const config = {
@@ -9,7 +10,7 @@ export async function getRepeats(accessToken: string) {
       timeout: 2500,
     };
     const response = await axios.get(
-      `http://localhost:3000/other/repeats`,
+      `http://${envConfig.viteApplicationDomain}:${envConfig.viteApplicationPort}/other/repeats`,
       config,
     );
     return response;

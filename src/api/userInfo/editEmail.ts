@@ -1,5 +1,7 @@
+import { ConfigService } from "@/utils/ConfigService";
 import axios from "axios";
 
+const envConfig = ConfigService.getConfig();
 export async function editEmail(
     id: number,
     newEmail: string,
@@ -17,7 +19,7 @@ export async function editEmail(
             oldEmail: oldEmail,
         };
         const response = await axios.patch(
-            `http://localhost:3000/user-info/users/${id}/email`,
+            `http://${envConfig.viteApplicationDomain}:${envConfig.viteApplicationPort}/user-info/users/${id}/email`,
             data,
             config
         );

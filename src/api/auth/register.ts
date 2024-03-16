@@ -1,5 +1,7 @@
+import { ConfigService } from "@/utils/ConfigService";
 import axios from "axios";
 
+const envConfig = ConfigService.getConfig();
 export async function register(
 	email: string,
 	password: string,
@@ -18,7 +20,7 @@ export async function register(
 			avatar: avatar,
 		};
 		const response = await axios.post(
-			"http://localhost:3000/auth/register",
+			`http://${envConfig.viteApplicationDomain}:${envConfig.viteApplicationPort}/auth/register`,
 			data,
 			config
 		);

@@ -1,5 +1,7 @@
+import { ConfigService } from "@/utils/ConfigService";
 import axios from "axios";
 
+const envConfig = ConfigService.getConfig();
 export async function login(
   email: string,
   password: string | null = null,
@@ -16,7 +18,7 @@ export async function login(
       password: password,
     };
     const response = await axios.post(
-      "http://localhost:3000/auth/login",
+      `http://${envConfig.viteApplicationDomain}:${envConfig.viteApplicationPort}/auth/login`,
       data,
       config
     );

@@ -1,5 +1,7 @@
+import { ConfigService } from "@/utils/ConfigService";
 import axios from "axios";
 
+const envConfig = ConfigService.getConfig();
 export async function getUserInfo(accessToken: string, id: number) {
     try {
         const config = {
@@ -9,7 +11,7 @@ export async function getUserInfo(accessToken: string, id: number) {
             timeout: 2500,
         };
         const response = await axios.get(
-            `http://localhost:3000/user-info/users/${id}`,
+            `http://${envConfig.viteApplicationDomain}:${envConfig.viteApplicationPort}/user-info/users/${id}`,
             config,
         );
         return response;
